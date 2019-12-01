@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name": "mixcord",
+      "cwd": ".",
+      "script": "/usr/bin/java",
+      "args": [
+        "-jar",
+        "/home/lireoy/mixcord/Mixcord.jar"
+      ],
+      "node_args": [],
+      "exec_interpreter": "",
+      "exec_mode": "fork"
+    }
+  ]
+}
+
