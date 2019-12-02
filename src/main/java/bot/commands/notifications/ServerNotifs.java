@@ -36,12 +36,12 @@ public class ServerNotifs extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         String serverId = commandEvent.getMessage().getGuild().getId();
-        Cursor cursor = getDatabase().filter(serverId);
+        ArrayList list = getDatabase().filter(serverId);
 
         StringBuilder description = new StringBuilder();
         String prevChannel = "";
-        if (!cursor.hasNext()) {
-            for (Object doc : cursor) {
+        if (!list.isEmpty()) {
+            for (Object doc : list) {
                 JSONObject entry = new JSONObject(doc.toString());
                 String streamer = entry.getString("streamerName");
                 String channel = entry.getString("channelId");
@@ -69,10 +69,10 @@ public class ServerNotifs extends Command {
                 + commandEvent.getAuthor().getDiscriminator();
         String footerImg = commandEvent.getAuthor().getAvatarUrl();
 
-        if (cursor.bufferedSize() > 1) {
-            String message = "There's a total of " + cursor.bufferedSize() + " notifications in this server.";
+        if (list.size() > 1) {
+            String message = "There's a total of " + list.size() + " notifications in this server.";
             commandEvent.reply(message);
-        } else if (cursor.bufferedSize() == 1) {
+        } else if (list.size() == 1) {
             commandEvent.reply("There's only 1 notification in this server.");
         }
         commandEvent.reply(new EmbedBuilder()

@@ -25,7 +25,7 @@ public class DatabaseDriver {
         return getDatabase().map(ReqlExpr::toJson).run(getConnection());
     }
 
-    public Cursor filter(String serverId) {
+    public ArrayList filter(String serverId) {
         return getDatabase().filter(getRethink().hashMap("serverId", serverId))
                 .orderBy("channelId").map(ReqlExpr::toJson).run(getConnection());
     }

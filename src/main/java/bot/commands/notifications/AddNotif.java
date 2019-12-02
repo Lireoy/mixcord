@@ -41,9 +41,9 @@ public class AddNotif extends Command {
         } else if (query.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
-            Cursor cursor = Mixcord.getDatabase().filter(serverId);
+            ArrayList list = Mixcord.getDatabase().filter(serverId);
 
-            if (cursor.bufferedSize() >= 10) {
+            if (list.size() >= 10) {
                 commandEvent.reply("This server has reached the limit for the number of notifications.");
                 return;
             }
