@@ -79,7 +79,7 @@ public class NotifColorEdit extends Command {
             } else {
                 commandEvent.reply("There are no notifications in this channel");
             }
-
+            cursor.close();
         } else {
             commandEvent.reply("Please provide a valid hex color.");
         }

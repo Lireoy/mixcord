@@ -4,11 +4,13 @@ import bot.Mixcord;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -39,9 +41,9 @@ public class AddNotif extends Command {
         } else if (query.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
-            ArrayList list = Mixcord.getDatabase().filter(serverId);
+            Cursor cursor = Mixcord.getDatabase().filter(serverId);
 
-            if (list.size() >= 10) {
+            if (cursor.bufferedSize() >= 10) {
                 commandEvent.reply("This server has reached the limit for the number of notifications.");
                 return;
             }

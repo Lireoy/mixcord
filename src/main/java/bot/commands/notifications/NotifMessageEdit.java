@@ -80,7 +80,7 @@ public class NotifMessageEdit extends Command {
 
                 commandEvent.reply(response);
             }
-
+            cursor.close();
         } else {
             commandEvent.reply("There are no notifications in this channel");
         }

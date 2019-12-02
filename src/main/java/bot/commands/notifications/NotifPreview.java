@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 @Slf4j
 public class NotifPreview extends Command {
 
@@ -59,10 +61,9 @@ public class NotifPreview extends Command {
                             .setTitle()
                             .setDescription()
                             .build());
-
-            queryJson = null;
         } else {
             commandEvent.reply("There is no such notification in this channel.");
         }
+        cursor.close();
     }
 }

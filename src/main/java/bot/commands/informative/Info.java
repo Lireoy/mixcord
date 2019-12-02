@@ -9,9 +9,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.time.Instant;
 
 @Slf4j

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -132,6 +133,7 @@ public class NotifierService implements Runnable {
                 log.info("Looped {} notifications in {}s", metrics.getNotifsProcessed(), metrics.getSecs());
                 metrics.initReset();
             }
+            cursor.close();
         }
     }
 

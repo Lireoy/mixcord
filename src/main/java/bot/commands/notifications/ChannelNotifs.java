@@ -75,6 +75,7 @@ public class ChannelNotifs extends Command {
                 .setFooter(footer, footerImg)
                 .setTimestamp(Instant.now())
                 .build());
+        cursor.close();
     }
 
     private DatabaseDriver getDatabase() {

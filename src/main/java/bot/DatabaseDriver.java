@@ -25,7 +25,7 @@ public class DatabaseDriver {
         return getDatabase().map(ReqlExpr::toJson).run(getConnection());
     }
 
-    public ArrayList filter(String serverId) {
+    public Cursor filter(String serverId) {
         return getDatabase().filter(getRethink().hashMap("serverId", serverId))
                 .orderBy("channelId").map(ReqlExpr::toJson).run(getConnection());
     }
@@ -132,7 +132,7 @@ public class DatabaseDriver {
             JSONObject document = new JSONObject(cursor.next().toString());
             return document.getString("id");
         }
-
+        cursor.close();
         return "-1";
     }
 
