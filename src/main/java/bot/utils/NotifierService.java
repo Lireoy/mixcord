@@ -18,7 +18,6 @@ public class NotifierService implements Runnable {
     private String metricsGuildId;
     private String metricsChannelId;
     private DatabaseDriver databaseDriver;
-    private MetricsUtil metrics;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     public NotifierService(DatabaseDriver driver, String metricsGuildId, String metricsChannelId) {
@@ -36,7 +35,7 @@ public class NotifierService implements Runnable {
     public void run() {
         log.info("Notifier service was started.");
         running.set(true);
-        metrics = new MetricsUtil();
+        MetricsUtil metrics = new MetricsUtil();
 
         while (running.get()) {
             if (metrics.getCycle() == 0) {
@@ -62,7 +61,8 @@ public class NotifierService implements Runnable {
 
                 Guild guild = Mixcord.getJda().getGuildById(dbServerId);
                 TextChannel textChannel = Mixcord.getJda().getTextChannelById(dbChannelId);
-                if (!queryIsOnline && dbStreamingStatus) {
+
+                if (queryIsOnline && !dbStreamingStatus) {
                     if (Mixcord.getJda().getGuilds().contains(guild)) {
                         if (Objects.requireNonNull(Mixcord.getJda().getGuildById(dbServerId))
                                 .getTextChannels().contains(textChannel)) {
@@ -121,8 +121,8 @@ public class NotifierService implements Runnable {
                     }
                 }
                 metrics.incrementNotifsProcessed();
-            }
 
+            }
             metrics.incementCycle();
 
             if (metrics.getCycle() == 20) {
@@ -143,7 +143,6 @@ public class NotifierService implements Runnable {
 
     public void stop() {
         running.set(false);
-        metrics = null;
         log.info("Stopping notifier service...");
     }
 
