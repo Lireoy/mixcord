@@ -9,7 +9,6 @@ import bot.commands.notifierservice.NotifServiceStatus;
 import bot.commands.notifierservice.StartNotifService;
 import bot.commands.notifierservice.StopNotifService;
 import bot.utils.NotifServiceRework;
-import bot.utils.NotifierService;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import io.github.cdimascio.dotenv.Dotenv;
