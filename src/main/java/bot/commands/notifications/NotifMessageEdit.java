@@ -59,31 +59,46 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().filter(serverId, channelId, streamerName);
+        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (cursor.hasNext()) {
             JSONObject dbNotification = new JSONObject(cursor.next().toString());
 
             String dbDocumentId = dbNotification.getString("id");
             String dbStreamerName = dbNotification.getString("streamerName");
             String dbNotifMessage = dbNotification.getString("message");
+            boolean dbEmbed = dbNotification.getBoolean("embed");
 
             if (dbNotifMessage.equals(newMessage)) {
                 commandEvent.reply("Your new message is same as the old one!");
-            } else {
+                return;
+            }
+
+            String MIXER_PATTERN = "https://mixer.com/" + dbStreamerName;
+
+            if (dbEmbed) {
                 Mixcord.getDatabase().updateMessage(dbDocumentId, newMessage);
 
-                String response = "";
+                StringBuilder response = new StringBuilder();
 
-                response += "Notification message was changed for the following notification: `" + dbStreamerName + "`";
-                response += "\nOld message:\n```" + dbNotifMessage + "```\n\n";
-                response += "New message:\n```" + newMessage + "```";
+                response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
+                response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
+                response.append("New message:\n```").append(newMessage).append("```");
 
-                commandEvent.reply(response);
+                commandEvent.reply(response.toString());
+                //TODO: Fix this shit. Papulex put another streamers link into a notification for an other streamer.
+            } else {
+                if (dbNotifMessage.contains(MIXER_PATTERN)) {
+                    StringBuilder response = new StringBuilder();
+                    response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
+                    response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
+                    response.append("New message:\n```").append(newMessage).append("```");
+                } else {
+                    commandEvent.reply("Your notification message does not contain a link to the steamer. Please include one, and try again.");
+                }
             }
-            cursor.close();
         } else {
             commandEvent.reply("There are no notifications in this channel");
         }
-
+        cursor.close();
     }
 }

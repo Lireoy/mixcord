@@ -20,23 +20,25 @@ import java.io.IOException;
 @Slf4j
 public class MixerQuery {
 
-    private static Dotenv dotenv = Mixcord.getDotenv();
-    private static String MIXER_API_CLIENT_ID = dotenv.get("MIXER_API_CLIENT_ID");
+    private static final Dotenv dotenv = Mixcord.getDotenv();
+    private static final String MIXER_API_CLIENT_ID = dotenv.get("MIXER_API_CLIENT_ID");
     //private static String MIXER_API_CLIENT_SECRET = dotenv.get("MIXER_API_CLIENT_SECRET");
 
-    // Requires legit string
-    // Creates a custom Http client
-    // Custom Timout values to avoid long stuck commands
-    // setCookieSpec.STANDARD to avoid "Invalid 'expires' attribute" and "Invalid cookie header"
-    // Returns response JSON when successful
-    // Returns null when failed
+    /**
+     * Queries Mixer's Api with the specified parameter for information about the channel.
+     * Uses the 'channels' api endpoint.
+     *
+     * @param queryParam the parameter which the query should be executed with
+     * @return the JSON response, or null if failed
+     */
     public static JSONObject queryChannel(String queryParam) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         String uri = Constants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
 
+        // Custom Timout values to avoid long stuck commands
         RequestConfig requestConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.STANDARD)
+                .setCookieSpec(CookieSpecs.STANDARD) // avoids "Invalid 'expires' attribute" and "Invalid cookie header"
                 .setConnectionRequestTimeout(10000)
                 .setConnectTimeout(10000)
                 .setSocketTimeout(10000)

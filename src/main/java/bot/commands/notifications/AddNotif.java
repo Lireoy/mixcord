@@ -4,13 +4,11 @@ import bot.Mixcord;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -41,7 +39,7 @@ public class AddNotif extends Command {
         } else if (query.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
-            ArrayList list = Mixcord.getDatabase().filter(serverId);
+            ArrayList list = Mixcord.getDatabase().selectServerNotifs(serverId);
 
             if (list.size() >= 10) {
                 commandEvent.reply("This server has reached the limit for the number of notifications.");
@@ -65,21 +63,23 @@ public class AddNotif extends Command {
             String streamerId = String.valueOf(channel.getInt("userId"));
             String streamerName = channel.getString("token");
 
-            // Database handling
-            String responseCode = Mixcord.getDatabase().insert(serverId, channelId, streamerName, streamerId);
+            if (streamerName.isEmpty() || streamerId.isEmpty()) {
+                commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@331756964801544202>");
+                log.info("Streamer name or ID was empty.");
+                return;
+            }
 
-            // Response to user
-            if (responseCode.equals("1")) {
+            if (Mixcord.getDatabase().addStreamer(streamerName, streamerId)) {
+                log.info("New streamer detected, added to database...");
+            }
+
+            boolean responseCode = Mixcord.getDatabase().addNotif(serverId, channelId, streamerName, streamerId);
+
+            if (responseCode) {
                 commandEvent.reply("From now, you will receive notifications for " + streamerName + " in this channel.");
                 commandEvent.reactSuccess();
-            }
-            if (responseCode.equals("0")) {
+            } else {
                 commandEvent.reply("You have already set up a notification for this streamer.");
-                commandEvent.reactSuccess();
-            }
-            if (responseCode.equals("-1")) {
-                commandEvent.reply("Please provide a streamer!");
-                commandEvent.reactError();
             }
         }
     }

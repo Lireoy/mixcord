@@ -54,7 +54,7 @@ public class NotifColorEdit extends Command {
         HexUtil hexValidator = new HexUtil();
 
         if (hexValidator.validateHex(newColor.trim())) {
-            Cursor cursor = Mixcord.getDatabase().filter(serverId, channelId, streamerName);
+            Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
             if (cursor.hasNext()) {
                 JSONObject dbNotification = new JSONObject(cursor.next().toString());
 

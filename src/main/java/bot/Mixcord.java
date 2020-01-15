@@ -8,6 +8,7 @@ import bot.commands.notifications.*;
 import bot.commands.notifierservice.NotifServiceStatus;
 import bot.commands.notifierservice.StartNotifService;
 import bot.commands.notifierservice.StopNotifService;
+import bot.utils.NotifServiceRework;
 import bot.utils.NotifierService;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -38,7 +39,7 @@ public class Mixcord {
     private static CommandClient client;
     private static JDA jda;
     private static DatabaseDriver database;
-    private static NotifierService notifierService;
+    private static NotifServiceRework notifierService;
 
     public static void main(String[] args) {
 
@@ -62,25 +63,14 @@ public class Mixcord {
 
         String databaseIp = Objects.requireNonNull(dotenv.get("DB_IP"));
         int databasePort = Integer.parseInt(Objects.requireNonNull(dotenv.get("DB_PORT")));
-        String databaseName = Objects.requireNonNull(dotenv.get("DB_NAME"));
-        String databaseTable = Objects.requireNonNull(dotenv.get("DB_TABLE"));
         String databaseUser = Objects.requireNonNull(dotenv.get("DB_USER"));
         String databasePassword = Objects.requireNonNull(dotenv.get("DB_PASS"));
-        String metricsGuildId = dotenv.get("METRICS_GUILD_ID");
-        String metricsChannelId = dotenv.get("METRICS_CHANNEL_ID");
         //String mixerApiClientId = dotenv.get("MIXER_API_CLIENT_ID");
 
-        database = new DatabaseDriver(databaseIp, databasePort,
-                databaseName, databaseTable, databaseUser, databasePassword);
-
-        if (Objects.requireNonNull(metricsGuildId).length() < 18 ||
-                Objects.requireNonNull(metricsChannelId).length() < 18) {
-            notifierService = new NotifierService(database, Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-            log.info("Notifier service was created with fallback for metrics.");
-        } else {
-            notifierService = new NotifierService(database);
-            log.info("Custom notifier service was created for metrics.");
-        }
+        database = new DatabaseDriver(databaseIp, databasePort, databaseUser, databasePassword);
+        notifierService = new NotifServiceRework(database);
+        log.info("Notifier service was started.");
+        log.info("Posting metrics to G:{} - C:{}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
 
         String DISCORD_BOT_TOKEN = dotenv.get("DISCORD_BOT_TOKEN");
         int NUMBER_OF_SHARDS = Integer.parseInt(Objects.requireNonNull(dotenv.get("NUMBER_OF_SHARDS")));
@@ -109,6 +99,7 @@ public class Mixcord {
                         new NotifPreview(),
                         new NotifMessageEdit(),
                         new NotifColorEdit(),
+                        new NotifEmbedConfig(),
 
                         // Notifier Service
                         new StartNotifService(),
@@ -175,7 +166,7 @@ public class Mixcord {
         return database;
     }
 
-    public static NotifierService getNotifierService() {
+    public static NotifServiceRework getNotifierService() {
         return notifierService;
     }
 }

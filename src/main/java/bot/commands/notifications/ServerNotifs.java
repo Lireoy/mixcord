@@ -5,7 +5,6 @@ import bot.DatabaseDriver;
 import bot.Mixcord;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -36,7 +35,7 @@ public class ServerNotifs extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         String serverId = commandEvent.getMessage().getGuild().getId();
-        ArrayList list = getDatabase().filter(serverId);
+        ArrayList list = getDatabase().selectServerNotifs(serverId);
 
         StringBuilder description = new StringBuilder();
         String prevChannel = "";

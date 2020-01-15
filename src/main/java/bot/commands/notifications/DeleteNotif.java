@@ -4,10 +4,13 @@ import bot.Mixcord;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 @Slf4j
 public class DeleteNotif extends Command {
@@ -38,6 +41,11 @@ public class DeleteNotif extends Command {
         if (username.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
+            //TODO: CHECK IN DATABASE, BEFORE ANY ONLINE QUERY - in theory done, but idk why I wrote this todo
+            if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
+                return;
+            }
+
             // Query Mixer to get case-correct streamer name, ID etc.
             JSONObject channel = MixerQuery.queryChannel(username);
             if (channel == JSONObject.NULL) {
@@ -53,16 +61,21 @@ public class DeleteNotif extends Command {
                 return;
             }
             String streamerId = String.valueOf(channel.getInt("userId"));
+            String streamerName = channel.getString("token");
 
-            // Database handling
-            String responseCode = Mixcord.getDatabase().delete(serverId, channelId, streamerId);
+            boolean response = Mixcord.getDatabase().deleteNotif(serverId, channelId, streamerId);
+
+            Cursor cursor = Mixcord.getDatabase().selectStreamerNotifs(streamerId);
+            if (!cursor.hasNext()) {
+                Mixcord.getDatabase().deleteStreamer(streamerName, streamerId);
+                log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
+            }
 
             // Response to user
-            if (responseCode.equals("1")) {
+            if (response) {
                 commandEvent.reply("Notification was deleted.");
                 commandEvent.reactSuccess();
-            }
-            if (responseCode.equals("-1")) {
+            } else {
                 commandEvent.reply("Something went wrong. Could not delete the notification.");
                 commandEvent.reactError();
             }

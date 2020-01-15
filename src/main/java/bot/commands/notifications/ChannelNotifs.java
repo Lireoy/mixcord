@@ -36,7 +36,7 @@ public class ChannelNotifs extends Command {
 
         String serverId = commandEvent.getMessage().getGuild().getId();
         String channelId = commandEvent.getMessage().getChannel().getId();
-        Cursor cursor = getDatabase().filter(serverId, channelId);
+        Cursor cursor = getDatabase().selectChannelNotifs(serverId, channelId);
 
         StringBuilder description = new StringBuilder();
         int notifCount = 0;

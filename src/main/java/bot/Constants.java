@@ -5,8 +5,8 @@ public class Constants {
     // DEV RELATED
     public static final String OWNER_ID = "331756964801544202"; // Lireoy
     public static final String CO_OWNER_ID = "236251438685093889"; // Akira
-    public static final String METRICS_GUILD = "348110542667251712"; // Jóska Húsbóttya
-    public static final String METRICS_CHANNEL = "640283673769410560"; // Dev -> Metrics
+    public static final String METRICS_GUILD = "637724317672669184"; // Mixord
+    public static final String METRICS_CHANNEL = "643117794925215765"; // Staff -> Metrics
 
     // BOT SETTINGS
     public static final String PREFIX = ".";

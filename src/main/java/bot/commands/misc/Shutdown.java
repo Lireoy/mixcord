@@ -17,6 +17,11 @@ public class Shutdown extends Command {
         this.ownerCommand = true;
     }
 
+    /**
+     * Shuts down the application with a specified reason.
+     *
+     * @param commandEvent the event which triggered this command
+     */
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();

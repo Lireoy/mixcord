@@ -21,6 +21,16 @@ public class Info extends Command {
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
     }
 
+    /**
+     * Sends the following information about the bot to the author in a formatted embed.
+     * <p>
+     * Current uptime, guild count, member count,
+     * current Java version, number of shards, used and free memory,
+     * Mixcord website link, Discord server invite link,
+     * Discord user names of developers.
+     *
+     * @param commandEvent which triggered this command
+     */
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();

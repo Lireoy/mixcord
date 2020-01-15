@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,7 +42,7 @@ public class NotifierService implements Runnable {
                 metrics.startTimer();
             }
 
-            Cursor cursor = getDatabaseDriver().selectAll();
+            Cursor cursor = getDatabaseDriver().selectAllNotifs();
             //log.info("Looping {} notifications...", cursor.bufferedItems().size());
             for (Object doc : cursor) {
                 JSONObject dbNotification = new JSONObject(doc.toString());
@@ -54,6 +53,7 @@ public class NotifierService implements Runnable {
                 boolean dbStreamingStatus = dbNotification.getBoolean("isStreaming");
                 String dbServerId = dbNotification.getString("serverId");
                 String dbChannelId = dbNotification.getString("channelId");
+                boolean dbEmbed = dbNotification.getBoolean("embed");
 
                 JSONObject queryJson = MixerQuery.queryChannel(dbStreamerName);
                 assert queryJson != null;
@@ -76,19 +76,24 @@ public class NotifierService implements Runnable {
                             String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
 
                             log.info("Queueing notification...");
-                            Objects.requireNonNull(textChannel).sendMessage(message).queue();
-                            textChannel.sendMessage(
-                                    new EmbedSender(queryJson, dbNotification)
-                                            .setAuthor()
-                                            .setTitle()
-                                            .setDescription()
-                                            .setImage(embLiveThumbnail)
-                                            .build()).queue();
-                            log.info("Sent notification to G:{} C:{}", dbServerId, dbChannelId);
-                            metrics.incrementNotifsSent();
+
+                            if (dbEmbed) {
+                                Objects.requireNonNull(textChannel).sendMessage(message).queue();
+                                textChannel.sendMessage(
+                                        new EmbedSender(dbNotification, queryJson)
+                                                .setCustomAuthor()
+                                                .setCustomTitle()
+                                                .setCustomDescription()
+                                                .setImage(embLiveThumbnail)
+                                                .build()).queue();
+                                log.info("Sent notification to G:{} C:{}", dbServerId, dbChannelId);
+                                metrics.incrementNotifsSent();
+                            } else {
+                                Objects.requireNonNull(textChannel).sendMessage(message).queue();
+                            }
                         } else {
                             log.info("Channel does not exits. G:{} C:{}", dbServerId, dbChannelId);
-                            databaseDriver.delete(dbDocumentId);
+                            databaseDriver.deleteNotif(dbDocumentId);
                             log.info("Deleted the notification in G:{} C:{} for {} ({})",
                                     dbServerId, dbChannelId, dbStreamerName, dbStreamerId);
                         }
@@ -113,7 +118,7 @@ public class NotifierService implements Runnable {
                             log.info("Sent event end message to G:{} C:{}", dbServerId, dbChannelId);
                         } else {
                             log.info("Channel does not exits. G:{} C:{}", dbServerId, dbChannelId);
-                            databaseDriver.delete(dbDocumentId);
+                            databaseDriver.deleteNotif(dbDocumentId);
                             log.info("Deleted the notification in G:{} C:{} for {} ({})",
                                     dbServerId, dbChannelId, dbStreamerName, dbStreamerId);
                         }
@@ -124,9 +129,9 @@ public class NotifierService implements Runnable {
                 metrics.incrementNotifsProcessed();
 
             }
-            metrics.incementCycle();
+            metrics.incrementCycle();
 
-            if (metrics.getCycle() == 20) {
+            if (metrics.getCycle() == 2000) {
                 metrics.stopTimer();
                 metrics.postMetrics(getMetricsGuildId(), getMetricsChannelId());
                 log.info("Posting metrics to {} - {}", getMetricsGuildId(), getMetricsChannelId());

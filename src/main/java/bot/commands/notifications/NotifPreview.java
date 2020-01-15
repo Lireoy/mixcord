@@ -11,8 +11,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 @Slf4j
 public class NotifPreview extends Command {
 
@@ -45,22 +43,28 @@ public class NotifPreview extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().filter(serverId, channelId, streamerName);
+        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (cursor.hasNext()) {
             JSONObject dbNotification = new JSONObject(cursor.next().toString());
 
             String dbStreamerName = dbNotification.getString("streamerName");
             String dbNotifMessage = dbNotification.getString("message");
+            boolean dbEmbed = dbNotification.getBoolean("embed");
 
             JSONObject queryJson = MixerQuery.queryChannel(dbStreamerName);
 
-            commandEvent.reply(dbNotifMessage);
-            commandEvent.reply(
-                    new EmbedSender(queryJson, dbNotification)
-                            .setAuthor()
-                            .setTitle()
-                            .setDescription()
-                            .build());
+            if (dbEmbed) {
+                commandEvent.reply(dbNotifMessage);
+                commandEvent.reply(
+                        new EmbedSender(dbNotification, queryJson)
+                                .setCustomAuthor()
+                                .setCustomTitle()
+                                .setCustomDescription()
+                                .build());
+            } else {
+                commandEvent.reply(dbNotifMessage);
+            }
+
         } else {
             commandEvent.reply("There is no such notification in this channel.");
         }
