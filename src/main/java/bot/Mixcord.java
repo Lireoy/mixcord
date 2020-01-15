@@ -8,7 +8,7 @@ import bot.commands.notifications.*;
 import bot.commands.notifierservice.NotifServiceStatus;
 import bot.commands.notifierservice.StartNotifService;
 import bot.commands.notifierservice.StopNotifService;
-import bot.utils.NotifServiceRework;
+import bot.utils.NotifService;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -38,7 +38,7 @@ public class Mixcord {
     private static CommandClient client;
     private static JDA jda;
     private static DatabaseDriver database;
-    private static NotifServiceRework notifierService;
+    private static NotifService notifierService;
 
     public static void main(String[] args) {
 
@@ -67,7 +67,7 @@ public class Mixcord {
         //String mixerApiClientId = dotenv.get("MIXER_API_CLIENT_ID");
 
         database = new DatabaseDriver(databaseIp, databasePort, databaseUser, databasePassword);
-        notifierService = new NotifServiceRework(database);
+        notifierService = new NotifService(database);
         log.info("Notifier service was started.");
         log.info("Posting metrics to G:{} - C:{}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
 
@@ -165,7 +165,7 @@ public class Mixcord {
         return database;
     }
 
-    public static NotifServiceRework getNotifierService() {
+    public static NotifService getNotifierService() {
         return notifierService;
     }
 }

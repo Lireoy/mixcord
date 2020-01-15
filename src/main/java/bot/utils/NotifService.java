@@ -9,12 +9,12 @@ import org.json.JSONObject;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public class NotifServiceRework implements Runnable {
+public class NotifService implements Runnable {
 
     private DatabaseDriver databaseDriver;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public NotifServiceRework(DatabaseDriver driver) {
+    public NotifService(DatabaseDriver driver) {
         this.databaseDriver = driver;
     }
 
