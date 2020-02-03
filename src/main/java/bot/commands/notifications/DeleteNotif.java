@@ -1,6 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,7 +20,7 @@ public class DeleteNotif extends Command {
         this.name = "DeleteNotif";
         this.aliases = new String[]{"DelNotif"};
         this.help = "Deletes a streamer notification in the channel where the command is used.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

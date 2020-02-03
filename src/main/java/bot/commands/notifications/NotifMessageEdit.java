@@ -2,6 +2,7 @@ package bot.commands.notifications;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -18,7 +19,7 @@ public class NotifMessageEdit extends Command {
         this.name = "NotifMessageEdit";
         this.aliases = new String[]{"MessageEdit", "EditMessage"};
         this.help = "Edits the notification's message.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.structure.Server;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -21,7 +22,7 @@ public class Whitelist extends Command {
     public Whitelist() {
         this.name = "Whitelist";
         this.help = "Add / remove a server from the whitelist, or list all whitelisted servers.";
-        this.category = new Category("owner");
+        this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = true;
         this.ownerCommand = true;

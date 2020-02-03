@@ -1,5 +1,6 @@
 package bot.commands.owner;
 
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ public class ServerInfo extends Command {
     public ServerInfo() {
         this.name = "ServerInfo";
         this.help = "Shows information about the server.";
-        this.category = new Category("owner");
+        this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = true;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{

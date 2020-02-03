@@ -2,6 +2,7 @@ package bot.commands.mixer;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,7 +20,7 @@ public class MixerUser extends Command {
     public MixerUser() {
         this.name = "MixerUser";
         this.help = "Displays a Mixer user's data.";
-        this.category = new Category("mixer");
+        this.category = new Category(CommandCategory.MIXER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.botPermissions = new Permission[]{

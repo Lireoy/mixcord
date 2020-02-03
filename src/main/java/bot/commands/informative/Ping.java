@@ -1,5 +1,6 @@
 package bot.commands.informative;
 
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ public class Ping extends Command {
         this.name = "Ping";
         this.aliases = new String[]{"Pong", "Pingpong", "Latency"};
         this.help = "Shows the current latency of the bot.";
-        this.category = new Category("informative");
+        this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,

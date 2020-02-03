@@ -74,9 +74,6 @@ public class Mixcord {
                         new Ping(),
                         new Info(),
                         new Invite(),
-                        new RoleInfo(),
-                        new ServerInfo(),
-                        //new Commands(),
 
                         // Notifications
                         new AddNotif(),
@@ -89,18 +86,18 @@ public class Mixcord {
                         new NotifColorEdit(),
                         new NotifEmbedConfig(),
 
-                        // Notifier Service
-                        new StartNotifService(),
-                        new StopNotifService(),
-                        new RestartNotifService(),
-                        new NotifServiceStatus(),
-
                         // Mixer
                         new MixerUser(),
                         new MixerUserSocials(),
 
-                        // Misc
+                        // Owner
                         new Whitelist(),
+                        new NotifServiceStatus(),
+                        new StartNotifService(),
+                        new StopNotifService(),
+                        new RestartNotifService(),
+                        new RoleInfo(),
+                        new ServerInfo(),
                         new Shutdown())
                 .build();
         client.getCommands().forEach((command) -> log.info("Added command: {}", command.getName()));

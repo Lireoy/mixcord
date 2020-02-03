@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.DatabaseDriver;
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.structure.Notification;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -19,7 +20,7 @@ public class MakeDefault extends Command {
     public MakeDefault() {
         this.name = "MakeDefault";
         this.help = "Resets a notification's configuration to the defaults.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

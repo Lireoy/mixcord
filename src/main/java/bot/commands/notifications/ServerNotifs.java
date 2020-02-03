@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.DatabaseDriver;
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class ServerNotifs extends Command {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};
         this.help = "Lists all available notifications for this server.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{

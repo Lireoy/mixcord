@@ -1,6 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.structure.Notification;
 import bot.utils.EmbedSender;
 import bot.utils.MixerQuery;
@@ -20,7 +21,7 @@ public class NotifPreview extends Command {
         this.name = "NotifPreview";
         this.aliases = new String[]{"Preview", "NotificationPreview"};
         this.help = "Sends a preview for a notification.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

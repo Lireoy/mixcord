@@ -1,5 +1,6 @@
 package bot.commands.owner;
 
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
@@ -19,7 +20,7 @@ public class RoleInfo extends Command {
     public RoleInfo() {
         this.name = "RoleInfo";
         this.help = "Shows information about a role.";
-        this.category = new Category("owner");
+        this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<role>";
         this.guildOnly = true;
         this.ownerCommand = true;

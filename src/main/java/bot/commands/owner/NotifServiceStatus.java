@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ public class NotifServiceStatus extends Command {
         this.name = "NotifServiceStatus";
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
         this.help = "Creates a new notification for a Mixer streamer in the channel where the command is used.";
-        this.category = new Category("owner");
+        this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.ownerCommand = true;

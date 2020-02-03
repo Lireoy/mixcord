@@ -1,6 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import bot.utils.HexUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -18,7 +19,7 @@ public class NotifColorEdit extends Command {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
         this.help = "Edits the notification's embed color.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

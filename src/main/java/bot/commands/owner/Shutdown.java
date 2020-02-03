@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ public class Shutdown extends Command {
     public Shutdown() {
         this.name = "Shutdown";
         this.help = "Kills the bot. You know what shutdown means, don't ya? Cool. Be aware.";
-        this.category = new Category("owner");
+        this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<reason>";
         this.guildOnly = true;
         this.ownerCommand = true;

@@ -1,6 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Mixcord;
+import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -15,7 +16,7 @@ public class NotifEmbedConfig extends Command {
     public NotifEmbedConfig() {
         this.name = "NotifEmbedConfig";
         this.help = "Edits the notification format. Set it to true for embed, false for non-embed notification.";
-        this.category = new Category("notifications");
+        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
