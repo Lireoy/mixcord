@@ -36,8 +36,6 @@ public class EventHandler extends ListenerAdapter {
 
     @Override
     public void onDisconnect(@Nonnull DisconnectEvent event) {
-        //TODO: Upon disconnect still keep checking the Mixer data, however store it locally, to push it later to Discord
-        //TODO: reading this for the 3rd time this might be a bad idea to still keep checking
         log.info("Disconnected from session...");
         Mixcord.setNotifierServiceStateArchive(Mixcord.getNotifierService().getState());
         log.info("Saved notifier service state");

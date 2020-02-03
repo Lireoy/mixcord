@@ -18,7 +18,6 @@ import java.util.Arrays;
 @Slf4j
 public class Whitelist extends Command {
 
-    //TODO: update help text
     public Whitelist() {
         this.name = "Whitelist";
         this.help = "Add / remove a server from the whitelist, or list all whitelisted servers.";

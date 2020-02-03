@@ -45,7 +45,6 @@ public class DeleteNotif extends Command {
         if (username.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
-            //TODO: CHECK IN DATABASE, BEFORE ANY ONLINE QUERY - in theory done, but idk why I wrote this todo
             if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
                 commandEvent.reply("There is no such notification...");
                 return;
