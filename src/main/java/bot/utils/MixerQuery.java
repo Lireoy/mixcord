@@ -2,7 +2,6 @@ package bot.utils;
 
 import bot.Constants;
 import bot.Mixcord;
-import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
@@ -20,10 +19,6 @@ import java.io.IOException;
 @Slf4j
 public class MixerQuery {
 
-    private static final Dotenv dotenv = Mixcord.getDotenv();
-    private static final String MIXER_API_CLIENT_ID = dotenv.get("MIXER_API_CLIENT_ID");
-    //private static String MIXER_API_CLIENT_SECRET = dotenv.get("MIXER_API_CLIENT_SECRET");
-
     /**
      * Queries Mixer's Api with the specified parameter for information about the channel.
      * Uses the 'channels' api endpoint.
@@ -33,7 +28,6 @@ public class MixerQuery {
      */
     public static JSONObject queryChannel(String queryParam) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
-
         String uri = Constants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
 
         // Custom Timout values to avoid long stuck commands
@@ -43,8 +37,9 @@ public class MixerQuery {
                 .setConnectTimeout(10000)
                 .setSocketTimeout(10000)
                 .build();
+
         HttpUriRequest request = RequestBuilder.get().setUri(uri)
-                .setHeader("Client-ID", MIXER_API_CLIENT_ID)
+                .setHeader("Client-ID", Mixcord.getCredentials().getMixerApiClientId())
                 .setConfig(requestConfig)
                 .build();
 

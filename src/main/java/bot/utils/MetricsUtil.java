@@ -34,6 +34,7 @@ public class MetricsUtil {
      */
     public void startTimer() {
         this.startTime = System.nanoTime();
+        log.info("Start time: {}", this.startTime);
     }
 
     /**
@@ -41,6 +42,7 @@ public class MetricsUtil {
      */
     public void stopTimer() {
         this.endTime = System.nanoTime();
+        log.info("Stop time: {}", this.endTime);
     }
 
     /**
@@ -48,10 +50,10 @@ public class MetricsUtil {
      */
     public void initReset() {
         this.cycle = 0;
-        this.startTime = 0;
         this.endTime = 0;
         this.notifsProcessed = 0;
         this.notifsSent = 0;
+        startTimer();
     }
 
     /**
@@ -86,21 +88,21 @@ public class MetricsUtil {
      * @return the elapsed time from start to finish in milliseconds
      */
     public long getMilliSecs() {
-        return (endTime - startTime) / 1000000;
+        return (this.endTime - this.startTime) / 1000000;
     }
 
     /**
      * @return the elapsed time from start to finish in seconds with double precision
      */
     public double getSecs() {
-        return (double) (getMilliSecs() / 1000000);
+        return getMilliSecs() / 1000.0;
     }
 
     /**
      * @return the number of processed notifications
      */
     public int getNotifsProcessed() {
-        return notifsProcessed;
+        return this.notifsProcessed;
     }
 
 
@@ -122,7 +124,7 @@ public class MetricsUtil {
                 String stringBuilder = "· Cycles: " + cycle + "\n" +
                         "· Notifications Processed: " + notifsProcessed + "\n" +
                         "· NotifsSent: " + notifsSent + "\n" +
-                        "· Time: " + getSecs() + "sec";
+                        "· Time: " + getSecs() + " sec";
                 Objects.requireNonNull(channel).sendMessage(
                         new EmbedSender()
                                 .setTitle("Metrics")

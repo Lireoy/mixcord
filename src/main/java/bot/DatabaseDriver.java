@@ -15,12 +15,12 @@ public class DatabaseDriver {
     private Connection connection; // connection link
     private Table notifications; // notifications table
     private Table streamers; // streamers table
+    private Table guilds; // servers table
 
-    DatabaseDriver(String databaseIp, int databasePort, String databaseUser, String databasePassword) {
-        this.connection = getRethink().connection().hostname(databaseIp).port(databasePort)
-                .user(databaseUser, databasePassword).connect();
-        this.notifications = getRethink().db("Mixcord").table("notifications");
-        this.streamers = getRethink().db("Mixcord").table("streamers");
+    DatabaseDriver() {
+        this.notifications = rethink.db("Mixcord").table("notifications");
+        this.streamers = rethink.db("Mixcord").table("streamers");
+        this.guilds = rethink.db("Mixcord").table("guilds");
     }
 
     /**
@@ -34,10 +34,10 @@ public class DatabaseDriver {
         // Check if entry is in the database
         if (getStreamerDocId(streamerName, streamerId).equals("-1")) {
             // If not in database, insert the data.
-            getStreamers().insert(getRethink().hashMap("streamerName", streamerName)
+            streamers.insert(rethink.hashMap("streamerName", streamerName)
                     .with("streamerId", streamerId)
                     .with("isStreaming", false))
-                    .run(getConnection());
+                    .run(connection);
             // Return successful database insertion.
             return true;
         } else {
@@ -52,7 +52,7 @@ public class DatabaseDriver {
      * @return a {@link Cursor} with all the documents in the streamers table
      */
     public Cursor selectAllStreamers() {
-        return getStreamers().map(ReqlExpr::toJson).run(getConnection());
+        return streamers.map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -63,8 +63,8 @@ public class DatabaseDriver {
      * @return a {@link Cursor} with all the notifications for the streamer
      */
     public Cursor selectStreamerNotifs(String streamerId) {
-        return getNotifications().filter(row -> row.g("streamerId").eq(streamerId))
-                .map(ReqlExpr::toJson).run(getConnection());
+        return notifications.filter(row -> row.g("streamerId").eq(streamerId))
+                .map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -75,9 +75,9 @@ public class DatabaseDriver {
      * @return a {@link Cursor} with the selected streamer
      */
     public Cursor selectOneStreamer(String streamerName, String streamerId) {
-        return getStreamers().filter(row -> row.g("streamerName").match("(?i)" + streamerName + "$")
+        return streamers.filter(row -> row.g("streamerName").match("(?i)" + streamerName + "$")
                 .and(row.g("streamerId").eq(streamerId)))
-                .map(ReqlExpr::toJson).run(getConnection());
+                .map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -88,9 +88,9 @@ public class DatabaseDriver {
      * @return a {@link String} containing the document ID
      */
     private String getStreamerDocId(String streamerName, String streamerId) {
-        Cursor cursor = getStreamers().filter(row -> row.g("streamerName").eq(streamerName)
+        Cursor cursor = streamers.filter(row -> row.g("streamerName").eq(streamerName)
                 .and(row.g("streamerId").eq(streamerId)))
-                .map(ReqlExpr::toJson).run(getConnection());
+                .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
             JSONObject document = new JSONObject(cursor.next().toString());
@@ -123,7 +123,7 @@ public class DatabaseDriver {
      * @param dbEntryId the ID of the document you want to delete
      */
     public void deleteStreamer(String dbEntryId) {
-        getStreamers().get(dbEntryId).delete().run(getConnection());
+        streamers.get(dbEntryId).delete().run(connection);
     }
 
     /**
@@ -137,21 +137,22 @@ public class DatabaseDriver {
      * @return true if the insertion is successful
      */
     public boolean addNotif(String serverId, String channelId, String streamerName, String streamerId) {
-        String defaultMsg = "<" + Constants.MIXER_COM + streamerName + "> is now live on Mixer!";
-        String defaultEndMsg = streamerName + " finished streaming.";
+        //String defaultMsg = "<" + Constants.MIXER_COM + streamerName + "> is now live on Mixer!";
+        String defaultMsg = String.format(Constants.NOTIF_MESSAGE_DEFAULT, streamerName);
+        String defaultEndMsg = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
         // Check if entry is in the database
-        if (getNotifDocId(serverId, channelId, streamerId).equals("-1")) {
+        if (getNotifDocId(serverId, channelId, streamerId) == null) {
             // If not in database, insert the data.
-            getNotifications().insert(getRethink().hashMap("serverId", serverId)
+            notifications.insert(rethink.hashMap("serverId", serverId)
                     .with("channelId", channelId)
                     .with("streamerId", streamerId)
                     .with("streamerName", streamerName)
-                    .with("embed", true)
-                    .with("embedColor", "ffffff")
+                    .with("embed", Constants.NOTIF_EMBED_DEFAULT)
+                    .with("embedColor", Constants.NOTIF_EMBED_COLOR_DEFAULT)
                     .with("message", defaultMsg)
-                    .with("streamEndAction", "0")
+                    .with("streamEndAction", Constants.NOTIF_END_ACTION)
                     .with("streamEndMessage", defaultEndMsg)
-            ).run(getConnection());
+            ).run(connection);
 
             return true;
         } else {
@@ -165,7 +166,7 @@ public class DatabaseDriver {
      * @return a {@link Cursor} with all the documents in the notifications table
      */
     public Cursor selectAllNotifs() {
-        return getNotifications().map(ReqlExpr::toJson).run(getConnection());
+        return notifications.map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -176,8 +177,8 @@ public class DatabaseDriver {
      * @return an {@link ArrayList} with all the notifications for the server
      */
     public ArrayList selectServerNotifs(String serverId) {
-        return getNotifications().filter(getRethink().hashMap("serverId", serverId))
-                .orderBy("channelId").map(ReqlExpr::toJson).run(getConnection());
+        return notifications.filter(rethink.hashMap("serverId", serverId))
+                .orderBy("channelId").map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -188,8 +189,8 @@ public class DatabaseDriver {
      * @return an {@link ArrayList} with all the notifications for the channel
      */
     public Cursor selectChannelNotifs(String serverId, String channelId) {
-        return getNotifications().filter(getRethink().hashMap("serverId", serverId)
-                .with("channelId", channelId)).map(ReqlExpr::toJson).run(getConnection());
+        return notifications.filter(rethink.hashMap("serverId", serverId)
+                .with("channelId", channelId)).map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -207,10 +208,11 @@ public class DatabaseDriver {
         // (?i) is canse insestitive mode
         // ^ start of the string
         // $ end of the string
-        return getNotifications().filter(row -> row.g("streamerName").match("(?i)" + streamerName + "$")
+        return notifications.filter(row -> row.g("streamerName")
+                .match("(?i)" + streamerName + "$")
                 .and(row.g("serverId").eq(serverId))
                 .and(row.g("channelId").eq(channelId)))
-                .map(ReqlExpr::toJson).run(getConnection());
+                .map(ReqlExpr::toJson).run(connection);
     }
 
     /**
@@ -221,9 +223,9 @@ public class DatabaseDriver {
      * @param isStreaming the new value of the field
      */
     public void updateIsStreaming(String documentId, boolean isStreaming) {
-        getStreamers().get(documentId).update(
-                getRethink().hashMap("isStreaming", isStreaming)
-        ).run(getConnection());
+        streamers.get(documentId).update(
+                rethink.hashMap("isStreaming", isStreaming)
+        ).run(connection);
     }
 
     /**
@@ -234,9 +236,9 @@ public class DatabaseDriver {
      * @param newMessage the new value of the field
      */
     public void updateMessage(String documentId, String newMessage) {
-        getNotifications().get(documentId).update(
-                getRethink().hashMap("message", newMessage)
-        ).run(getConnection());
+        notifications.get(documentId).update(
+                rethink.hashMap("message", newMessage)
+        ).run(connection);
     }
 
     /**
@@ -247,9 +249,9 @@ public class DatabaseDriver {
      * @param newColor   the new value of the field
      */
     public void updateColor(String documentId, String newColor) {
-        getNotifications().get(documentId).update(
-                getRethink().hashMap("embedColor", newColor)
-        ).run(getConnection());
+        notifications.get(documentId).update(
+                rethink.hashMap("embedColor", newColor)
+        ).run(connection);
     }
 
     /**
@@ -260,9 +262,21 @@ public class DatabaseDriver {
      * @param newEmbedValue set true for embed, false for non-embed
      */
     public void updateEmbed(String documentId, boolean newEmbedValue) {
-        getNotifications().get(documentId).update(
-                getRethink().hashMap("embed", newEmbedValue)
-        ).run(getConnection());
+        notifications.get(documentId).update(
+                rethink.hashMap("embed", newEmbedValue)
+        ).run(connection);
+    }
+
+    public void updateEndAction(String documentId, String newEndAction) {
+        notifications.get(documentId).update(
+                rethink.hashMap("streamEndAction", newEndAction)
+        ).run(connection);
+    }
+
+    public void updateEndMessage(String documentId, String newEndMessage) {
+        notifications.get(documentId).update(
+                rethink.hashMap("streamEndMessage", newEndMessage)
+        ).run(connection);
     }
 
     /**
@@ -290,7 +304,7 @@ public class DatabaseDriver {
      * @param dbEntryId the ID of the document you want to delete
      */
     public void deleteNotif(String dbEntryId) {
-        getNotifications().get(dbEntryId).delete().run(getConnection());
+        notifications.get(dbEntryId).delete().run(connection);
     }
 
     /**
@@ -302,10 +316,10 @@ public class DatabaseDriver {
      * @return the unique ID of the document if found, otherwise null
      */
     private String getNotifDocId(String serverId, String channelId, String streamerId) {
-        Cursor cursor = getNotifications().filter(row -> row.g("serverId").eq(serverId)
+        Cursor cursor = notifications.filter(row -> row.g("serverId").eq(serverId)
                 .and(row.g("channelId").eq(channelId))
                 .and(row.g("streamerId").eq(streamerId)))
-                .map(ReqlExpr::toJson).run(getConnection());
+                .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
             JSONObject document = new JSONObject(cursor.next().toString());
@@ -315,31 +329,50 @@ public class DatabaseDriver {
         return null;
     }
 
-    /**
-     * @return the {@link RethinkDB} instance
-     */
-    private RethinkDB getRethink() {
-        return this.rethink;
+    public boolean addServer(String serverId, boolean whitelisted) {
+        if (getGuildDocId(serverId) == null) {
+            guilds.insert(rethink.hashMap("serverId", serverId)
+                    .with("whitelisted", whitelisted)
+                    .with("prefix", "."))
+                    .run(connection);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * @return the RethinkDB {@link Connection} instance
-     */
-    private Connection getConnection() {
-        return this.connection;
+    public Cursor selectOneServer(String serverId) {
+        return guilds.filter(rethink
+                .hashMap("serverId", serverId))
+                .map(ReqlExpr::toJson).run(connection);
     }
 
-    /**
-     * @return the path for the notifications {@link Table}
-     */
-    private Table getNotifications() {
-        return this.notifications;
+    public Cursor selectAllGuilds() {
+        return guilds.map(ReqlExpr::toJson).run(connection);
     }
 
-    /**
-     * @return the path for the streamers {@link Table}
-     */
-    private Table getStreamers() {
-        return this.streamers;
+    public void updateWhitelist(String documentId, boolean whitelisted) {
+        guilds.get(documentId).update(rethink.hashMap("whitelisted", whitelisted)).run(connection);
+    }
+
+    public void deleteGuild(String docId) {
+        guilds.get(docId).delete().run(connection);
+    }
+
+    private String getGuildDocId(String serverId) {
+        Cursor cursor = guilds.filter(row -> row.g("serverId").eq(serverId))
+                .map(ReqlExpr::toJson).run(connection);
+
+        if (cursor.hasNext()) {
+            JSONObject document = new JSONObject(cursor.next().toString());
+            return document.getString("id");
+        }
+        cursor.close();
+        return null;
+    }
+
+    public DatabaseDriver setConnection(Connection connection) {
+        this.connection = connection;
+        return this;
     }
 }

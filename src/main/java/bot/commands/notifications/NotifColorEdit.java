@@ -8,6 +8,7 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.codec.binary.Hex;
 import org.json.JSONObject;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class NotifColorEdit extends Command {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
         this.help = "Edits the notification's embed color.";
-        this.arguments = "<streamer name>, <hex color code>";
+        this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
@@ -38,7 +39,7 @@ public class NotifColorEdit extends Command {
 
         if (args.length > 1) {
             streamerName = args[0].trim();
-            newColor = args[1].trim();
+            newColor = HexUtil.formatHex(args[1].trim());
         }
 
         if (streamerName.isEmpty()) {
@@ -71,7 +72,7 @@ public class NotifColorEdit extends Command {
 
                     response += "Notification color was changed for the following notification: `" + dbStreamerName + "`";
                     response += "\nOld color:\n```" + dbEmbedColor + "```\n\n";
-                    response += "New message:\n```" + newColor + "```";
+                    response += "New color:\n```" + newColor + "```";
 
                     commandEvent.reply(response);
                 }

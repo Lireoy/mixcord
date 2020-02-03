@@ -12,8 +12,9 @@ import org.json.JSONObject;
 @Slf4j
 public class NotifEmbedConfig extends Command {
 
+    // TODO: Refactor the name
     public NotifEmbedConfig() {
-        this.name = "NotifSendEmbed";
+        this.name = "NotifEmbedConfig";
         this.help = "Edits the notification format. Set it to true for embed, false for non-embed notification.";
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;

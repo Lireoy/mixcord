@@ -5,6 +5,7 @@ public class Constants {
     // DEV RELATED
     public static final String OWNER_ID = "331756964801544202"; // Lireoy
     public static final String CO_OWNER_ID = "236251438685093889"; // Akira
+    public static final String CO_OWNER_ID2 = "388424304678666240"; // Nexus
     public static final String METRICS_GUILD = "637724317672669184"; // Mixord
     public static final String METRICS_CHANNEL = "643117794925215765"; // Staff -> Metrics
 
@@ -32,4 +33,11 @@ public class Constants {
     // MIXCORD.IO
     public static final String MIXCORD_IO = "https://streamcord.io/mixer/";
     public static final String MIXCORD_IO_LOGO = "https://mixer.com/_latest/assets/favicons/favicon-32x32.png";
+
+    // NOTIFICATION DEFAULT VALUES
+    public static final boolean NOTIF_EMBED_DEFAULT = true;
+    public static final String NOTIF_EMBED_COLOR_DEFAULT = "ffffff";
+    public static final String NOTIF_MESSAGE_DEFAULT = "<https://mixer.com/%s> is now live on Mixer!";
+    public static final String NOTIF_END_MESSAGE_DEFAULT = "%s finished streaming.";
+    public static final String NOTIF_END_ACTION = "0";
 }

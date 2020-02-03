@@ -7,15 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class StartNotifService extends Command {
+public class RestartNotifService extends Command {
 
-    public StartNotifService() {
-        this.name = "StartNotifService";
-        this.help = "Starts the notifier service.";
+    public RestartNotifService(){
+        this.name = "RestartNotifSerivce";
+        this.help = "Restarts the notifier service.";
         this.ownerCommand = true;
     }
 
-    // This command start the notifier service manually
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();
@@ -30,4 +29,3 @@ public class StartNotifService extends Command {
         }
     }
 }
-

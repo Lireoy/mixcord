@@ -18,7 +18,7 @@ import java.time.Instant;
 public class ChannelNotifs extends Command {
 
     private DatabaseDriver database;
-
+    // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};

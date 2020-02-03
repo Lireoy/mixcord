@@ -2,6 +2,8 @@ package bot.utils;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.structure.Notification;
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONObject;
 
@@ -14,7 +16,7 @@ import java.time.Instant;
 public class EmbedSender extends EmbedBuilder {
 
     private JSONObject mixerInfo;
-    private JSONObject dbInfo;
+    private Notification notif;
 
     /**
      * Sets the embed time and footer.
@@ -29,12 +31,12 @@ public class EmbedSender extends EmbedBuilder {
      * It also provides method options to set additional details
      * with the specified parameters.
      *
-     * @param dbInfo    the JSON object which has information from the database
+     * @param notif    the JSON object which has information from the database
      * @param mixerInfo the JSON object which has information about the streamer from Mixer
      */
-    public EmbedSender(JSONObject dbInfo, JSONObject mixerInfo) {
+    public EmbedSender(Notification notif, JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
-        this.dbInfo = dbInfo;
+        this.notif = notif;
         this.setCustomColor();
         this.setImage(Constants.MIXER_BANNER_DEFAULT);
         this.setFooter(Constants.MIXCORD_IO, Mixcord.getJda().getSelfUser().getAvatarUrl());
@@ -93,16 +95,16 @@ public class EmbedSender extends EmbedBuilder {
      * Sets the embed color based on the information in {@link EmbedSender#mixerInfo}.
      */
     private void setCustomColor() {
-        this.setColor(HexUtil.formatForEmbed(dbInfo.getString("embedColor")));
+        this.setColor(HexUtil.formatForEmbed(notif.getEmbedColor()));
     }
 
     /**
      * Constructs a valid link for a streamer by concatenating a static link and the streamer's name.
-     * The streamer name is from {@link EmbedSender#dbInfo}.
+     * The streamer name is from {@link EmbedSender#notif}.
      *
      * @return a String, which is a valid link for the streamer.
      */
     private String getChannelLink() {
-        return Constants.MIXER_COM + dbInfo.getString("streamerName");
+        return Constants.MIXER_COM + notif.getStreamerName();
     }
 }

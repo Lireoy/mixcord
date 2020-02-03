@@ -2,6 +2,10 @@ package bot.utils;
 
 import bot.Constants;
 import bot.DatabaseDriver;
+import bot.Mixcord;
+import bot.structure.Notification;
+import bot.structure.Streamer;
+import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -22,78 +26,82 @@ public class NotifService implements Runnable {
         log.info("Notifier service was started.");
         running.set(true);
         MetricsUtil metrics = new MetricsUtil();
+        try {
+            while (running.get()) {
+                Gson gson = new Gson();
+                Cursor streamers = getDatabaseDriver().selectAllStreamers();
+                for (Object streamerObj : streamers) {
+                    // Checking one streamer at a time
+                    Streamer streamer = gson.fromJson(new JSONObject(streamerObj.toString()).toString(), Streamer.class);
 
-        while (running.get()) {
-            Cursor streamers = getDatabaseDriver().selectAllStreamers();
-            for (Object streamer : streamers) {
-                // Checking one streamer at a time
-                JSONObject dbStreamer = new JSONObject(streamer.toString());
+                    // Mixer query
+                    JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
+                    assert queryJson != null;
+                    boolean queryIsOnline = queryJson.getBoolean("online");
 
-                // Data from database
-                String dbDocumentId = dbStreamer.getString("id");
-                String dbStreamerName = dbStreamer.getString("streamerName");
-                String dbStreamerId = dbStreamer.getString("streamerId");
-                boolean dbStreamingStatus = dbStreamer.getBoolean("isStreaming");
+                    if (queryIsOnline && !streamer.isStreaming()) {
+                        // Was offline, is now online
 
-                // Mixer query
-                JSONObject queryJson = MixerQuery.queryChannel(dbStreamerName);
-                assert queryJson != null;
-                boolean queryIsOnline = queryJson.getBoolean("online");
+                        log.info("{} ({}) is streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
+                        getDatabaseDriver().updateIsStreaming(streamer.getId(), true);
+                        log.info("Updated streaming to TRUE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
+                        log.info("Queueing notifications...");
 
-                if (queryIsOnline && !dbStreamingStatus) {
-                    // Was offline, is now online
+                        // Select all notifications for this streamer from database
+                        Cursor notifications = getDatabaseDriver().selectStreamerNotifs(streamer.getStreamerId());
+                        for (Object notificationObj : notifications) {
 
-                    log.info("{} ({}) is streaming. Processing...", dbStreamerName, dbStreamerId);
-                    getDatabaseDriver().updateIsStreaming(dbDocumentId, true);
-                    log.info("Updated streaming to TRUE for {} ({})", dbStreamerName, dbStreamerId);
-                    log.info("Queueing notifications...");
+                            Notification notif = gson.fromJson(
+                                    new JSONObject(notificationObj.toString()).toString(), Notification.class);
 
-                    // Select all notifications for this streamer from database
-                    Cursor notifications = getDatabaseDriver().selectStreamerNotifs(dbStreamerId);
-                    for (Object notification : notifications) {
-                        JSONObject dbNotification = new JSONObject(notification.toString());
-
-                        boolean dbEmbed = dbNotification.getBoolean("embed");
-                        if (dbEmbed) {
-                            NotifSender.sendEmbed(dbNotification, queryJson);
-                        } else {
-                            NotifSender.sendNonEmbed(dbNotification);
+                            boolean dbEmbed = notif.isEmbed();
+                            if (dbEmbed) {
+                                NotifSender.sendEmbed(notif, queryJson);
+                            } else {
+                                NotifSender.sendNonEmbed(notif);
+                            }
+                            metrics.incrementNotifsSent();
                         }
-                        metrics.incrementNotifsSent();
+                        notifications.close();
                     }
-                    notifications.close();
+
+                    if (!queryIsOnline && streamer.isStreaming()) {
+                        // Was online, is now offline
+
+                        log.info("{} ({}) is not streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
+                        getDatabaseDriver().updateIsStreaming(streamer.getId(), false);
+                        log.info("Updated streaming to FALSE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
+                        log.info("Queueing event end message...");
+
+                        // Select all notifications for this streamer from database
+                        Cursor notifications = getDatabaseDriver().selectStreamerNotifs(streamer.getStreamerId());
+                        for (Object notificationObj : notifications) {
+                            Notification notif = gson.fromJson(
+                                    new JSONObject(notificationObj.toString()).toString(), Notification.class);
+                            NotifSender.sendOfflineMsg(notif);
+                            metrics.incrementNotifsSent();
+                        }
+                        notifications.close();
+                    }
+                    metrics.incrementNotifsProcessed();
+                    streamers.close();
                 }
 
-                if (!queryIsOnline && dbStreamingStatus) {
-                    // Was online, is now offline
+                metrics.incrementCycle();
 
-                    log.info("{} ({}) is not streaming. Processing...", dbStreamerName, dbStreamerId);
-                    getDatabaseDriver().updateIsStreaming(dbDocumentId, false);
-                    log.info("Updated streaming to FALSE for {} ({})", dbStreamerName, dbStreamerId);
-                    log.info("Queueing event end message...");
-
-                    // Select all notifications for this streamer from database
-                    Cursor notifications = getDatabaseDriver().selectStreamerNotifs(dbStreamerId);
-                    for (Object notification : notifications) {
-                        JSONObject dbNotification = new JSONObject(notification.toString());
-                        NotifSender.sendOfflineMsg(dbNotification);
-                        metrics.incrementNotifsSent();
-                    }
-                    notifications.close();
+                if (metrics.getCycle() == 10) {
+                    metrics.stopTimer();
+                    metrics.postMetrics(Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
+                    log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
+                    log.info("Looped {} notifications in {}s", metrics.getNotifsProcessed(), metrics.getSecs());
+                    metrics.initReset();
                 }
-                metrics.incrementNotifsProcessed();
-                streamers.close();
             }
-
-            metrics.incrementCycle();
-
-            if (metrics.getCycle() == 10) {
-                metrics.stopTimer();
-                metrics.postMetrics(Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-                log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-                log.info("Looped {} notifications in {}s", metrics.getNotifsProcessed(), metrics.getSecs());
-                metrics.initReset();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Okay so we caught some ugly exception, we should carry on, no stopping with the notifs.");
+            Mixcord.getNotifierService().restart();
+            // lmao
         }
     }
 
@@ -106,6 +114,12 @@ public class NotifService implements Runnable {
     public void stop() {
         running.set(false);
         log.info("Stopping notifier service...");
+    }
+
+    public void restart() {
+        log.info("Restarting notifier service...");
+        stop();
+        start();
     }
 
     public boolean getState() {

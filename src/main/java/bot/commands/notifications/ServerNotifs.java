@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class ServerNotifs extends Command {
 
     private DatabaseDriver database;
-
+    // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};

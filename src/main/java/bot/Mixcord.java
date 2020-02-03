@@ -2,84 +2,70 @@ package bot;
 
 import bot.commands.informative.*;
 import bot.commands.misc.Shutdown;
+import bot.commands.misc.Whitelist;
 import bot.commands.mixer.MixerUser;
 import bot.commands.mixer.MixerUserSocials;
 import bot.commands.notifications.*;
 import bot.commands.notifierservice.NotifServiceStatus;
+import bot.commands.notifierservice.RestartNotifService;
 import bot.commands.notifierservice.StartNotifService;
 import bot.commands.notifierservice.StopNotifService;
+import bot.structure.Credentials;
 import bot.utils.NotifService;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Slf4j
 public class Mixcord {
 
-    /////////////////////////////////////////
-    //                                     //
-    // Load DotENV first or else the token //
-    // and the database will get exception //
-    //                                     //
-    /////////////////////////////////////////
-    private static Dotenv dotenv;
+    private static Credentials credentials;
     private static CommandClient client;
     private static JDA jda;
     private static DatabaseDriver database;
     private static NotifService notifierService;
+    private static boolean notifierServiceStateArchive;
 
     public static void main(String[] args) {
+        displayAscii();
+        loadCredentials();
 
-        try (FileReader fr = new FileReader("MixcordASCII.txt")) {
-            int i;
-            while ((i = fr.read()) != -1) {
-                System.out.print((char) i);
-            }
-        } catch (IOException e) {
-            log.info("Could not find ASCII art.");
-        }
+        String BOT_TOKEN = credentials.isProductionBuild() ?
+                credentials.getDiscordBotToken() : credentials.getDiscordBotTokenCanary();
 
-        if (new File(".env").exists()) {
-            dotenv = Dotenv.load();
-        } else {
-            log.info("Could not find .env file.");
-            log.info("Shutting down application...");
-            System.exit(0);
-        }
+        DatabaseConnectionBuilder connectionBuilder = new DatabaseConnectionBuilder()
+                .setDatabaseIp(credentials.getDatabaseIp())
+                .setDatabasePort(credentials.getDatabasePort())
+                .setDatabaseUser(credentials.getDatabaseUser())
+                .setDatabasePassword(credentials.getDatabasePassword());
 
-
-        String databaseIp = Objects.requireNonNull(dotenv.get("DB_IP"));
-        int databasePort = Integer.parseInt(Objects.requireNonNull(dotenv.get("DB_PORT")));
-        String databaseUser = Objects.requireNonNull(dotenv.get("DB_USER"));
-        String databasePassword = Objects.requireNonNull(dotenv.get("DB_PASS"));
-        //String mixerApiClientId = dotenv.get("MIXER_API_CLIENT_ID");
-
-        database = new DatabaseDriver(databaseIp, databasePort, databaseUser, databasePassword);
+        database = new DatabaseDriver().setConnection(connectionBuilder.build());
         notifierService = new NotifService(database);
         log.info("Notifier service was started.");
         log.info("Posting metrics to G:{} - C:{}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-
-        String DISCORD_BOT_TOKEN = dotenv.get("DISCORD_BOT_TOKEN");
-        int NUMBER_OF_SHARDS = Integer.parseInt(Objects.requireNonNull(dotenv.get("NUMBER_OF_SHARDS")));
 
         CommandClientBuilder builder = new CommandClientBuilder();
         client = builder
                 .setPrefix(Constants.PREFIX)
                 .setAlternativePrefix(Constants.ALTERNATE_PREFIX)
                 .setOwnerId(Constants.OWNER_ID)
-                .setCoOwnerIds(Constants.CO_OWNER_ID)
+                .setCoOwnerIds(Constants.CO_OWNER_ID, Constants.CO_OWNER_ID2)
                 .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
                 .addCommands(
                         // Informative
@@ -95,6 +81,7 @@ public class Mixcord {
                         new DeleteNotif(),
                         new ChannelNotifs(),
                         new ServerNotifs(),
+                        new MakeDefault(),
                         new NotifPreview(),
                         new NotifMessageEdit(),
                         new NotifColorEdit(),
@@ -103,6 +90,7 @@ public class Mixcord {
                         // Notifier Service
                         new StartNotifService(),
                         new StopNotifService(),
+                        new RestartNotifService(),
                         new NotifServiceStatus(),
 
                         // Mixer
@@ -110,32 +98,35 @@ public class Mixcord {
                         new MixerUserSocials(),
 
                         // Misc
+                        new Whitelist(),
                         new Shutdown())
                 .build();
-        log.info("Bot prefix set to {}", Constants.PREFIX);
-        log.info("Bot alternate prefix set to {}", Constants.ALTERNATE_PREFIX);
-        log.info("Bot owner is {}", Constants.OWNER_ID);
-        log.info("Bot co-owner is {}", Constants.CO_OWNER_ID);
-
-        log.info("Total number of commands available: {}", client.getCommands().size());
         client.getCommands().forEach((command) -> log.info("Added command: {}", command.getName()));
+        log.info("Total number of commands available: {}", client.getCommands().size());
 
-        // Create client with token
+        log.info("Bot prefix set to {}", client.getPrefix());
+        log.info("Bot alternate prefix set to {}", client.getAltPrefix());
+
+        log.info("Added owner: {}", client.getOwnerId());
+        Arrays.stream(client.getCoOwnerIds()).forEach(coOwnerId -> log.info("Added co-owner: {}", coOwnerId));
+        EventHandler eventHandler = new EventHandler();
+
         try {
-            for (int i = 0; i < NUMBER_OF_SHARDS; i++) {
+            for (int i = 0; i < credentials.getNumberOfShards(); i++) {
                 JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
-                        .setToken(DISCORD_BOT_TOKEN)
-                        .useSharding(i, NUMBER_OF_SHARDS)
+                        .setToken(BOT_TOKEN)
+                        .useSharding(i, credentials.getNumberOfShards())
                         .setStatus(OnlineStatus.ONLINE)
                         .setActivity(Activity.playing("Type .help"))
                         .addEventListeners(client)
+                        .addEventListeners(eventHandler)
                         .setAutoReconnect(true);
                 jda = jdaBuilder.build().awaitReady();
 
                 log.info("Shard {} is ready!", i);
 
                 // Discord has a rate limit of 5 seconds between separate identification
-                if (NUMBER_OF_SHARDS > 1) {
+                if (credentials.getNumberOfShards() > 1) {
                     Thread.sleep(5001);
                 }
             }
@@ -149,8 +140,34 @@ public class Mixcord {
         }
     }
 
-    public static Dotenv getDotenv() {
-        return dotenv;
+    private static void displayAscii() {
+        try (FileReader fr = new FileReader("MixcordASCII.txt")) {
+            int i;
+            while ((i = fr.read()) != -1) {
+                System.out.print((char) i);
+            }
+        } catch (IOException e) {
+            log.warn("Could not find ASCII art.");
+        }
+    }
+
+    private static void loadCredentials() {
+        if (new File("credentials.json").exists()) {
+            try {
+                String text = new String(Files.readAllBytes(Paths.get("credentials.json")), StandardCharsets.UTF_8);
+                credentials = new Gson().fromJson(new JSONObject(text).toString(), Credentials.class);
+            } catch (IOException e) {
+                log.error("Failed to read 'credentials.json'.");
+            }
+        } else {
+            log.error("Could not find 'credentials.json' file.");
+            log.info("Shutting down application...");
+            System.exit(0);
+        }
+    }
+
+    public static Credentials getCredentials() {
+        return credentials;
     }
 
     public static CommandClient getClient() {
@@ -167,5 +184,13 @@ public class Mixcord {
 
     public static NotifService getNotifierService() {
         return notifierService;
+    }
+
+    public static boolean getNotifierServiceStateArchive() {
+        return notifierServiceStateArchive;
+    }
+
+    public static void setNotifierServiceStateArchive(boolean notifierServiceStateArchive) {
+        Mixcord.notifierServiceStateArchive = notifierServiceStateArchive;
     }
 }

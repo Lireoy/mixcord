@@ -1,6 +1,8 @@
 package bot.commands.notifications;
 
+import bot.Constants;
 import bot.Mixcord;
+import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -76,29 +78,41 @@ public class NotifMessageEdit extends Command {
             String MIXER_PATTERN = "https://mixer.com/" + dbStreamerName;
 
             if (dbEmbed) {
-                Mixcord.getDatabase().updateMessage(dbDocumentId, newMessage);
-
-                StringBuilder response = new StringBuilder();
-
-                response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
-                response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
-                response.append("New message:\n```").append(newMessage).append("```");
-
-                commandEvent.reply(response.toString());
-                //TODO: Fix this shit. Papulex put another streamers link into a notification for an other streamer.
-            } else {
-                if (dbNotifMessage.contains(MIXER_PATTERN)) {
-                    StringBuilder response = new StringBuilder();
-                    response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
-                    response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
-                    response.append("New message:\n```").append(newMessage).append("```");
+                if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+                    if (StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
+                        updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
+                    } else {
+                        commandEvent.reply("Your notification message contains a link to a different steamer.");
+                    }
                 } else {
-                    commandEvent.reply("Your notification message does not contain a link to the steamer. Please include one, and try again.");
+                    updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
+                }
+            } else {
+                if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+                    if (StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
+                        updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
+                    } else {
+                        commandEvent.reply("Your notification message contains a link to a different steamer.");
+                    }
+                } else {
+                    commandEvent.reply("Your notification message does not contain a link to the streamer.");
                 }
             }
         } else {
-            commandEvent.reply("There are no notifications in this channel");
+            commandEvent.reply("There is no such notification in this channel");
         }
         cursor.close();
+    }
+
+    private void updateMsgAndRespond(CommandEvent commandEvent, String newMessage, String dbDocumentId, String dbStreamerName, String dbNotifMessage) {
+        Mixcord.getDatabase().updateMessage(dbDocumentId, newMessage);
+
+        StringBuilder response = new StringBuilder();
+
+        response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
+        response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
+        response.append("New message:\n```").append(newMessage).append("```");
+
+        commandEvent.reply(response.toString());
     }
 }

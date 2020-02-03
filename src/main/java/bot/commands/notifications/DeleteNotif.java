@@ -43,6 +43,7 @@ public class DeleteNotif extends Command {
         } else {
             //TODO: CHECK IN DATABASE, BEFORE ANY ONLINE QUERY - in theory done, but idk why I wrote this todo
             if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
+                commandEvent.reply("There is no such notification...");
                 return;
             }
 
@@ -67,8 +68,11 @@ public class DeleteNotif extends Command {
 
             Cursor cursor = Mixcord.getDatabase().selectStreamerNotifs(streamerId);
             if (!cursor.hasNext()) {
-                Mixcord.getDatabase().deleteStreamer(streamerName, streamerId);
-                log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
+                if (Mixcord.getDatabase().deleteStreamer(streamerName, streamerId)) {
+                    log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
+                } else {
+                    log.info("Deletion failed for some reason. Streamer: {} - {}", streamerName, streamerId);
+                }
             }
 
             // Response to user

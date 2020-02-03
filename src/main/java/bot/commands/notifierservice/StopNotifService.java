@@ -12,7 +12,6 @@ public class StopNotifService extends Command {
     public StopNotifService() {
         this.name = "StopNotifService";
         this.help = "Stops the notifier service.";
-        this.guildOnly = true;
         this.ownerCommand = true;
     }
 

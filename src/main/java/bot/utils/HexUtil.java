@@ -16,7 +16,6 @@ public class HexUtil {
     private static final String HEX_PATTERN = "(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
 
     private Pattern pattern;
-    private Matcher matcher;
 
     /**
      * Creates a new instance for {@link HexUtil} and compiles the pattern for validating HEX color values.
@@ -32,8 +31,7 @@ public class HexUtil {
      * @return true valid hex, false invalid hex
      */
     public boolean validateHex(final String hex) {
-        matcher = pattern.matcher(hex);
-        return matcher.matches();
+        return pattern.matcher(hex).matches();
     }
 
     /**
@@ -56,10 +54,14 @@ public class HexUtil {
      * @return the rgb color component
      */
     public static Color formatForEmbed(final String hex) {
+        return HexUtil.hex2Rgb(formatHex(hex));
+    }
+
+    public static String formatHex(final String hex) {
         if (hex.startsWith("#")) {
-            return HexUtil.hex2Rgb(hex.substring(1));
+            return hex.substring(1);
         } else {
-            return HexUtil.hex2Rgb(hex);
+            return hex;
         }
     }
 }

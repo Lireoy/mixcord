@@ -1,9 +1,9 @@
 package bot.commands.notifications;
 
+import bot.Constants;
+import bot.DatabaseDriver;
 import bot.Mixcord;
 import bot.structure.Notification;
-import bot.utils.EmbedSender;
-import bot.utils.MixerQuery;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -14,12 +14,11 @@ import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
 @Slf4j
-public class NotifPreview extends Command {
+public class MakeDefault extends Command {
 
-    public NotifPreview() {
-        this.name = "NotifPreview";
-        this.aliases = new String[]{"Preview", "NotificationPreview"};
-        this.help = "Sends a preview for a notification.";
+    public MakeDefault() {
+        this.name = "MakeDefault";
+        this.help = "Resets a notification's configuration to the defaults.";
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -47,25 +46,22 @@ public class NotifPreview extends Command {
 
         Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (cursor.hasNext()) {
-            Gson gson = new Gson();
-            Notification notif = gson.fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
-            JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
+            Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
 
-            if (notif.isEmbed()) {
-                commandEvent.reply(notif.getMessage());
-                commandEvent.reply(
-                        new EmbedSender(notif, queryJson)
-                                .setCustomAuthor()
-                                .setCustomTitle()
-                                .setCustomDescription()
-                                .build());
-            } else {
-                commandEvent.reply(notif.getMessage());
-            }
+            String message = String.format(Constants.NOTIF_MESSAGE_DEFAULT, notif.getStreamerName());
+            String endMessage = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, notif.getStreamerName());
 
+            Mixcord.getDatabase().updateEmbed(notif.getId(), Constants.NOTIF_EMBED_DEFAULT);
+            Mixcord.getDatabase().updateColor(notif.getId(), Constants.NOTIF_EMBED_COLOR_DEFAULT);
+            Mixcord.getDatabase().updateMessage(notif.getId(), message);
+            Mixcord.getDatabase().updateEndAction(notif.getId(), Constants.NOTIF_END_ACTION);
+            Mixcord.getDatabase().updateEndMessage(notif.getId(), endMessage);
+
+            commandEvent.reply("Notification configuration was reset for `" + notif.getStreamerName() + "`.");
         } else {
             commandEvent.reply("There is no such notification in this channel.");
         }
         cursor.close();
     }
 }
+
