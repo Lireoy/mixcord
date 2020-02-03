@@ -1,9 +1,10 @@
-package bot.commands.misc;
+package bot.commands.owner;
 
 import bot.Mixcord;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
@@ -12,9 +13,13 @@ public class Shutdown extends Command {
     public Shutdown() {
         this.name = "Shutdown";
         this.help = "Kills the bot. You know what shutdown means, don't ya? Cool. Be aware.";
+        this.category = new Category("owner");
         this.arguments = "<reason>";
         this.guildOnly = true;
         this.ownerCommand = true;
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     /**

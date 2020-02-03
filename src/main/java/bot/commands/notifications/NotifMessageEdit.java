@@ -18,10 +18,13 @@ public class NotifMessageEdit extends Command {
         this.name = "NotifMessageEdit";
         this.aliases = new String[]{"MessageEdit", "EditMessage"};
         this.help = "Edits the notification's message.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

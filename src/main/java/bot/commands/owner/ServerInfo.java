@@ -1,4 +1,4 @@
-package bot.commands.informative;
+package bot.commands.owner;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -16,8 +16,13 @@ public class ServerInfo extends Command {
     public ServerInfo() {
         this.name = "ServerInfo";
         this.help = "Shows information about the server.";
+        this.category = new Category("owner");
         this.guildOnly = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.ownerCommand = true;
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override

@@ -19,9 +19,14 @@ public class MixerUser extends Command {
     public MixerUser() {
         this.name = "MixerUser";
         this.help = "Displays a Mixer user's data.";
+        this.category = new Category("mixer");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_EMBED_LINKS,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

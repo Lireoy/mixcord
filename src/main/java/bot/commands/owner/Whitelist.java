@@ -1,4 +1,4 @@
-package bot.commands.misc;
+package bot.commands.owner;
 
 import bot.Mixcord;
 import bot.structure.Server;
@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
@@ -21,9 +22,14 @@ public class Whitelist extends Command {
     public Whitelist() {
         this.name = "Whitelist";
         this.help = "Add / remove a server from the whitelist, or list all whitelisted servers.";
+        this.category = new Category("owner");
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = true;
         this.ownerCommand = true;
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

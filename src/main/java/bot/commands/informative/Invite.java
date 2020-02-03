@@ -17,9 +17,13 @@ public class Invite extends Command {
         this.name = "Invite";
         this.aliases = new String[]{"Inv", "GetOverHere"};
         this.help = "Provides an invite link so you can add this bot to your server.";
+        this.category = new Category("informative");
         this.guildOnly = true;
         this.ownerCommand = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     /**

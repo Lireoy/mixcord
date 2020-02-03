@@ -1,15 +1,17 @@
 package bot;
 
 import bot.commands.informative.*;
-import bot.commands.misc.Shutdown;
-import bot.commands.misc.Whitelist;
+import bot.commands.owner.Shutdown;
+import bot.commands.owner.Whitelist;
 import bot.commands.mixer.MixerUser;
 import bot.commands.mixer.MixerUserSocials;
 import bot.commands.notifications.*;
-import bot.commands.notifierservice.NotifServiceStatus;
-import bot.commands.notifierservice.RestartNotifService;
-import bot.commands.notifierservice.StartNotifService;
-import bot.commands.notifierservice.StopNotifService;
+import bot.commands.owner.NotifServiceStatus;
+import bot.commands.owner.RestartNotifService;
+import bot.commands.owner.StartNotifService;
+import bot.commands.owner.StopNotifService;
+import bot.commands.owner.RoleInfo;
+import bot.commands.owner.ServerInfo;
 import bot.structure.Credentials;
 import bot.utils.NotifService;
 import com.google.gson.Gson;
@@ -74,7 +76,7 @@ public class Mixcord {
                         new Invite(),
                         new RoleInfo(),
                         new ServerInfo(),
-                        new Commands(),
+                        //new Commands(),
 
                         // Notifications
                         new AddNotif(),

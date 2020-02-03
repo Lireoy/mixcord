@@ -19,10 +19,14 @@ public class DeleteNotif extends Command {
         this.name = "DeleteNotif";
         this.aliases = new String[]{"DelNotif"};
         this.help = "Deletes a streamer notification in the channel where the command is used.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

@@ -19,10 +19,14 @@ public class MakeDefault extends Command {
     public MakeDefault() {
         this.name = "MakeDefault";
         this.help = "Resets a notification's configuration to the defaults.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

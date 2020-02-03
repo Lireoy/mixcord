@@ -17,16 +17,17 @@ import java.time.Instant;
 @Slf4j
 public class ChannelNotifs extends Command {
 
-    private DatabaseDriver database;
     // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};
         this.help = "Lists all available notifications for this channel.";
+        this.category = new Category("notifications");
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.database = Mixcord.getDatabase();
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ChannelNotifs extends Command {
 
         String serverId = commandEvent.getMessage().getGuild().getId();
         String channelId = commandEvent.getMessage().getChannel().getId();
-        Cursor cursor = getDatabase().selectChannelNotifs(serverId, channelId);
+        Cursor cursor = Mixcord.getDatabase().selectChannelNotifs(serverId, channelId);
 
         StringBuilder description = new StringBuilder();
         int notifCount = 0;
@@ -76,9 +77,5 @@ public class ChannelNotifs extends Command {
                 .setTimestamp(Instant.now())
                 .build());
         cursor.close();
-    }
-
-    private DatabaseDriver getDatabase() {
-        return database;
     }
 }

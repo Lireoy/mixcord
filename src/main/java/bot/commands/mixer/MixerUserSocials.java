@@ -19,9 +19,14 @@ public class MixerUserSocials extends Command {
     public MixerUserSocials() {
         this.name = "MixerUserSocials";
         this.help = "Displays a Mixer user's social profiles.";
+        this.category = new Category("mixer");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_EMBED_LINKS,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

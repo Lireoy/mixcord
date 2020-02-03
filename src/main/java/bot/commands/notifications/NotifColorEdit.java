@@ -18,10 +18,13 @@ public class NotifColorEdit extends Command {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
         this.help = "Edits the notification's embed color.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     @Override

@@ -16,10 +16,13 @@ public class NotifEmbedConfig extends Command {
     public NotifEmbedConfig() {
         this.name = "NotifEmbedConfig";
         this.help = "Edits the notification format. Set it to true for embed, false for non-embed notification.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     @Override

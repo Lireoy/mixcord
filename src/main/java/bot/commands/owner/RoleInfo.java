@@ -1,4 +1,4 @@
-package bot.commands.informative;
+package bot.commands.owner;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,9 +19,13 @@ public class RoleInfo extends Command {
     public RoleInfo() {
         this.name = "RoleInfo";
         this.help = "Shows information about a role.";
+        this.category = new Category("owner");
         this.arguments = "<role>";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
         this.guildOnly = true;
+        this.ownerCommand = true;
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     @Override

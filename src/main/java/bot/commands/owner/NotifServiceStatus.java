@@ -1,4 +1,4 @@
-package bot.commands.notifierservice;
+package bot.commands.owner;
 
 import bot.Mixcord;
 import com.jagrosh.jdautilities.command.Command;
@@ -11,12 +11,16 @@ public class NotifServiceStatus extends Command {
 
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
-        this.aliases = new String[]{"Status", "NotifierService", "NotifierServiceStatus"};
+        this.aliases = new String[]{"Status", "NotifierServiceStatus"};
         this.help = "Creates a new notification for a Mixer streamer in the channel where the command is used.";
+        this.category = new Category("owner");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.ownerCommand = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override

@@ -17,16 +17,17 @@ import java.util.ArrayList;
 @Slf4j
 public class ServerNotifs extends Command {
 
-    private DatabaseDriver database;
     // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};
         this.help = "Lists all available notifications for this server.";
+        this.category = new Category("notifications");
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
-        this.database = Mixcord.getDatabase();
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ServerNotifs extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         String serverId = commandEvent.getMessage().getGuild().getId();
-        ArrayList list = getDatabase().selectServerNotifs(serverId);
+        ArrayList list = Mixcord.getDatabase().selectServerNotifs(serverId);
 
         StringBuilder description = new StringBuilder();
         String prevChannel = "";
@@ -80,9 +81,5 @@ public class ServerNotifs extends Command {
                 .setFooter(footer, footerImg)
                 .setTimestamp(Instant.now())
                 .build());
-    }
-
-    private DatabaseDriver getDatabase() {
-        return database;
     }
 }

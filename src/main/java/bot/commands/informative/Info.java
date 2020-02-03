@@ -17,8 +17,11 @@ public class Info extends Command {
     public Info() {
         this.name = "Info";
         this.help = "Shows information about the bot.";
+        this.category = new Category("informative");
         this.guildOnly = true;
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE};
     }
 
     /**

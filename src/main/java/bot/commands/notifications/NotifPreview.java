@@ -20,10 +20,14 @@ public class NotifPreview extends Command {
         this.name = "NotifPreview";
         this.aliases = new String[]{"Preview", "NotificationPreview"};
         this.help = "Sends a preview for a notification.";
+        this.category = new Category("notifications");
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_ADD_REACTION};
     }
 
     @Override
