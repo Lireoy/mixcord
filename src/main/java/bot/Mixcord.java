@@ -17,6 +17,7 @@ import bot.utils.NotifService;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -65,7 +66,7 @@ public class Mixcord {
         CommandClientBuilder builder = new CommandClientBuilder();
         client = builder
                 .setPrefix(Constants.PREFIX)
-                .setAlternativePrefix(Constants.ALTERNATE_PREFIX)
+                .setAlternativePrefix("@mention")
                 .setOwnerId(Constants.OWNER_ID)
                 .setCoOwnerIds(Constants.CO_OWNER_ID, Constants.CO_OWNER_ID2)
                 .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
