@@ -17,7 +17,6 @@ import bot.utils.NotifService;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -134,7 +133,7 @@ public class Mixcord {
             // Starts the automatic notification system
             // If you delete this, then you have to start
             // the notifier service manually on every startup
-            //notifierService.run();
+            notifierService.run();
         } catch (LoginException | InterruptedException e) {
             log.error(e.getMessage());
         }

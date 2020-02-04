@@ -41,14 +41,25 @@ public class Whitelist extends Command {
         ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
         if (argList.get(0).trim().equalsIgnoreCase("all")) {
+            StringBuilder serversDetails = new StringBuilder();
             Cursor cursor = Mixcord.getDatabase().selectAllGuilds();
             for (Object o : cursor) {
                 Gson gson = new Gson();
                 Server server = gson.fromJson(new JSONObject(o.toString()).toString(), Server.class);
-                // TODO: when listing whitelisted servers, not just log, instead post it to the discord channel
-                // TODO: and then list the server ID, server name, and owner maybe
-                log.info(server.toString());
+
+                Guild guild = Mixcord.getJda().getGuildById(server.getServerId());
+                serversDetails.append("· <@")
+                        .append(guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)")
+                        .append("> - `")
+                        .append(guild != null ? guild.getName() : "(Could not retrieve name)")
+                        .append("` - `")
+                        .append(server.getServerId())
+                        .append("` - `")
+                        .append(guild != null ? guild.getMembers().size() : -1)
+                        .append(" members`\n");
             }
+
+            commandEvent.replyFormatted(serversDetails.toString());
             return;
         }
 

@@ -11,7 +11,6 @@ public class Constants {
 
     // BOT SETTINGS
     public static final String PREFIX = ".";
-    public static final String ALTERNATE_PREFIX = "!";
     public static final String SUCCESS = "✅";
     public static final String WARNING = "‼";
     public static final String ERROR = "❌";

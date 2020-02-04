@@ -34,7 +34,6 @@ public class MetricsUtil {
      */
     public void startTimer() {
         this.startTime = System.nanoTime();
-        log.info("Start time: {}", this.startTime);
     }
 
     /**
@@ -42,7 +41,6 @@ public class MetricsUtil {
      */
     public void stopTimer() {
         this.endTime = System.nanoTime();
-        log.info("Stop time: {}", this.endTime);
     }
 
     /**
