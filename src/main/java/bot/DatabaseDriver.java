@@ -27,12 +27,12 @@ public class DatabaseDriver {
      * Adds a streamer to the streamers table with the specified parameters.
      *
      * @param streamerName the name of the streamer
-     * @param streamerId   the id of the streamer
+     * @param streamerId   the ID of the streamer
      * @return true if the insertion is successful
      */
     public boolean addStreamer(String streamerName, String streamerId) {
         // Check if entry is in the database
-        if (getStreamerDocId(streamerName, streamerId).equals("-1")) {
+        if (getStreamerDocId(streamerName, streamerId) == null) {
             // If not in database, insert the data.
             streamers.insert(rethink.hashMap("streamerName", streamerName)
                     .with("streamerId", streamerId)
@@ -71,7 +71,7 @@ public class DatabaseDriver {
      * Selects one streamer from the streamers table with the specified parameters.
      *
      * @param streamerName the name of the streamer
-     * @param streamerId   the id of the streamer
+     * @param streamerId   the ID of the streamer
      * @return a {@link Cursor} with the selected streamer
      */
     public Cursor selectOneStreamer(String streamerName, String streamerId) {
@@ -84,8 +84,8 @@ public class DatabaseDriver {
      * Gets a streamer entry's document ID with the specified parameters.
      *
      * @param streamerName the name of the streamer
-     * @param streamerId   the id of the streamer
-     * @return a {@link String} containing the document ID
+     * @param streamerId   the ID of the streamer
+     * @return the unique ID of the document if found, otherwise null
      */
     private String getStreamerDocId(String streamerName, String streamerId) {
         Cursor cursor = streamers.filter(row -> row.g("streamerName").eq(streamerName)
@@ -97,19 +97,19 @@ public class DatabaseDriver {
             return document.getString("id");
         }
         cursor.close();
-        return "-1";
+        return null;
     }
 
     /**
      * Deletes a document from the streamers table with the specified parameters.
      *
      * @param streamerName the name of the streamer
-     * @param streamerId   the id of the streamer
+     * @param streamerId   the ID of the streamer
      * @return true if deletion is successful
      */
     public boolean deleteStreamer(String streamerName, String streamerId) {
         String documentId = getStreamerDocId(streamerName, streamerId);
-        if (documentId.equals("-1")) {
+        if (documentId == null) {
             return false;
         } else {
             deleteStreamer(documentId);
@@ -120,7 +120,7 @@ public class DatabaseDriver {
     /**
      * Deletes the specified document from the streamers table.
      *
-     * @param dbEntryId the ID of the document you want to delete
+     * @param dbEntryId the ID of the document to delete
      */
     public void deleteStreamer(String dbEntryId) {
         streamers.get(dbEntryId).delete().run(connection);
@@ -133,7 +133,7 @@ public class DatabaseDriver {
      * @param serverId     the server ID where the notification should be sent
      * @param channelId    the channel ID where the notification should be sent
      * @param streamerName the name of the streamer
-     * @param streamerId   the id of the streamer
+     * @param streamerId   the ID of the streamer
      * @return true if the insertion is successful
      */
     public boolean addNotif(String serverId, String channelId, String streamerName, String streamerId) {
@@ -183,9 +183,10 @@ public class DatabaseDriver {
 
     /**
      * Selects all notifications from the notifications table
-     * with the specified channel ID mapped to JSON.
+     * with the specified parameters mapped to JSON.
      *
-     * @param serverId the server ID to look for in the notifications
+     * @param serverId  the server ID to look for in the notifications
+     * @param channelId the channel ID to look for in the notifications
      * @return an {@link ArrayList} with all the notifications for the channel
      */
     public Cursor selectChannelNotifs(String serverId, String channelId) {
@@ -205,7 +206,7 @@ public class DatabaseDriver {
     public Cursor selectOneNotification(String serverId, String channelId, String streamerName) {
         // Retrieve all notification with name "William" (case insensitive).
         // .match("(?i)^william$")
-        // (?i) is canse insestitive mode
+        // (?i) is case insensitive mode
         // ^ start of the string
         // $ end of the string
         return notifications.filter(row -> row.g("streamerName")
@@ -219,7 +220,7 @@ public class DatabaseDriver {
      * Updates the specified streamer's streaming status in the streamers table
      * with the specified parameter.
      *
-     * @param documentId  the ID of the document you want to update
+     * @param documentId  the ID of the document to update
      * @param isStreaming the new value of the field
      */
     public void updateIsStreaming(String documentId, boolean isStreaming) {
@@ -232,7 +233,7 @@ public class DatabaseDriver {
      * Updates the specified notification's message in the notifications table
      * with the specified parameter.
      *
-     * @param documentId the ID of the document you want to update
+     * @param documentId the ID of the document to update
      * @param newMessage the new value of the field
      */
     public void updateMessage(String documentId, String newMessage) {
@@ -245,7 +246,7 @@ public class DatabaseDriver {
      * Updates the specified notification's embed color in the notifications table
      * with the specified parameter.
      *
-     * @param documentId the ID of the document you want to update
+     * @param documentId the ID of the document to update
      * @param newColor   the new value of the field
      */
     public void updateColor(String documentId, String newColor) {
@@ -258,7 +259,7 @@ public class DatabaseDriver {
      * Updates the specified notification's embed mode in the notifications table
      * with the specified parameter.
      *
-     * @param documentId    the ID of the document you want to update
+     * @param documentId    the ID of the document to update
      * @param newEmbedValue set true for embed, false for non-embed
      */
     public void updateEmbed(String documentId, boolean newEmbedValue) {
@@ -267,12 +268,26 @@ public class DatabaseDriver {
         ).run(connection);
     }
 
+    /**
+     * Updates the specified notification's end action in the notification table
+     * with the specified parameter.
+     *
+     * @param documentId   the ID of the document to update
+     * @param newEndAction a number as a String
+     */
     public void updateEndAction(String documentId, String newEndAction) {
         notifications.get(documentId).update(
                 rethink.hashMap("streamEndAction", newEndAction)
         ).run(connection);
     }
 
+    /**
+     * Updates the specified notification's end message in the notification table
+     * with the specified parameter.
+     *
+     * @param documentId    the ID of the document to update
+     * @param newEndMessage the new value of the field
+     */
     public void updateEndMessage(String documentId, String newEndMessage) {
         notifications.get(documentId).update(
                 rethink.hashMap("streamEndMessage", newEndMessage)
@@ -284,7 +299,7 @@ public class DatabaseDriver {
      *
      * @param serverId   the server ID to look for in the notifications
      * @param channelId  the channel ID to look for in the notifications
-     * @param streamerId the id of the streamer
+     * @param streamerId the ID of the streamer
      * @return true if the deletion is successful
      */
     public boolean deleteNotif(String serverId, String channelId, String streamerId) {
@@ -301,7 +316,7 @@ public class DatabaseDriver {
     /**
      * Deletes a specific document from the notifications table.
      *
-     * @param dbEntryId the ID of the document you want to delete
+     * @param dbEntryId the ID of the document to delete
      */
     public void deleteNotif(String dbEntryId) {
         notifications.get(dbEntryId).delete().run(connection);
@@ -312,7 +327,7 @@ public class DatabaseDriver {
      *
      * @param serverId   the server ID to look for in the notifications
      * @param channelId  the channel ID to look for in the notifications
-     * @param streamerId the id of the streamer
+     * @param streamerId the ID of the streamer
      * @return the unique ID of the document if found, otherwise null
      */
     private String getNotifDocId(String serverId, String channelId, String streamerId) {
@@ -329,10 +344,16 @@ public class DatabaseDriver {
         return null;
     }
 
-    public boolean addServer(String serverId, boolean whitelisted) {
+    /**
+     * Adds a server to the guilds table with the specified parameters.
+     *
+     * @param serverId the ID of the server
+     * @return true if the insertion is successful
+     */
+    public boolean addServer(String serverId) {
         if (getGuildDocId(serverId) == null) {
             guilds.insert(rethink.hashMap("serverId", serverId)
-                    .with("whitelisted", whitelisted)
+                    .with("whitelisted", false)
                     .with("prefix", "."))
                     .run(connection);
             return true;
@@ -341,24 +362,53 @@ public class DatabaseDriver {
         }
     }
 
+    /**
+     * Selects one server from the guilds table with the specified parameter.
+     *
+     * @param serverId the ID of the server
+     * @return a {@link Cursor} with a single server if found
+     */
     public Cursor selectOneServer(String serverId) {
         return guilds.filter(rethink
                 .hashMap("serverId", serverId))
                 .map(ReqlExpr::toJson).run(connection);
     }
 
+    /**
+     * Selects all servers from the guilds table mapped to JSON.
+     *
+     * @return a {@link Cursor} with all the documents in the guilds table
+     */
     public Cursor selectAllGuilds() {
         return guilds.map(ReqlExpr::toJson).run(connection);
     }
 
+    /**
+     * Updates the specified server's whitelist status in the guilds table
+     * with the specified parameter.
+     *
+     * @param documentId  the ID of the document to update
+     * @param whitelisted set true to be whitelisted, otherwise false
+     */
     public void updateWhitelist(String documentId, boolean whitelisted) {
         guilds.get(documentId).update(rethink.hashMap("whitelisted", whitelisted)).run(connection);
     }
 
+    /**
+     * Deletes a specific document from the guilds table.
+     *
+     * @param docId the ID of the document to delete
+     */
     public void deleteGuild(String docId) {
         guilds.get(docId).delete().run(connection);
     }
 
+    /**
+     * Gets a guild entry's document ID with the specified parameter.
+     *
+     * @param serverId the ID of the server
+     * @return the unique ID of the document if found, otherwise null
+     */
     private String getGuildDocId(String serverId) {
         Cursor cursor = guilds.filter(row -> row.g("serverId").eq(serverId))
                 .map(ReqlExpr::toJson).run(connection);
@@ -371,6 +421,12 @@ public class DatabaseDriver {
         return null;
     }
 
+    /**
+     * Sets the connection for the {@link DatabaseDriver}
+     *
+     * @param connection the RethinkDB connection
+     * @return the DatabaseDriver instance
+     */
     public DatabaseDriver setConnection(Connection connection) {
         this.connection = connection;
         return this;

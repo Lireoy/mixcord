@@ -40,11 +40,12 @@ public class Whitelist extends Command {
         String[] args = commandEvent.getArgs().trim().split(",", 2);
         ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
+
+        Gson gson = new Gson();
         if (argList.get(0).trim().equalsIgnoreCase("all")) {
             StringBuilder serversDetails = new StringBuilder();
             Cursor cursor = Mixcord.getDatabase().selectAllGuilds();
             for (Object o : cursor) {
-                Gson gson = new Gson();
                 Server server = gson.fromJson(new JSONObject(o.toString()).toString(), Server.class);
 
                 Guild guild = Mixcord.getJda().getGuildById(server.getServerId());
@@ -80,7 +81,6 @@ public class Whitelist extends Command {
 
         Cursor whitelistCursor = Mixcord.getDatabase().selectOneServer(serverId);
         if (whitelistCursor.hasNext()) {
-            Gson gson = new Gson();
             Server server = gson.fromJson(new JSONObject(whitelistCursor.next().toString()).toString(), Server.class);
             boolean oldWhitelistVal = server.isWhitelisted();
 
@@ -96,7 +96,12 @@ public class Whitelist extends Command {
             commandEvent.reply("Successfully updated `" + serverId + "` to `" + newWhitelistVal + "`.");
             commandEvent.reactSuccess();
         } else {
-            Mixcord.getDatabase().addServer(serverId, true);
+            Mixcord.getDatabase().addServer(serverId);
+            Server server = gson.fromJson(new JSONObject(
+                    Mixcord.getDatabase().selectOneServer(serverId).next().toString())
+                    .toString(), Server.class);
+
+            Mixcord.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully whitelisted `" + serverId + "`.");
             commandEvent.reactSuccess();
         }

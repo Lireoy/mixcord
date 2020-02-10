@@ -13,9 +13,18 @@ import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 
+/**
+ * This class handles specific events which are triggered.
+ */
 @Slf4j
 public class EventHandler extends ListenerAdapter {
 
+    /**
+     * Starts back up the notification service if it was running
+     * before the disconnect event.
+     *
+     * @param event the event which triggered the listener
+     */
     @Override
     public void onResume(@Nonnull ResumedEvent event) {
         log.info("Resumed session...");
@@ -25,6 +34,12 @@ public class EventHandler extends ListenerAdapter {
         }
     }
 
+    /**
+     * Starts back up the notification service if it was running
+     * before the disconnect event.
+     *
+     * @param event the event which triggered the listener
+     */
     @Override
     public void onReconnect(@Nonnull ReconnectedEvent event) {
         log.info("Reconnected to session...");
@@ -34,6 +49,12 @@ public class EventHandler extends ListenerAdapter {
         }
     }
 
+    /**
+     * Saves the current state of the notifier service.
+     * If the notifier service was running, it is stopped.
+     *
+     * @param event the event which triggered the listener
+     */
     @Override
     public void onDisconnect(@Nonnull DisconnectEvent event) {
         log.info("Disconnected from session...");
@@ -45,12 +66,23 @@ public class EventHandler extends ListenerAdapter {
         }
     }
 
+    /**
+     * Logs and adds the server to the guilds table with default values.
+     *
+     * @param event the event which triggered the listener
+     */
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
-        Mixcord.getDatabase().addServer(event.getGuild().getId(), false);
+        Mixcord.getDatabase().addServer(event.getGuild().getId());
         log.info("Joined guild {}", event.getGuild().getId());
     }
 
+    /**
+     * When the bot is kicked from a guild
+     * their configuration is deleted from the database.
+     *
+     * @param event the event which triggered the listener
+     */
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
         log.info("Leaving guild {}", event.getGuild().getId());
