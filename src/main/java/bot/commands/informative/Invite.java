@@ -11,6 +11,9 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.time.Instant;
 
+/**
+ * Sends the bot's invite link to the user in a formatted embed.
+ */
 @Slf4j
 public class Invite extends Command {
 
@@ -27,13 +30,6 @@ public class Invite extends Command {
                 Permission.MESSAGE_ADD_REACTION};
     }
 
-    /**
-     * Sends the bot's invite link to the author in a formatted embed,
-     * with the author's name and discriminator and profile picture in the footer.
-     * The embed's timestamp is set to the time of execution.
-     *
-     * @param commandEvent the event which triggered this command
-     */
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();

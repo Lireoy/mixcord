@@ -12,6 +12,14 @@ import net.dv8tion.jda.api.entities.User;
 import java.lang.management.ManagementFactory;
 import java.time.Instant;
 
+/**
+ * Sends information about the bot to the user in a formatted embed.
+ * <p>
+ * Current uptime, guild count, member count,
+ * current Java version, number of shards, used and free memory,
+ * Mixcord website link, Discord server invite link,
+ * Discord user names of developers.
+ */
 @Slf4j
 public class Info extends Command {
 
@@ -25,16 +33,6 @@ public class Info extends Command {
                 Permission.MESSAGE_WRITE};
     }
 
-    /**
-     * Sends the following information about the bot to the author in a formatted embed.
-     * <p>
-     * Current uptime, guild count, member count,
-     * current Java version, number of shards, used and free memory,
-     * Mixcord website link, Discord server invite link,
-     * Discord user names of developers.
-     *
-     * @param commandEvent which triggered this command
-     */
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();
@@ -51,7 +49,6 @@ public class Info extends Command {
         final long hours = duration / 3600000L % 24;
         final long minutes = duration / 60000L % 60;
         final long seconds = duration / 1000L % 60;
-        // final long milliseconds = duration % 1000;
 
         String uptime =
                 (years == 0 ? "" : years + " years, ") +
@@ -59,11 +56,9 @@ public class Info extends Command {
                         (days == 0 ? "" : days + " days, ") +
                         (hours == 0 ? "" : hours + " hours, ") +
                         (minutes == 0 ? "" : minutes + " minutes, ") +
-                        (seconds == 0 ? "" : seconds + " seconds, ")
-                /* + (milliseconds == 0 ? "" : milliseconds + " Milliseconds, ") */;
+                        (seconds == 0 ? "" : seconds + " seconds, ");
 
         uptime = replaceLast(uptime);
-        //uptime = replaceLast(uptime, ",", " and");
 
         // Usage segment
         int guildCount = commandEvent.getJDA().getGuilds().size();
@@ -79,7 +74,6 @@ public class Info extends Command {
         String version = "· Java " + System.getProperty("java.version");
 
         // Shards
-        //TODO: Gateway and REST ping
         long ping = commandEvent.getJDA().getGatewayPing();
         int shardId = commandEvent.getJDA().getShardInfo().getShardId();
         int totalShards = commandEvent.getJDA().getShardInfo().getShardTotal();

@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONObject;
 
+/**
+ * Edits a specific notifications embed color.
+ */
 @Slf4j
 public class NotifColorEdit extends Command {
 

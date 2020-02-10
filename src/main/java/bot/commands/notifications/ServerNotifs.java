@@ -15,6 +15,9 @@ import org.json.JSONObject;
 import java.time.Instant;
 import java.util.ArrayList;
 
+/**
+ * Lists all notifications already set up in a specific Discord guild.
+ */
 @Slf4j
 public class ServerNotifs extends Command {
 

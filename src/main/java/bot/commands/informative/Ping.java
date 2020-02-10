@@ -10,6 +10,13 @@ import net.dv8tion.jda.api.entities.User;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Sends the bot's latency information to the user in a regular message.
+ * The latency is determined by measuring the gateway ping
+ * and the time it took Discord to send our message.
+ * The gateway ping is our connection latency to Discord's Api.
+ * The true ping is the time difference between message creation and current time.
+ */
 @Slf4j
 public class Ping extends Command {
 
@@ -24,15 +31,6 @@ public class Ping extends Command {
                 Permission.MESSAGE_WRITE};
     }
 
-    /**
-     * Sends the bot's latency information to the author in a regular message.
-     * The latency is determined by measuring the gateway ping
-     * and the time it took Discord to send our message.
-     * The gateway ping is our connection latency to Discord's Api.
-     * The true ping is the time difference between message creation and current time.
-     *
-     * @param commandEvent the event which triggered this command
-     */
     @Override
     protected void execute(CommandEvent commandEvent) {
         User commandAuthor = commandEvent.getAuthor();

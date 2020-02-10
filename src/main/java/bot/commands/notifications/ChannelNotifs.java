@@ -15,6 +15,9 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 
+/**
+ * Lists all notifications already set up in a specific Discord channel.
+ */
 @Slf4j
 public class ChannelNotifs extends Command {
 

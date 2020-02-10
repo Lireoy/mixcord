@@ -14,6 +14,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+/**
+ * Sends a complete notification preview for a specific streamer
+ * in a specific Discord channel with the already specified options.
+ */
 @Slf4j
 public class NotifPreview extends Command {
 

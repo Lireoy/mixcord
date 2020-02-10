@@ -1,7 +1,6 @@
 package bot.commands.mixer;
 
 import bot.Constants;
-import bot.Mixcord;
 import bot.structure.CommandCategory;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
@@ -14,6 +13,10 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 
+/**
+ * Sends information about a specific Mixer user's social accounts to the Discord user in a formatted embed.
+ * Only available socials are displayed.
+ */
 @Slf4j
 public class MixerUserSocials extends Command {
 

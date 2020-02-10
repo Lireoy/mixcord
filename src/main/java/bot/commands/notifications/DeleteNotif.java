@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Deletes a specific notification entry from the database.
+ */
 @Slf4j
 public class DeleteNotif extends Command {
 

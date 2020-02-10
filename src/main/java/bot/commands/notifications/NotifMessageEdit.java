@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+/**
+ * Changes the notification message for a specific notification.
+ */
 @Slf4j
 public class NotifMessageEdit extends Command {
 

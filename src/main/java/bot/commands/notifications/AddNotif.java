@@ -15,6 +15,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Adds a notification entry to the database for a specific Mixer user.
+ * The notification limit is checked here as case by case basis.
+ */
 @Slf4j
 public class AddNotif extends Command {
 

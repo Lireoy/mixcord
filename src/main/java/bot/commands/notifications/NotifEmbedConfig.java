@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+/**
+ * Changes in what format a specific notification is going to be sent.
+ */
 @Slf4j
 public class NotifEmbedConfig extends Command {
 

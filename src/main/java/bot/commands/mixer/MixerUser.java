@@ -13,6 +13,10 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 
+/**
+ * Sends information about a specific Mixer user to the Discord user in a formatted embed.
+ * Information varies based on the current state of the channel. (Live or offline)
+ */
 @Slf4j
 public class MixerUser extends Command {
 
@@ -50,9 +54,7 @@ public class MixerUser extends Command {
                 return;
             }
 
-            // This line avoids lots of spaghetti code
             JSONObject user = channel.getJSONObject("user");
-
             String username = channel.getString("token");
             int id = channel.getInt("id");
             String liveThumbnail = Constants.MIXER_THUMB_PRE + id + Constants.MIXER_THUMB_POST;

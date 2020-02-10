@@ -14,6 +14,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+/**
+ * Resets all the fields in a database entry to the default values.
+ */
 @Slf4j
 public class MakeDefault extends Command {
 
