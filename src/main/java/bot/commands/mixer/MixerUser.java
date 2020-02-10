@@ -1,7 +1,6 @@
 package bot.commands.mixer;
 
 import bot.Constants;
-import bot.Mixcord;
 import bot.structure.CommandCategory;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
@@ -57,7 +56,8 @@ public class MixerUser extends Command {
             String username = channel.getString("token");
             int id = channel.getInt("id");
             String liveThumbnail = Constants.MIXER_THUMB_PRE + id + Constants.MIXER_THUMB_POST;
-            String avatarUrl = user.getString("avatarUrl");
+            Object avatarObject = user.get("avatarUrl");
+            String avatarUrl = avatarObject == JSONObject.NULL ? Constants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
             Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
             String isVerified = user.getBoolean("verified") ? Constants.SUCCESS : Constants.ERROR;
             String isPartnered = channel.getBoolean("partnered") ? Constants.SUCCESS : Constants.ERROR;
