@@ -1,17 +1,14 @@
 package bot.commands.mixer;
 
-import bot.Constants;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
-
-import java.time.Instant;
 
 /**
  * Sends information about a specific Mixer user's social accounts to the Discord user in a formatted embed.
@@ -52,16 +49,9 @@ public class MixerUserSocials extends Command {
                 return;
             }
 
-            String username = channel.getString("token");
-            String channelUrl = Constants.MIXER_COM + username;
             JSONObject user = channel.getJSONObject("user");
             JSONObject socials = user.getJSONObject("social");
-            Object avatarUrl = user.get("avatarUrl");
 
-            // Handles "null" as a profile picture exception
-            if (avatarUrl == JSONObject.NULL) {
-                avatarUrl = Constants.MIXER_PROFILE_PICTURE_DEFAULT;
-            }
 
             StringBuilder description = new StringBuilder();
             boolean hasSocial = false;
@@ -102,26 +92,23 @@ public class MixerUserSocials extends Command {
                 description.append("· [Steam](").append(socials.getString("steam")).append(")\n");
                 hasSocial = true;
             }
-
-            String footer = commandEvent.getAuthor().getName() + "#"
-                    + commandEvent.getAuthor().getDiscriminator();
-            String footerImg = commandEvent.getAuthor().getAvatarUrl();
+            // TODO: FIND A SPREADSHIRT LINKED ACCOUNT
 
             if (hasSocial) {
-                commandEvent.reply(new EmbedBuilder()
-                        .setAuthor(username, channelUrl, avatarUrl.toString())
-                        .setDescription(description)
-                        .setFooter(footer, footerImg)
-                        .setTimestamp(Instant.now())
-                        .build());
+                commandEvent.reply(
+                        new EmbedSender(null, channel)
+                                .setCustomAuthor()
+                                .setDescription(description)
+                                .build()
+                );
             } else {
                 description = new StringBuilder("No socials are available.");
-                commandEvent.reply(new EmbedBuilder()
-                        .setAuthor(username, channelUrl, avatarUrl.toString())
-                        .setDescription(description)
-                        .setFooter(footer, footerImg)
-                        .setTimestamp(Instant.now())
-                        .build());
+                commandEvent.reply(
+                        new EmbedSender(null, channel)
+                                .setCustomAuthor()
+                                .setDescription(description)
+                                .build()
+                );
             }
         }
     }

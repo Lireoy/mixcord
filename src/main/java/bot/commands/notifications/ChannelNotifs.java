@@ -1,7 +1,6 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.DatabaseDriver;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;

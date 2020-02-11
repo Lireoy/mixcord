@@ -3,7 +3,6 @@ package bot.utils;
 import bot.Constants;
 import bot.Mixcord;
 import bot.structure.Notification;
-import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONObject;
 
@@ -31,7 +30,7 @@ public class EmbedSender extends EmbedBuilder {
      * It also provides method options to set additional details
      * with the specified parameters.
      *
-     * @param notif    the JSON object which has information from the database
+     * @param notif     the JSON object which has information from the database
      * @param mixerInfo the JSON object which has information about the streamer from Mixer
      */
     public EmbedSender(Notification notif, JSONObject mixerInfo) {
@@ -50,6 +49,8 @@ public class EmbedSender extends EmbedBuilder {
      * @return The EmbedSender instance. Useful for chaining.
      */
     public EmbedSender setCustomAuthor() {
+        if (mixerInfo == null) return this;
+
         Object authorImg = null;
         try {
             authorImg = mixerInfo.getJSONObject("user").get("avatarUrl");
@@ -70,6 +71,8 @@ public class EmbedSender extends EmbedBuilder {
      * @return The EmbedSender instance. Useful for chaining.
      */
     public EmbedSender setCustomTitle() {
+        if (mixerInfo == null) return this;
+
         this.setTitle(mixerInfo.getString("name"), getChannelLink());
         return this;
     }
@@ -81,6 +84,8 @@ public class EmbedSender extends EmbedBuilder {
      * @return The EmbedSender instance. Useful for chaining.
      */
     public EmbedSender setCustomDescription() {
+        if (mixerInfo == null) return this;
+
         String gameName = mixerInfo.getJSONObject("type").getString("name");
         String currentViewers = String.valueOf(mixerInfo.getJSONObject("type")
                 .getInt("viewersCurrent"));
@@ -95,6 +100,8 @@ public class EmbedSender extends EmbedBuilder {
      * Sets the embed color based on the information in {@link EmbedSender#mixerInfo}.
      */
     private void setCustomColor() {
+        if (notif == null) return;
+
         this.setColor(HexUtil.formatForEmbed(notif.getEmbedColor()));
     }
 
@@ -105,6 +112,7 @@ public class EmbedSender extends EmbedBuilder {
      * @return a String, which is a valid link for the streamer.
      */
     private String getChannelLink() {
-        return Constants.MIXER_COM + notif.getStreamerName();
+        String streamerName = notif == null ? mixerInfo.getString("token") : notif.getStreamerName();
+        return Constants.MIXER_COM + streamerName;
     }
 }

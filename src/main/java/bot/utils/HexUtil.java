@@ -3,7 +3,6 @@ package bot.utils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +27,7 @@ public class HexUtil {
      * Validates hex with regular expression.
      *
      * @param hex hex for validation
-     * @return true valid hex, false invalid hex
+     * @return true for valid hex, otherwise false
      */
     public boolean validateHex(final String hex) {
         return pattern.matcher(hex).matches();
@@ -37,8 +36,8 @@ public class HexUtil {
     /**
      * Converts hex color to rgb.
      *
-     * @param hex hex for color convert
-     * @return the rgb color component
+     * @param hex hex to convert to {@link Color}
+     * @return the rgb {@link Color} component
      */
     private static Color hex2Rgb(final String hex) {
         return new Color(
@@ -48,15 +47,21 @@ public class HexUtil {
     }
 
     /**
-     * Formats a hex color and then converts it to rgb
+     * Formats a hex color and then converts it to rgb.
      *
-     * @param hex hex for color convert
-     * @return the rgb color component
+     * @param hex hex to convert to {@link Color}
+     * @return the rgb {@link Color} component
      */
     public static Color formatForEmbed(final String hex) {
         return HexUtil.hex2Rgb(formatHex(hex));
     }
 
+    /**
+     * Removes the hash symbol from the beginning of the hex value if found.
+     *
+     * @param hex the hex value to format
+     * @return a hex value in a {@link String} without a hash symbol
+     */
     public static String formatHex(final String hex) {
         if (hex.startsWith("#")) {
             return hex.substring(1);

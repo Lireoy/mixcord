@@ -11,8 +11,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 /**
  * Deletes a specific notification entry from the database.
  */

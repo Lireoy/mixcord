@@ -9,7 +9,6 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.apache.commons.codec.binary.Hex;
 import org.json.JSONObject;
 
 /**

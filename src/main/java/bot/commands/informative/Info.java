@@ -2,15 +2,14 @@ package bot.commands.informative;
 
 import bot.Constants;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
 import java.lang.management.ManagementFactory;
-import java.time.Instant;
 
 /**
  * Sends information about the bot to the user in a formatted embed.
@@ -100,7 +99,7 @@ public class Info extends Command {
 
 
         commandEvent.getTextChannel().sendMessage(
-                new EmbedBuilder()
+                new EmbedSender()
                         .setTitle("Mixcord")
                         .addField("Uptime", uptime, false)
                         .addField("Usage", usage, true)
@@ -110,8 +109,6 @@ public class Info extends Command {
                         .addField("Links", links, false)
                         .addField("Developers", developers, false)
                         .addField("Infrastructure", infrastructure, false)
-                        .setFooter(footer, footerImg)
-                        .setTimestamp(Instant.now())
                         .build()
         ).queue();
     }

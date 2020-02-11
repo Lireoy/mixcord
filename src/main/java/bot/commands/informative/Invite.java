@@ -2,14 +2,12 @@ package bot.commands.informative;
 
 import bot.Mixcord;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-
-import java.time.Instant;
 
 /**
  * Sends the bot's invite link to the user in a formatted embed.
@@ -42,11 +40,9 @@ public class Invite extends Command {
         String clientId = Mixcord.getJda().getSelfUser().getId();
 
         commandEvent.reactSuccess();
-        commandEvent.reply(new EmbedBuilder()
+        commandEvent.reply(new EmbedSender()
                 .setAuthor("Invite")
                 .setDescription("[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=" + clientId + "&permissions=347200&scope=bot)")
-                .setFooter(footer, footerImg)
-                .setTimestamp(Instant.now())
                 .build());
     }
 }

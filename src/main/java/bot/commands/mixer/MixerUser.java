@@ -2,16 +2,14 @@ package bot.commands.mixer;
 
 import bot.Constants;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
-
-import java.time.Instant;
 
 /**
  * Sends information about a specific Mixer user to the Discord user in a formatted embed.
@@ -54,10 +52,11 @@ public class MixerUser extends Command {
                 return;
             }
 
-            JSONObject user = channel.getJSONObject("user");
-            String username = channel.getString("token");
             int id = channel.getInt("id");
             String liveThumbnail = Constants.MIXER_THUMB_PRE + id + Constants.MIXER_THUMB_POST;
+            String username = channel.getString("token");
+
+            JSONObject user = channel.getJSONObject("user");
             Object avatarObject = user.get("avatarUrl");
             String avatarUrl = avatarObject == JSONObject.NULL ? Constants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
             Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
@@ -86,16 +85,11 @@ public class MixerUser extends Command {
             String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
             String image = bannerUrl == JSONObject.NULL ? Constants.MIXER_BANNER_DEFAULT : bannerUrl.toString();
 
-
-            String footer = commandEvent.getAuthor().getName() + "#" +
-                    commandEvent.getAuthor().getDiscriminator();
-            String footerImg = commandEvent.getAuthor().getAvatarUrl();
-
             if (streaming) {
                 // Live
                 commandEvent.reply(
-                        new EmbedBuilder()
-                                .setAuthor(username, channelUrl, avatarUrl)
+                        new EmbedSender(null, channel)
+                                .setCustomAuthor()
                                 .setThumbnail(avatarUrl)
                                 .addField("Bio", bio.toString(), false)
                                 .addField("Trusted", trusted, true)
@@ -108,23 +102,19 @@ public class MixerUser extends Command {
                                 .addField("Target audience", targetAudience, true)
                                 .addField("Link", liveStreamLink, false)
                                 .setImage(liveThumbnail)
-                                .setFooter(footer, footerImg)
-                                .setTimestamp(Instant.now())
                                 .build()
                 );
             } else {
                 // Offline
                 commandEvent.reply(
-                        new EmbedBuilder()
-                                .setAuthor(username, channelUrl, avatarUrl)
+                        new EmbedSender(null, channel)
+                                .setCustomAuthor()
                                 .setThumbnail(avatarUrl)
                                 .addField("Bio", bio.toString(), false)
                                 .addField("Trusted", trusted, true)
                                 .addField("Status", status, true)
                                 .addField("Followers", followers, true)
                                 .setImage(image)
-                                .setFooter(footer, footerImg)
-                                .setTimestamp(Instant.now())
                                 .build()
                 );
             }

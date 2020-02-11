@@ -15,6 +15,7 @@ import bot.commands.owner.ServerInfo;
 import bot.structure.Credentials;
 import bot.utils.NotifService;
 import com.google.gson.Gson;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
@@ -33,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 
 @Slf4j
 public class Mixcord {
@@ -69,6 +74,7 @@ public class Mixcord {
                 .setOwnerId(Constants.OWNER_ID)
                 .setCoOwnerIds(Constants.CO_OWNER_ID, Constants.CO_OWNER_ID2)
                 .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
+                .setServerInvite(Constants.DISCORD)
                 .addCommands(
                         // Informative
                         new Ping(),
@@ -99,6 +105,36 @@ public class Mixcord {
                         new RoleInfo(),
                         new ServerInfo(),
                         new Shutdown())
+                .setHelpConsumer(event -> {
+                    StringBuilder helpBuilder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
+                    Command.Category category = null;
+                    for (Command command : client.getCommands()) {
+                        if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
+                            if (!Objects.equals(category, command.getCategory())) {
+                                category = command.getCategory();
+                                helpBuilder.append("\n\n  __").append(category == null ? "No Category" : category.getName()).append("__:\n");
+                            }
+                            helpBuilder.append("\n`").append(client.getPrefix()).append(client.getPrefix() == null ? " " : "").append(command.getName())
+                                    .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
+                                    .append(" - ").append(command.getHelp());
+                        }
+                    }
+                    User owner = event.getJDA().getUserById(client.getOwnerId());
+                    if (owner != null) {
+                        helpBuilder.append("\n\nFor additional help, contact **").append(owner.getName()).append("**#").append(owner.getDiscriminator());
+                        if (client.getServerInvite() != null)
+                            helpBuilder.append(" or join ").append(client.getServerInvite());
+                    }
+                    try {
+                        if (event.isFromType(ChannelType.TEXT)) {
+                            event.reply(helpBuilder.toString());
+                            event.reactSuccess();
+                        }
+                    } catch (InsufficientPermissionException ex) {
+                        event.reactError();
+                        event.replyInDm("Help cannot be sent. I don't have permission to write in that channel.");
+                    }
+                })
                 .build();
         client.getCommands().forEach((command) -> log.info("Added command: {}", command.getName()));
         log.info("Total number of commands available: {}", client.getCommands().size());
