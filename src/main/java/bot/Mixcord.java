@@ -120,16 +120,22 @@ public class Mixcord {
                                     .append(" - ").append(command.getHelp());
                         }
                     }
-                    User owner = event.getJDA().getUserById(client.getOwnerId());
-                    if (owner != null) {
-                        helpBuilder.append("\n\nFor additional help, contact **").append(owner.getName()).append("**#").append(owner.getDiscriminator());
-                        if (client.getServerInvite() != null)
-                            helpBuilder.append(" or join ").append(client.getServerInvite());
-                    }
                     try {
                         if (event.isFromType(ChannelType.TEXT)) {
                             event.reply(helpBuilder.toString());
                             event.reactSuccess();
+
+                            User owner = event.getJDA().getUserById(client.getOwnerId());
+                            if (owner != null) {
+                                StringBuilder contact = new StringBuilder();
+                                contact.append("For additional help, contact **")
+                                        .append(owner.getName())
+                                        .append("**#")
+                                        .append(owner.getDiscriminator())
+                                        .append(" or join ")
+                                        .append(Constants.DISCORD);
+                                event.reply(contact.toString());
+                            }
                         }
                     } catch (InsufficientPermissionException ex) {
                         event.reactError();
