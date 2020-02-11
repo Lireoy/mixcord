@@ -80,6 +80,7 @@ public class Mixcord {
                         new Ping(),
                         new Info(),
                         new Invite(),
+                        new WhoCanUseMe(),
 
                         // Notifications
                         new AddNotif(),
