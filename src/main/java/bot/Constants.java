@@ -31,6 +31,7 @@ public class Constants {
 
     // MIXCORD.IO
     public static final String MIXCORD_IO = "https://streamcord.io/mixer/";
+    public static final String MIXCORD_IO_EMBED_FOOTER = "streamcord.io/mixer";
     public static final String MIXCORD_IO_LOGO = "https://mixer.com/_latest/assets/favicons/favicon-32x32.png";
 
     // NOTIFICATION DEFAULT VALUES

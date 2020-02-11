@@ -3,15 +3,14 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.time.Instant;
 import java.util.ArrayList;
 
 /**
@@ -39,50 +38,54 @@ public class ServerNotifs extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         String serverId = commandEvent.getMessage().getGuild().getId();
-        ArrayList list = Mixcord.getDatabase().selectServerNotifs(serverId);
+        ArrayList list = Mixcord.getDatabase().selectServerNotifsOrdered(serverId);
 
-        StringBuilder description = new StringBuilder();
         String prevChannel = "";
-        if (!list.isEmpty()) {
-            for (Object doc : list) {
-                JSONObject entry = new JSONObject(doc.toString());
-                String streamer = entry.getString("streamerName");
-                String channel = entry.getString("channelId");
-
-                if (!prevChannel.equals(channel)) {
-                    description
-                            .append("\n")
-                            .append("<#")
-                            .append(channel)
-                            .append(">\n");
-                }
-                prevChannel = channel;
-                description
-                        .append("· [")
-                        .append(streamer)
-                        .append("](")
-                        .append(Constants.MIXER_COM)
-                        .append(streamer).append(")\n");
-            }
-        } else {
-            description = new StringBuilder("There are no notifications in this server");
+        if (list.isEmpty()) {
+            commandEvent.reactError();
+            commandEvent.reply("There are no notifications in this channel");
+            return;
         }
 
-        String footer = commandEvent.getAuthor().getName() + "#"
-                + commandEvent.getAuthor().getDiscriminator();
-        String footerImg = commandEvent.getAuthor().getAvatarUrl();
+        StringBuilder description = new StringBuilder();
+        for (Object doc : list) {
+            JSONObject entry = new JSONObject(doc.toString());
+            String streamer = entry.getString("streamerName");
+            String channel = entry.getString("channelId");
+
+            if (!prevChannel.equals(channel)) {
+                description
+                        .append("\n")
+                        .append("<#")
+                        .append(channel)
+                        .append(">\n");
+            }
+            prevChannel = channel;
+            description
+                    .append("· [")
+                    .append(streamer)
+                    .append("](")
+                    .append(Constants.MIXER_COM)
+                    .append(streamer).append(")\n");
+        }
+
+        if (list.size() == 1) {
+            commandEvent.reply("There's only 1 notification in this server.");
+            commandEvent.reply(
+                    new EmbedSender()
+                            .setTitle("Channel Notifications")
+                            .setDescription(description)
+                            .build());
+        }
 
         if (list.size() > 1) {
             String message = "There's a total of " + list.size() + " notifications in this server.";
             commandEvent.reply(message);
-        } else if (list.size() == 1) {
-            commandEvent.reply("There's only 1 notification in this server.");
+            commandEvent.reply(
+                    new EmbedSender()
+                            .setTitle("Server Notifications")
+                            .setDescription(description.toString())
+                            .build());
         }
-        commandEvent.reply(new EmbedBuilder()
-                .setTitle("Server Notifications")
-                .setDescription(description.toString())
-                .setFooter(footer, footerImg)
-                .setTimestamp(Instant.now())
-                .build());
     }
 }

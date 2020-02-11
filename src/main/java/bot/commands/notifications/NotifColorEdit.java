@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
 import bot.utils.HexUtil;
+import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -37,7 +38,7 @@ public class NotifColorEdit extends Command {
 
         String serverId = commandEvent.getMessage().getGuild().getId();
         String channelId = commandEvent.getMessage().getChannel().getId();
-        String[] args = commandEvent.getArgs().trim().split(",", 2);
+        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
 
 
         String streamerName = "";
@@ -59,36 +60,35 @@ public class NotifColorEdit extends Command {
         }
 
         HexUtil hexValidator = new HexUtil();
-
-        if (hexValidator.validateHex(newColor.trim())) {
-            Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
-            if (cursor.hasNext()) {
-                JSONObject dbNotification = new JSONObject(cursor.next().toString());
-
-                String dbDocumentId = dbNotification.getString("id");
-                String dbStreamerName = dbNotification.getString("streamerName");
-                String dbEmbedColor = dbNotification.getString("embedColor");
-
-                if (dbEmbedColor.equals(newColor)) {
-                    commandEvent.reply("Your new color is same as the old one!");
-                } else {
-                    Mixcord.getDatabase().updateColor(dbDocumentId, newColor);
-
-                    String response = "";
-
-                    response += "Notification color was changed for the following notification: `" + dbStreamerName + "`";
-                    response += "\nOld color:\n```" + dbEmbedColor + "```\n\n";
-                    response += "New color:\n```" + newColor + "```";
-
-                    commandEvent.reply(response);
-                }
-
-            } else {
-                commandEvent.reply("There are no notifications in this channel");
-            }
-            cursor.close();
-        } else {
+        if (!hexValidator.validateHex(newColor.trim())) {
             commandEvent.reply("Please provide a valid hex color.");
+            return;
         }
+
+        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        if (!cursor.hasNext()) {
+            commandEvent.reply("There are no notifications in this channel");
+            return;
+        }
+
+        JSONObject dbNotification = new JSONObject(cursor.next().toString());
+        cursor.close();
+
+        String dbDocumentId = dbNotification.getString("id");
+        String dbStreamerName = dbNotification.getString("streamerName");
+        String dbEmbedColor = dbNotification.getString("embedColor");
+
+        if (dbEmbedColor.equals(newColor)) {
+            commandEvent.reply("Your new color is same as the old one!");
+            return;
+        }
+
+        Mixcord.getDatabase().updateColor(dbDocumentId, newColor);
+
+        String response = "";
+        response += "Notification color was changed for the following notification: `" + dbStreamerName + "`";
+        response += "\nOld color:\n```" + dbEmbedColor + "```\n\n";
+        response += "New color:\n```" + newColor + "```";
+        commandEvent.reply(response);
     }
 }

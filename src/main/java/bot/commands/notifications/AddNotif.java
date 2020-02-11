@@ -58,21 +58,26 @@ public class AddNotif extends Command {
 
         Cursor cursor = Mixcord.getDatabase().selectOneServer(serverId);
         Gson gson = new Gson();
-        if (cursor.hasNext()) {
-            Server server = gson.fromJson(new JSONObject(cursor.next().toString()).toString(), Server.class);
-            ArrayList list = Mixcord.getDatabase().selectServerNotifs(serverId);
-            if (server.isWhitelisted()) {
-                if (list.size() >= 25) {
-                    commandEvent.reply("This server has reached the limit for the number of notifications.");
-                    return;
-                }
-            } else {
-                if (list.size() >= 10) {
-                    commandEvent.reply("This server has reached the limit for the number of notifications.");
-                    return;
-                }
+        if (!cursor.hasNext()) {
+            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@331756964801544202>");
+            return;
+        }
+
+
+        Server server = gson.fromJson(new JSONObject(cursor.next().toString()).toString(), Server.class);
+        ArrayList list = Mixcord.getDatabase().selectServerNotifsOrdered(serverId);
+        if (server.isWhitelisted()) {
+            if (list.size() >= 25) {
+                commandEvent.reply("This server has reached the limit for the number of notifications.");
+                return;
+            }
+        } else {
+            if (list.size() >= 10) {
+                commandEvent.reply("This server has reached the limit for the number of notifications.");
+                return;
             }
         }
+
 
         // Query Mixer to get case-correct streamer name, ID etc.
         JSONObject channel = MixerQuery.queryChannel(query);
@@ -101,9 +106,7 @@ public class AddNotif extends Command {
             log.info("New streamer detected, added to database...");
         }
 
-        boolean responseCode = Mixcord.getDatabase().addNotif(serverId, channelId, streamerName, streamerId);
-
-        if (responseCode) {
+        if (Mixcord.getDatabase().addNotif(serverId, channelId, streamerName, streamerId)) {
             commandEvent.reply("From now, you will receive notifications for " + streamerName + " in this channel.");
             commandEvent.reactSuccess();
         } else {

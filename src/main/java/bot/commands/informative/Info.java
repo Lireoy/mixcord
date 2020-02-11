@@ -3,6 +3,7 @@ package bot.commands.informative;
 import bot.Constants;
 import bot.structure.CommandCategory;
 import bot.utils.EmbedSender;
+import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +56,9 @@ public class Info extends Command {
                         (days == 0 ? "" : days + " days, ") +
                         (hours == 0 ? "" : hours + " hours, ") +
                         (minutes == 0 ? "" : minutes + " minutes, ") +
-                        (seconds == 0 ? "" : seconds + " seconds, ");
+                        (seconds == 0 ? "" : seconds + " seconds");
 
-        uptime = replaceLast(uptime);
+        uptime = StringUtil.replaceLastComa(uptime);
 
         // Usage segment
         int guildCount = commandEvent.getJDA().getGuilds().size();
@@ -111,9 +112,5 @@ public class Info extends Command {
                         .addField("Infrastructure", infrastructure, false)
                         .build()
         ).queue();
-    }
-
-    private String replaceLast(final String text) {
-        return text.replaceFirst("(?s)(.*)" + ", ", "$1" + "");
     }
 }

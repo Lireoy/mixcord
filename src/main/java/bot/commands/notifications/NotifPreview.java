@@ -56,25 +56,23 @@ public class NotifPreview extends Command {
 
         Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (cursor.hasNext()) {
-            Gson gson = new Gson();
-            Notification notif = gson.fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
-            JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
-
-            if (notif.isEmbed()) {
-                commandEvent.reply(notif.getMessage());
-                commandEvent.reply(
-                        new EmbedSender(notif, queryJson)
-                                .setCustomAuthor()
-                                .setCustomTitle()
-                                .setCustomDescription()
-                                .build());
-            } else {
-                commandEvent.reply(notif.getMessage());
-            }
-
-        } else {
             commandEvent.reply("There is no such notification in this channel.");
+            return;
         }
+        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
         cursor.close();
+        JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
+
+        if (notif.isEmbed()) {
+            commandEvent.reply(notif.getMessage());
+            commandEvent.reply(
+                    new EmbedSender(notif, queryJson)
+                            .setCustomAuthor()
+                            .setCustomTitle()
+                            .setCustomDescription()
+                            .build());
+        } else {
+            commandEvent.reply(notif.getMessage());
+        }
     }
 }

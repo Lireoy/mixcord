@@ -21,8 +21,8 @@ public class NotifSender {
      * Sends the specified message to the specified address in an embed when a streamer comes online.
      * If the channel or guild does not exist, the notification is deleted.
      *
-     * @param notif JSON object which contains data for the notification from the database
-     * @param queryJson      JSON object which contains data for the streamer from Mixer
+     * @param notif     JSON object which contains data for the notification from the database
+     * @param queryJson JSON object which contains data for the streamer from Mixer
      */
     public static void sendEmbed(Notification notif, JSONObject queryJson) {
         String queryChId = String.valueOf(queryJson.getInt("id"));
@@ -31,30 +31,33 @@ public class NotifSender {
         Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
         TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
 
-        if (Mixcord.getJda().getGuilds().contains(guild)) {
-            if (Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
-                    .getTextChannels().contains(textChannel)) {
-                Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
-                textChannel.sendMessage(
-                        new EmbedSender(notif, queryJson)
-                                .setCustomAuthor()
-                                .setCustomTitle()
-                                .setCustomDescription()
-                                .setImage(embLiveThumbnail)
-                                .build()).queue();
-                log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            } else {
-                log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-                database.deleteNotif(notif.getId());
-                log.info("Deleted the notification in G:{} C:{} for {} ({})",
-                        notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-                if (!database.selectStreamerNotifs(notif.getStreamerId()).hasNext()) {
-                    database.deleteStreamer(notif.getStreamerName(), notif.getStreamerId());
-                }
-            }
-        } else {
+        if (!Mixcord.getJda().getGuilds().contains(guild)) {
             log.info("Guild is not available. G:{}", notif.getServerId());
+            return;
         }
+
+        if (!Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
+                .getTextChannels().contains(textChannel)) {
+            log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
+            database.deleteNotif(notif.getId());
+            log.info("Deleted the notification in G:{} C:{} for {} ({})",
+                    notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
+            if (!database.selectStreamerNotifs(notif.getStreamerId()).hasNext()) {
+                database.deleteStreamerByDocId(notif.getStreamerId());
+            }
+        }
+
+
+        Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
+        textChannel.sendMessage(
+                new EmbedSender(notif, queryJson)
+                        .setCustomAuthor()
+                        .setCustomTitle()
+                        .setCustomDescription()
+                        .setImage(embLiveThumbnail)
+                        .build()).queue();
+        log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
+
     }
 
     /**
@@ -79,7 +82,7 @@ public class NotifSender {
                 log.info("Deleted the notification in G:{} C:{} for {} ({})",
                         notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
                 if (!database.selectStreamerNotifs(notif.getStreamerId()).hasNext()) {
-                    database.deleteStreamer(notif.getStreamerName(), notif.getStreamerId());
+                    database.deleteStreamerByDocId(notif.getStreamerId());
                 }
             }
         } else {

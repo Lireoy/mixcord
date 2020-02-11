@@ -37,7 +37,7 @@ public class Ping extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         commandEvent.reply("Ping: ...", (m) -> {
-            long ping = commandEvent.getMessage().getTimeCreated().until(m.getTimeCreated(),
+            final long ping = commandEvent.getMessage().getTimeCreated().until(m.getTimeCreated(),
                     ChronoUnit.MILLIS);
 
             m.editMessage("Calculating...").queue();

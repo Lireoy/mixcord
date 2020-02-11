@@ -1,7 +1,8 @@
 package bot;
 
-import bot.structure.Server;
+import bot.structure.Notification;
 import com.google.gson.Gson;
+import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
@@ -12,6 +13,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles specific events which are triggered.
@@ -85,11 +88,35 @@ public class EventHandler extends ListenerAdapter {
      */
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
+        Gson gson = new Gson();
+
         log.info("Leaving guild {}", event.getGuild().getId());
-        Object guildObj = Mixcord.getDatabase().selectOneServer(event.getGuild().getId()).next();
-        JSONObject guildJson = new JSONObject(guildObj.toString());
-        Server server = new Gson().fromJson(guildJson.toString(), Server.class);
-        Mixcord.getDatabase().deleteGuild(server.getId());
+        Mixcord.getDatabase().deleteGuild(event.getGuild().getId());
         log.info("Deleting server configuration from database...");
+
+        List<String> streamerIds = new ArrayList<>();
+        Cursor notifs = Mixcord.getDatabase().selectServerNotifs(event.getGuild().getId());
+
+        int deletedNotifs = 0;
+        for (Object object : notifs) {
+            Notification notif = gson.fromJson(new JSONObject(object.toString()).toString(), Notification.class);
+            Mixcord.getDatabase().deleteNotif(notif.getId());
+            deletedNotifs++;
+
+            if (!streamerIds.contains(notif.getStreamerId())) {
+                streamerIds.add(notif.getStreamerId());
+            }
+        }
+        log.info("Deleted {} notifications for G:{}", deletedNotifs, event.getGuild().getId());
+
+        int deletedStreamers = 0;
+        for (String streamerId : streamerIds) {
+            if (!Mixcord.getDatabase().selectStreamerNotifs(streamerId).hasNext()) {
+                Mixcord.getDatabase().deleteStreamer(streamerId);
+                deletedStreamers++;
+            }
+        }
+
+        log.info("Deleted {} streamers from the database.", deletedStreamers);
     }
 }

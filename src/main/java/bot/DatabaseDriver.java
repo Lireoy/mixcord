@@ -32,7 +32,7 @@ public class DatabaseDriver {
      */
     public boolean addStreamer(String streamerName, String streamerId) {
         // Check if entry is in the database
-        if (getStreamerDocId(streamerName, streamerId) == null) {
+        if (getStreamerDocId(streamerId) == null) {
             // If not in database, insert the data.
             streamers.insert(rethink.hashMap("streamerName", streamerName)
                     .with("streamerId", streamerId)
@@ -83,13 +83,11 @@ public class DatabaseDriver {
     /**
      * Gets a streamer entry's document ID with the specified parameters.
      *
-     * @param streamerName the name of the streamer
      * @param streamerId   the ID of the streamer
      * @return the unique ID of the document if found, otherwise null
      */
-    private String getStreamerDocId(String streamerName, String streamerId) {
-        Cursor cursor = streamers.filter(row -> row.g("streamerName").eq(streamerName)
-                .and(row.g("streamerId").eq(streamerId)))
+    private String getStreamerDocId(String streamerId) {
+        Cursor cursor = streamers.filter(row -> row.g("streamerId").eq(streamerId))
                 .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
@@ -103,16 +101,15 @@ public class DatabaseDriver {
     /**
      * Deletes a document from the streamers table with the specified parameters.
      *
-     * @param streamerName the name of the streamer
      * @param streamerId   the ID of the streamer
      * @return true if deletion is successful
      */
-    public boolean deleteStreamer(String streamerName, String streamerId) {
-        String documentId = getStreamerDocId(streamerName, streamerId);
+    public boolean deleteStreamer(String streamerId) {
+        String documentId = getStreamerDocId(streamerId);
         if (documentId == null) {
             return false;
         } else {
-            deleteStreamer(documentId);
+            deleteStreamerByDocId(documentId);
             return true;
         }
     }
@@ -122,7 +119,7 @@ public class DatabaseDriver {
      *
      * @param dbEntryId the ID of the document to delete
      */
-    public void deleteStreamer(String dbEntryId) {
+    public void deleteStreamerByDocId(String dbEntryId) {
         streamers.get(dbEntryId).delete().run(connection);
     }
 
@@ -176,9 +173,14 @@ public class DatabaseDriver {
      * @param serverId the server ID to look for in the notifications
      * @return an {@link ArrayList} with all the notifications for the server
      */
-    public ArrayList selectServerNotifs(String serverId) {
+    public ArrayList selectServerNotifsOrdered(String serverId) {
         return notifications.filter(rethink.hashMap("serverId", serverId))
                 .orderBy("channelId").map(ReqlExpr::toJson).run(connection);
+    }
+
+    public Cursor selectServerNotifs(String serverId) {
+        return notifications.filter(rethink.hashMap("serverId", serverId))
+                .map(ReqlExpr::toJson).run(connection);
     }
 
     /**

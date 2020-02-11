@@ -3,7 +3,9 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
+import bot.structure.Notification;
 import bot.utils.StringUtil;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -38,7 +40,7 @@ public class NotifMessageEdit extends Command {
 
         String serverId = commandEvent.getMessage().getGuild().getId();
         String channelId = commandEvent.getMessage().getChannel().getId();
-        String[] args = commandEvent.getArgs().trim().split(",", 2);
+        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
 
         String streamerName = "";
         String newMessage = "";
@@ -70,56 +72,50 @@ public class NotifMessageEdit extends Command {
 
         Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (cursor.hasNext()) {
-            JSONObject dbNotification = new JSONObject(cursor.next().toString());
+            commandEvent.reply("There is no such notification in this channel");
+            return;
+        }
 
-            String dbDocumentId = dbNotification.getString("id");
-            String dbStreamerName = dbNotification.getString("streamerName");
-            String dbNotifMessage = dbNotification.getString("message");
-            boolean dbEmbed = dbNotification.getBoolean("embed");
+        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
+        cursor.close();
 
-            if (dbNotifMessage.equals(newMessage)) {
-                commandEvent.reply("Your new message is same as the old one!");
+        if (notif.getMessage().equals(newMessage)) {
+            commandEvent.reply("Your new message is same as the old one!");
+            return;
+        }
+
+        String MIXER_PATTERN = "https://mixer.com/" + notif.getStreamerName();
+
+        if (notif.isEmbed()) {
+            if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+                if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
+                    commandEvent.reply("Your notification message contains a link to a different steamer.");
+                    return;
+                }
+            }
+            updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
+        } else {
+            if (!StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+                commandEvent.reply("Your notification message does not contain a link to the streamer.");
                 return;
             }
-
-            String MIXER_PATTERN = "https://mixer.com/" + dbStreamerName;
-
-            if (dbEmbed) {
-                if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
-                    if (StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                        updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
-                    } else {
-                        commandEvent.reply("Your notification message contains a link to a different steamer.");
-                    }
-                } else {
-                    updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
-                }
-            } else {
-                if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
-                    if (StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                        updateMsgAndRespond(commandEvent, newMessage, dbDocumentId, dbStreamerName, dbNotifMessage);
-                    } else {
-                        commandEvent.reply("Your notification message contains a link to a different steamer.");
-                    }
-                } else {
-                    commandEvent.reply("Your notification message does not contain a link to the streamer.");
-                }
+            if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
+                commandEvent.reply("Your notification message contains a link to a different steamer.");
+                return;
             }
-        } else {
-            commandEvent.reply("There is no such notification in this channel");
+            updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
         }
-        cursor.close();
     }
 
-    private void updateMsgAndRespond(CommandEvent commandEvent, String newMessage, String dbDocumentId, String dbStreamerName, String dbNotifMessage) {
-        Mixcord.getDatabase().updateMessage(dbDocumentId, newMessage);
+    private void updateMsgAndRespond(CommandEvent event, String newMessage, String docId, String streamerName, String oldMessage) {
+        Mixcord.getDatabase().updateMessage(docId, newMessage);
 
         StringBuilder response = new StringBuilder();
 
-        response.append("Notification message was changed for the following notification: `").append(dbStreamerName).append("`");
-        response.append("\nOld message:\n```").append(dbNotifMessage).append("```\n\n");
+        response.append("Notification message was changed for the following notification: `").append(streamerName).append("`");
+        response.append("\nOld message:\n```").append(oldMessage).append("```\n\n");
         response.append("New message:\n```").append(newMessage).append("```");
 
-        commandEvent.reply(response.toString());
+        event.reply(response.toString());
     }
 }

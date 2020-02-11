@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
+import bot.utils.EmbedSender;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -45,40 +46,44 @@ public class ChannelNotifs extends Command {
         StringBuilder description = new StringBuilder();
         int notifCount = 0;
 
-        if (cursor.hasNext()) {
-            for (Object doc : cursor) {
-                JSONObject entry = new JSONObject(doc.toString());
-                String streamer = entry.getString("streamerName");
-                description
-                        .append("· [")
-                        .append(streamer)
-                        .append("](")
-                        .append(Constants.MIXER_COM)
-                        .append(streamer).append(")\n");
-                notifCount++;
-                if (notifCount % 5 == 0) {
-                    description.append("\n");
-                }
-            }
-        } else {
-            description = new StringBuilder("There are no notifications in this channel");
+        if (!cursor.hasNext()) {
+            commandEvent.reactError();
+            commandEvent.reply("There are no notifications in this channel");
+            return;
         }
 
-        String footer = commandEvent.getAuthor().getName() + "#"
-                + commandEvent.getAuthor().getDiscriminator();
-        String footerImg = commandEvent.getAuthor().getAvatarUrl();
+        for (Object doc : cursor) {
+            JSONObject entry = new JSONObject(doc.toString());
+            String streamer = entry.getString("streamerName");
+            description
+                    .append("· [")
+                    .append(streamer)
+                    .append("](")
+                    .append(Constants.MIXER_COM)
+                    .append(streamer).append(")\n");
+            notifCount++;
+            if (notifCount % 5 == 0) {
+                description.append("\n");
+            }
+        }
+        cursor.close();
+
+        if (notifCount == 1) {
+            commandEvent.reply("There's only 1 notification in this channel.");
+            commandEvent.reply(
+                    new EmbedSender()
+                            .setTitle("Channel Notifications")
+                            .setDescription(description)
+                            .build());
+        }
 
         if (notifCount > 1) {
             commandEvent.reply("There's a total of " + notifCount + " notifications in this channel.");
-        } else if (notifCount == 1) {
-            commandEvent.reply("There's only 1 notification in this channel.");
+            commandEvent.reply(
+                    new EmbedSender()
+                            .setTitle("Channel Notifications")
+                            .setDescription(description)
+                            .build());
         }
-        commandEvent.reply(new EmbedBuilder()
-                .setTitle("Channel Notifications")
-                .setDescription(description)
-                .setFooter(footer, footerImg)
-                .setTimestamp(Instant.now())
-                .build());
-        cursor.close();
     }
 }

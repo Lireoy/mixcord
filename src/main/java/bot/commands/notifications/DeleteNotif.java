@@ -44,50 +44,52 @@ public class DeleteNotif extends Command {
         if (username.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
         }
+
         if (username.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
-        } else {
-            if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
-                commandEvent.reply("There is no such notification...");
-                return;
-            }
+            return;
+        }
 
-            // Query Mixer to get case-correct streamer name, ID etc.
-            JSONObject channel = MixerQuery.queryChannel(username);
-            if (channel == JSONObject.NULL) {
-                commandEvent.reactError();
-                commandEvent.reply("Query response JSON was null, when deleting a notification, " +
-                        "please contact the developer: <@331756964801544202>");
-                return;
-            }
+        if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
+            commandEvent.reply("There is no such notification...");
+            return;
+        }
 
-            // Non existent streamer queries return with null from Mixer API
-            if (channel == null) {
-                commandEvent.reply("There is no such streamer...");
-                return;
-            }
-            String streamerId = String.valueOf(channel.getInt("userId"));
-            String streamerName = channel.getString("token");
+        // Query Mixer to get case-correct streamer name, ID etc.
+        JSONObject channel = MixerQuery.queryChannel(username);
+        if (channel == JSONObject.NULL) {
+            commandEvent.reactError();
+            commandEvent.reply("Query response JSON was null, when deleting a notification, " +
+                    "please contact the developer: <@331756964801544202>");
+            return;
+        }
 
-            boolean response = Mixcord.getDatabase().deleteNotif(serverId, channelId, streamerId);
+        // Non existent streamer queries return with null from Mixer API
+        if (channel == null) {
+            commandEvent.reply("There is no such streamer...");
+            return;
+        }
 
-            Cursor cursor = Mixcord.getDatabase().selectStreamerNotifs(streamerId);
-            if (!cursor.hasNext()) {
-                if (Mixcord.getDatabase().deleteStreamer(streamerName, streamerId)) {
-                    log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
-                } else {
-                    log.info("Deletion failed for some reason. Streamer: {} - {}", streamerName, streamerId);
-                }
-            }
+        String streamerId = String.valueOf(channel.getInt("userId"));
+        String streamerName = channel.getString("token");
 
-            // Response to user
-            if (response) {
-                commandEvent.reply("Notification was deleted.");
-                commandEvent.reactSuccess();
+        // Response to user
+        if (!Mixcord.getDatabase().deleteNotif(serverId, channelId, streamerId)) {
+            commandEvent.reply("Something went wrong. Could not delete the notification.");
+            commandEvent.reactError();
+            return;
+        }
+
+        Cursor cursor = Mixcord.getDatabase().selectStreamerNotifs(streamerId);
+        if (!cursor.hasNext()) {
+            if (Mixcord.getDatabase().deleteStreamer(streamerId)) {
+                log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
             } else {
-                commandEvent.reply("Something went wrong. Could not delete the notification.");
-                commandEvent.reactError();
+                log.info("Deletion failed for some reason. Streamer: {} - {}", streamerName, streamerId);
             }
+
+            commandEvent.reply("Notification was deleted.");
+            commandEvent.reactSuccess();
         }
     }
 }

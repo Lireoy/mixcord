@@ -1,21 +1,20 @@
 package bot.utils;
 
 /**
- * This class is a not so official extension of {@link String} class,
- * to be able to write custom methods.
+ * This class is a complementary class for the {@link String} class,
+ * with custom methods, written for Mixcord's use cases.
  */
 public class StringUtil {
 
     /**
-     * This method is written to
-     * create a method to {@link String#contains(CharSequence)}
-     * which supports case insensitivity.
+     * This method checks for matches between two
+     * {@link String}s with case insensitivity.
      *
      * @param baseString the {@link String} in which you want to search
      * @param toSearch   the {@link String} to look for in the baseString
      * @return true if a match was found, otherwise false
      */
-    public static boolean containsIgnoreCase(String baseString, String toSearch) {
+    public static boolean containsIgnoreCase(final String baseString, final String toSearch) {
         if (baseString == null || toSearch == null) return false;
 
         final int length = toSearch.length();
@@ -27,5 +26,20 @@ public class StringUtil {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * This method splits a {@link String} into
+     * two parts at the first occurrence of a coma.
+     *
+     * @param args the {@link String} to split
+     * @return a {@link String} array with two elements in it
+     */
+    public static String[] separateArgs(final String args) {
+        return args.trim().split(",", 2);
+    }
+
+    public static String replaceLastComa(final String text) {
+        return text.replaceFirst("(?s)(.*)" + ", ", "$1" + "");
     }
 }

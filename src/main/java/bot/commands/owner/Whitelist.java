@@ -3,6 +3,7 @@ package bot.commands.owner;
 import bot.Mixcord;
 import bot.structure.CommandCategory;
 import bot.structure.Server;
+import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -37,7 +38,7 @@ public class Whitelist extends Command {
         User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String[] args = commandEvent.getArgs().trim().split(",", 2);
+        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
         ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
 

@@ -21,7 +21,7 @@ public class EmbedSender extends EmbedBuilder {
      * Sets the embed time and footer.
      */
     public EmbedSender() {
-        this.setFooter(Constants.MIXCORD_IO, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 

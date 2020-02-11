@@ -33,10 +33,6 @@ public class Invite extends Command {
         User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String footer = commandEvent.getAuthor().getName() + "#"
-                + commandEvent.getAuthor().getDiscriminator();
-        String footerImg = commandEvent.getAuthor().getAvatarUrl();
-
         String clientId = Mixcord.getJda().getSelfUser().getId();
 
         commandEvent.reactSuccess();

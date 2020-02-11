@@ -88,6 +88,7 @@ public class Mixcord {
                         new ChannelNotifs(),
                         new ServerNotifs(),
                         new MakeDefault(),
+                        new NotifDetails(),
                         new NotifPreview(),
                         new NotifMessageEdit(),
                         new NotifColorEdit(),

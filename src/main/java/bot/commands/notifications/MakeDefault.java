@@ -52,23 +52,24 @@ public class MakeDefault extends Command {
         }
 
         Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
-        if (cursor.hasNext()) {
-            Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
-
-            String message = String.format(Constants.NOTIF_MESSAGE_DEFAULT, notif.getStreamerName());
-            String endMessage = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, notif.getStreamerName());
-
-            Mixcord.getDatabase().updateEmbed(notif.getId(), Constants.NOTIF_EMBED_DEFAULT);
-            Mixcord.getDatabase().updateColor(notif.getId(), Constants.NOTIF_EMBED_COLOR_DEFAULT);
-            Mixcord.getDatabase().updateMessage(notif.getId(), message);
-            Mixcord.getDatabase().updateEndAction(notif.getId(), Constants.NOTIF_END_ACTION);
-            Mixcord.getDatabase().updateEndMessage(notif.getId(), endMessage);
-
-            commandEvent.reply("Notification configuration was reset for `" + notif.getStreamerName() + "`.");
-        } else {
+        if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel.");
+            return;
         }
+
+        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
         cursor.close();
+
+        String message = String.format(Constants.NOTIF_MESSAGE_DEFAULT, notif.getStreamerName());
+        String endMessage = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, notif.getStreamerName());
+
+        Mixcord.getDatabase().updateEmbed(notif.getId(), Constants.NOTIF_EMBED_DEFAULT);
+        Mixcord.getDatabase().updateColor(notif.getId(), Constants.NOTIF_EMBED_COLOR_DEFAULT);
+        Mixcord.getDatabase().updateMessage(notif.getId(), message);
+        Mixcord.getDatabase().updateEndAction(notif.getId(), Constants.NOTIF_END_ACTION);
+        Mixcord.getDatabase().updateEndMessage(notif.getId(), endMessage);
+
+        commandEvent.reply("Notification configuration was reset for `" + notif.getStreamerName() + "`.");
     }
 }
 

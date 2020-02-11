@@ -10,6 +10,7 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
@@ -83,20 +84,23 @@ public class NotifService implements Runnable {
                         }
                         notifications.close();
                     }
-                    metrics.incrementNotifsProcessed();
+                    metrics.incrementStreamersProcessed();
                     streamers.close();
                 }
 
-                metrics.incrementCycle();
+                metrics.stopTimer();
+                metrics.postMetrics(Constants.METRICS_CHANNEL);
+                log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
+                log.info("Checked {} streamers in {}s", metrics.getStreamersProcessed(), metrics.getSecs());
 
-                if (metrics.getCycle() == 10) {
-                    metrics.stopTimer();
-                    metrics.postMetrics(Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-                    log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-                    log.info("Looped {} notifications in {}s", metrics.getNotifsProcessed(), metrics.getSecs());
-                    metrics.initReset();
+                if (metrics.getSecs() <= 40) {
+                    log.info("Sleeping the notifier service...");
+                    TimeUnit.SECONDS.sleep(60);
                 }
+
+                metrics.initReset();
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             log.info("Okay so we caught some ugly exception, we should carry on, no stopping with the notifs.");
