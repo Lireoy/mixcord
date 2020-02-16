@@ -2,7 +2,7 @@ package bot.commands.notifications;
 
 import bot.Constants;
 import bot.factories.DatabaseFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.structure.Notification;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 @Slf4j
 public class ServerNotifs extends Command {
 
-    // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};

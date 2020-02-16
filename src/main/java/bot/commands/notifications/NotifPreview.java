@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.factories.DatabaseFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.structure.Notification;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;

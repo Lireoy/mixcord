@@ -2,7 +2,7 @@ package bot.commands.owner;
 
 import bot.Mixcord;
 import bot.factories.DatabaseFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.structure.Server;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;

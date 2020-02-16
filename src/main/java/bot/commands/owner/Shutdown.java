@@ -2,7 +2,7 @@ package bot.commands.owner;
 
 import bot.Mixcord;
 import bot.factories.NotifServiceFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package bot.commands.notifications;
 
 import bot.Constants;
 import bot.factories.DatabaseFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.structure.Streamer;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.User;
 @Slf4j
 public class ChannelNotifs extends Command {
 
-    // TODO: Check message length limit for whitelisted servers (25 streamers max)
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};

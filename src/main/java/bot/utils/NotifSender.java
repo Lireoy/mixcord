@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-// TODO: UPDATE DOCS
 @Slf4j
 public class NotifSender {
 
@@ -20,8 +19,8 @@ public class NotifSender {
      * Sends the specified message to the specified address in an embed when a streamer comes online.
      * If the channel or guild does not exist, the notification is deleted.
      *
-     * @param notif     JSON object which contains data for the notification from the database
-     * @param queryJson JSON object which contains data for the streamer from Mixer
+     * @param notif     {@link Notification} object which contains data for the notification from the database
+     * @param queryJson {@link JSONObject} which contains data for the streamer from Mixer
      */
     public static void sendEmbed(Notification notif, JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
@@ -47,7 +46,7 @@ public class NotifSender {
      * Sends the specified message to the specified address as a regular message when a streamer comes online.
      * If the channel or guild does not exist, the notification is deleted.
      *
-     * @param notif JSON object which contains data for the notification from the database
+     * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendNonEmbed(Notification notif) {
         final Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
@@ -65,7 +64,7 @@ public class NotifSender {
      * Sends the specified offline message to the specified address.
      * If the channel or guild does not exist, the notification is deleted.
      *
-     * @param notif JSON object which contains data for the notification from the database
+     * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendOfflineMsg(Notification notif) {
         final Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());

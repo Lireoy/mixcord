@@ -1,4 +1,4 @@
-package bot.structure;
+package bot.structure.enums;
 
 public enum CommandCategory {
 
@@ -13,8 +13,7 @@ public enum CommandCategory {
         this.text = text;
     }
 
-    @Override
-    public String toString() {
+    public String getText() {
         return text;
     }
 }

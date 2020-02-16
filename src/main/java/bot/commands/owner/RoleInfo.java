@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

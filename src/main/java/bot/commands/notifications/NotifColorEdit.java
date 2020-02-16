@@ -3,7 +3,7 @@ package bot.commands.notifications;
 import bot.Constants;
 import bot.factories.DatabaseFactory;
 import bot.factories.HexUtilFactory;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.structure.Notification;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;

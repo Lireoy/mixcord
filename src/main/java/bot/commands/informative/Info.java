@@ -1,7 +1,7 @@
 package bot.commands.informative;
 
 import bot.Constants;
-import bot.structure.CommandCategory;
+import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
