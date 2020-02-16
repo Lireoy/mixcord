@@ -1,20 +1,16 @@
 package bot;
 
-import bot.commands.informative.*;
-import bot.commands.owner.Shutdown;
-import bot.commands.owner.Whitelist;
+import bot.commands.informative.Info;
+import bot.commands.informative.Invite;
+import bot.commands.informative.Ping;
+import bot.commands.informative.WhoCanUseMe;
 import bot.commands.mixer.MixerUser;
 import bot.commands.mixer.MixerUserSocials;
 import bot.commands.notifications.*;
-import bot.commands.owner.NotifServiceStatus;
-import bot.commands.owner.RestartNotifService;
-import bot.commands.owner.StartNotifService;
-import bot.commands.owner.StopNotifService;
-import bot.commands.owner.RoleInfo;
-import bot.commands.owner.ServerInfo;
+import bot.commands.owner.*;
+import bot.factories.*;
 import bot.structure.Credentials;
 import bot.utils.NotifService;
-import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -27,48 +23,30 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import org.json.JSONObject;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Slf4j
 public class Mixcord {
 
-    private static Credentials credentials;
     private static CommandClient client;
     private static JDA jda;
-    private static DatabaseDriver database;
-    private static NotifService notifierService;
-    private static boolean notifierServiceStateArchive;
 
     public static void main(String[] args) {
         displayAscii();
-        loadCredentials();
 
+        Credentials credentials = CredentialsFactory.getCredentials();
         String BOT_TOKEN = credentials.isProductionBuild() ?
                 credentials.getDiscordBotToken() : credentials.getDiscordBotTokenCanary();
 
-        DatabaseConnectionBuilder connectionBuilder = new DatabaseConnectionBuilder()
-                .setDatabaseIp(credentials.getDatabaseIp())
-                .setDatabasePort(credentials.getDatabasePort())
-                .setDatabaseUser(credentials.getDatabaseUser())
-                .setDatabasePassword(credentials.getDatabasePassword());
-
-        database = new DatabaseDriver().setConnection(connectionBuilder.build());
-        notifierService = new NotifService(database);
         log.info("Notifier service was started.");
         log.info("Posting metrics to G:{} - C:{}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
 
-        CommandClientBuilder builder = new CommandClientBuilder();
-        client = builder
+        client = new CommandClientBuilder()
                 .setPrefix(Constants.PREFIX)
                 .setAlternativePrefix("@mention")
                 .setOwnerId(Constants.OWNER_ID)
@@ -177,7 +155,7 @@ public class Mixcord {
             // Starts the automatic notification system
             // If you delete this, then you have to start
             // the notifier service manually on every startup
-            notifierService.run();
+            NotifServiceFactory.getNotifService().run();
         } catch (LoginException | InterruptedException e) {
             log.error(e.getMessage());
         }
@@ -194,46 +172,7 @@ public class Mixcord {
         }
     }
 
-    private static void loadCredentials() {
-        if (new File("credentials.json").exists()) {
-            try {
-                String text = new String(Files.readAllBytes(Paths.get("credentials.json")), StandardCharsets.UTF_8);
-                credentials = new Gson().fromJson(new JSONObject(text).toString(), Credentials.class);
-            } catch (IOException e) {
-                log.error("Failed to read 'credentials.json'.");
-            }
-        } else {
-            log.error("Could not find 'credentials.json' file.");
-            log.info("Shutting down application...");
-            System.exit(0);
-        }
-    }
-
-    public static Credentials getCredentials() {
-        return credentials;
-    }
-
-    public static CommandClient getClient() {
-        return client;
-    }
-
     public static JDA getJda() {
         return jda;
-    }
-
-    public static DatabaseDriver getDatabase() {
-        return database;
-    }
-
-    public static NotifService getNotifierService() {
-        return notifierService;
-    }
-
-    public static boolean getNotifierServiceStateArchive() {
-        return notifierServiceStateArchive;
-    }
-
-    public static void setNotifierServiceStateArchive(boolean notifierServiceStateArchive) {
-        Mixcord.notifierServiceStateArchive = notifierServiceStateArchive;
     }
 }

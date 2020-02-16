@@ -1,11 +1,11 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
+import bot.factories.HexUtilFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;
-import bot.utils.EmbedSender;
-import bot.utils.HexUtil;
+import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,19 +37,19 @@ public class NotifDetails extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
 
 
         if (commandAuthor.getId().equals(Constants.OWNER_ID) ||
                 commandAuthor.getId().equals(Constants.CO_OWNER_ID) ||
                 commandAuthor.getId().equals(Constants.CO_OWNER_ID2)) {
 
-            String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-            ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
+            final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+            final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
             String streamerName = "";
             String json = "";
@@ -71,24 +71,21 @@ public class NotifDetails extends Command {
                 return;
             }
 
-            Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+            final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
             if (!cursor.hasNext()) {
                 commandEvent.reply("There is no such notification...");
                 return;
             }
 
             if (json.equalsIgnoreCase("json")) {
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String reply = "```json\n" + gson.toJson(gson.fromJson(
-                        new JSONObject(cursor.next().toString()).toString(),
-                        Notification.class)) + "```";
-
+                String reply = "```json\n" + new JSONObject(cursor.next().toString()).toString(2) + "```";
                 commandEvent.reply(reply);
+                cursor.close();
                 return;
             }
         }
 
-        String username = commandEvent.getArgs();
+        final String username = commandEvent.getArgs();
 
         // Empty args check
         if (username.isEmpty()) {
@@ -100,23 +97,23 @@ public class NotifDetails extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, username);
+        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, username);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification...");
             return;
         }
 
-        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
+        cursor.close();
 
-        commandEvent.reply(
-                new EmbedSender()
-                        .setTitle("Notification details")
-                        .setColor(HexUtil.formatForEmbed(notif.getEmbedColor()))
-                        .addField("Name", notif.getStreamerName(), false)
-                        .addField("Send in embed", String.valueOf(notif.isEmbed()), false)
-                        .addField("Embed color", "#" + notif.getEmbedColor(), false)
-                        .addField("Stream start message", notif.getMessage(), false)
-                        .addField("Stream end message", notif.getStreamEndMessage(), false)
-                        .build());
+        commandEvent.reply(new MixerEmbedBuilder()
+                .setTitle("Notification details")
+                .setColor(HexUtilFactory.getHexUtil().formatForEmbed(notif.getEmbedColor()))
+                .addField("Name", notif.getStreamerName(), false)
+                .addField("Send in embed", String.valueOf(notif.isEmbed()), false)
+                .addField("Embed color", "#" + notif.getEmbedColor(), false)
+                .addField("Stream start message", notif.getMessage(), false)
+                .addField("Stream end message", notif.getStreamEndMessage(), false)
+                .build());
     }
 }

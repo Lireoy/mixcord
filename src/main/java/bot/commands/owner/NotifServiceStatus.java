@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.factories.NotifServiceFactory;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -26,7 +27,7 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        boolean state = Mixcord.getNotifierService().getState();
+        final boolean state = NotifServiceFactory.getNotifService().getState();
 
         if (state) {
             commandEvent.reply("Notifier service is running. ✅");

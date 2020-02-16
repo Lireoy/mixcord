@@ -1,7 +1,7 @@
 package bot.commands.mixer;
 
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
+import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -32,10 +32,10 @@ public class MixerUserSocials extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String streamerName = commandEvent.getArgs().trim();
+        final String streamerName = commandEvent.getArgs().trim();
 
         // Empty args check
         if (streamerName.isEmpty()) {
@@ -43,14 +43,15 @@ public class MixerUserSocials extends Command {
         } else if (streamerName.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
         } else {
-            JSONObject channel = MixerQuery.queryChannel(streamerName);
+            final JSONObject channel = MixerQuery.queryChannel(streamerName);
             if (channel == null) {
+                commandEvent.reply("There is no such streamer...");
                 commandEvent.reactError();
                 return;
             }
 
-            JSONObject user = channel.getJSONObject("user");
-            JSONObject socials = user.getJSONObject("social");
+            final JSONObject user = channel.getJSONObject("user");
+            final JSONObject socials = user.getJSONObject("social");
 
 
             StringBuilder description = new StringBuilder();
@@ -95,20 +96,17 @@ public class MixerUserSocials extends Command {
             // TODO: FIND A SPREADSHIRT LINKED ACCOUNT
 
             if (hasSocial) {
-                commandEvent.reply(
-                        new EmbedSender(null, channel)
-                                .setCustomAuthor()
-                                .setDescription(description)
-                                .build()
-                );
+                commandEvent.reply(new MixerEmbedBuilder(channel)
+                        .setCustomAuthor()
+                        .setCustomThumbnail()
+                        .setDescription(description)
+                        .build());
             } else {
                 description = new StringBuilder("No socials are available.");
-                commandEvent.reply(
-                        new EmbedSender(null, channel)
-                                .setCustomAuthor()
-                                .setDescription(description)
-                                .build()
-                );
+                commandEvent.reply(new MixerEmbedBuilder(channel)
+                        .setCustomAuthor()
+                        .setDescription(description)
+                        .build());
             }
         }
     }

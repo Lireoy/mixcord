@@ -1,9 +1,10 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.DatabaseDriver;
 import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.Notification;
+import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -15,8 +16,6 @@ import java.util.Objects;
 @Slf4j
 public class NotifSender {
 
-    static DatabaseDriver database = Mixcord.getDatabase();
-
     /**
      * Sends the specified message to the specified address in an embed when a streamer comes online.
      * If the channel or guild does not exist, the notification is deleted.
@@ -25,39 +24,23 @@ public class NotifSender {
      * @param queryJson JSON object which contains data for the streamer from Mixer
      */
     public static void sendEmbed(Notification notif, JSONObject queryJson) {
-        String queryChId = String.valueOf(queryJson.getInt("id"));
-        String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
+        final String queryChId = String.valueOf(queryJson.getInt("id"));
+        final String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
 
-        Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
-        TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
+        final Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
+        final TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
 
-        if (!Mixcord.getJda().getGuilds().contains(guild)) {
-            log.info("Guild is not available. G:{}", notif.getServerId());
-            return;
-        }
-
-        if (!Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
-                .getTextChannels().contains(textChannel)) {
-            log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            database.deleteNotif(notif.getId());
-            log.info("Deleted the notification in G:{} C:{} for {} ({})",
-                    notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-            if (!database.selectStreamerNotifs(notif.getStreamerId()).hasNext()) {
-                database.deleteStreamerByDocId(notif.getStreamerId());
-            }
-        }
-
+        if (!isGuildReachable(notif, guild)) return;
+        if (!isChannelReachable(notif, textChannel)) return;
 
         Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
-        textChannel.sendMessage(
-                new EmbedSender(notif, queryJson)
-                        .setCustomAuthor()
-                        .setCustomTitle()
-                        .setCustomDescription()
-                        .setImage(embLiveThumbnail)
-                        .build()).queue();
+        textChannel.sendMessage(new MixerEmbedBuilder(notif, queryJson)
+                .setCustomAuthor()
+                .setCustomTitle()
+                .setCustomDescription()
+                .setImage(embLiveThumbnail)
+                .build()).queue();
         log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
-
     }
 
     /**
@@ -67,27 +50,15 @@ public class NotifSender {
      * @param notif JSON object which contains data for the notification from the database
      */
     public static void sendNonEmbed(Notification notif) {
-        Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
+        final Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
+        final TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
 
-        TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
+        if (!isGuildReachable(notif, guild)) return;
+        if (!isChannelReachable(notif, textChannel)) return;
 
-        if (Mixcord.getJda().getGuilds().contains(guild)) {
-            if (Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
-                    .getTextChannels().contains(textChannel)) {
-                Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
-                log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            } else {
-                log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-                database.deleteNotif(notif.getId());
-                log.info("Deleted the notification in G:{} C:{} for {} ({})",
-                        notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-                if (!database.selectStreamerNotifs(notif.getStreamerId()).hasNext()) {
-                    database.deleteStreamerByDocId(notif.getStreamerId());
-                }
-            }
-        } else {
-            log.info("Guild is not available. G:{}", notif.getServerId());
-        }
+        Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
+        textChannel.sendMessage(notif.getMessage()).queue();
+        log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
 
     /**
@@ -97,22 +68,43 @@ public class NotifSender {
      * @param notif JSON object which contains data for the notification from the database
      */
     public static void sendOfflineMsg(Notification notif) {
-        Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
-        TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
+        final Guild guild = Mixcord.getJda().getGuildById(notif.getServerId());
+        final TextChannel textChannel = Mixcord.getJda().getTextChannelById(notif.getChannelId());
 
-        if (Mixcord.getJda().getGuilds().contains(guild)) {
-            if (Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
-                    .getTextChannels().contains(textChannel)) {
-                Objects.requireNonNull(textChannel).sendMessage(notif.getStreamEndMessage()).queue();
-                log.info("Sent event end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            } else {
-                log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-                database.deleteNotif(notif.getId());
-                log.info("Deleted the notification in G:{} C:{} for {} ({})",
-                        notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-            }
-        } else {
-            log.info("Guild does not exits. G:{}", notif.getServerId());
+        if (!isGuildReachable(notif, guild)) return;
+        if (!isChannelReachable(notif, textChannel)) return;
+
+        Objects.requireNonNull(textChannel).sendMessage(notif.getStreamEndMessage()).queue();
+        log.info("Sent stream end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
+    }
+
+    private static boolean isGuildReachable(Notification notif, Guild guild) {
+        if (!Mixcord.getJda().getGuilds().contains(guild)) {
+            log.info("Guild is not reachable. G:{}", notif.getServerId());
+            return false;
         }
+
+        return true;
+    }
+
+    private static boolean isChannelReachable(Notification notif, TextChannel textChannel) {
+        if (!Objects.requireNonNull(Mixcord.getJda().getGuildById(notif.getServerId()))
+                .getTextChannels().contains(textChannel)) {
+            log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
+            DatabaseFactory.getDatabase().deleteNotif(notif.getId());
+            log.info("Deleted the notification in G:{} C:{} for {} ({})",
+                    notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
+
+            final Cursor cursor = DatabaseFactory.getDatabase().selectStreamerNotifs(notif.getStreamerId());
+            if (!cursor.hasNext()) {
+                DatabaseFactory.getDatabase().deleteStreamer(notif.getStreamerId());
+                log.info("There are no more notifications for {} - {}. Deleted from database.",
+                        notif.getStreamerName(), notif.getStreamerId());
+            }
+            cursor.close();
+            return false;
+        }
+
+        return true;
     }
 }

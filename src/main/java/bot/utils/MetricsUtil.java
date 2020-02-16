@@ -18,7 +18,6 @@ public class MetricsUtil {
 
     private long startTime;
     private long endTime;
-    private int notifsProcessed;
     private int notifsSent;
     private int streamersProcessed;
 
@@ -46,7 +45,6 @@ public class MetricsUtil {
      */
     public void initReset() {
         this.endTime = 0;
-        this.notifsProcessed = 0;
         this.notifsSent = 0;
         this.streamersProcessed = 0;
         startTimer();
@@ -81,13 +79,6 @@ public class MetricsUtil {
     }
 
     /**
-     * @return the number of processed notifications
-     */
-    public int getNotifsProcessed() {
-        return this.notifsProcessed;
-    }
-
-    /**
      * @return the number of processed streamers
      */
     public int getStreamersProcessed() {
@@ -103,15 +94,13 @@ public class MetricsUtil {
     public void postMetrics(String channelId) {
         TextChannel channel = Mixcord.getJda().getTextChannelById(channelId);
 
-        StringBuilder stringBuilder = new StringBuilder()
-                .append("· Streamers Processed: ").append(streamersProcessed).append("\n")
-                .append("· NotifsSent: ").append(notifsSent).append("\n")
-                .append("· Time: ").append(getSecs()).append(" sec");
+        String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
+        String description = String.format(line, streamersProcessed, notifsSent, getSecs());
+
         assert channel != null;
-        channel.sendMessage(
-                new EmbedSender()
-                        .setTitle("Metrics")
-                        .setDescription(stringBuilder.toString())
-                        .build()).queue();
+        channel.sendMessage(new MixerEmbedBuilder()
+                .setTitle("Metrics")
+                .setDescription(description)
+                .build()).queue();
     }
 }

@@ -108,4 +108,18 @@ public class Credentials {
     public void setNumberOfShards(int numberOfShards) {
         this.numberOfShards = numberOfShards;
     }
+
+    @Override
+    public String toString() {
+        return ("isProductionBuild: " + isProductionBuild + ", " +
+                "discordBotToken: " + discordBotToken + ", " +
+                "discordBotTokenCanary: " + discordBotTokenCanary + ", " +
+                "mixerApiClientId: " + mixerApiClientId + ", " +
+                "mixerApiClientSecret: " + mixerApiClientSecret + ", " +
+                "databaseIp: " + databaseIp + ", " +
+                "databasePort: " + databasePort + ", " +
+                "databaseUser: " + databaseUser + ", " +
+                "databasePassword: " + databasePassword + ", " +
+                "numberOfShards: " + numberOfShards);
+    }
 }

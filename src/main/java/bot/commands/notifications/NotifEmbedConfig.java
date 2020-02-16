@@ -1,15 +1,17 @@
 package bot.commands.notifications;
 
-import bot.Mixcord;
+import bot.Constants;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
+import bot.structure.Notification;
 import bot.utils.StringUtil;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 /**
  * Changes in what format a specific notification is going to be sent.
@@ -31,22 +33,26 @@ public class NotifEmbedConfig extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String example = "\nExample: `" + Constants.PREFIX + "NotifEmbedConfig shroud, true`";
 
         String streamerName = "";
         String sendAsEmbed = "";
         boolean newEmbedValue = true;
         boolean booleanConvetSuccess = false;
 
-        if (args.length > 1) {
-            streamerName = args[0].trim();
-            sendAsEmbed = args[1].trim();
+        if (args.length < 2) {
+            commandEvent.reply("Please provide a full configuration." + example);
+            return;
         }
+
+        streamerName = args[0].trim();
+        sendAsEmbed = args[1].trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -55,6 +61,12 @@ public class NotifEmbedConfig extends Command {
 
         if (streamerName.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            return;
+        }
+
+        if (sendAsEmbed.isEmpty()) {
+
+            commandEvent.reply("Please provide a full configuration." + example);
             return;
         }
 
@@ -68,39 +80,40 @@ public class NotifEmbedConfig extends Command {
         }
 
         if (!booleanConvetSuccess) {
+            commandEvent.reply("Please provide a valid embed value." + example);
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;
         }
 
-        JSONObject dbNotification = new JSONObject(cursor.next().toString());
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        String dbDocumentId = dbNotification.getString("id");
-        String dbStreamerName = dbNotification.getString("streamerName");
-        String dbNotifMessage = dbNotification.getString("message");
-        boolean dbEmbed = dbNotification.getBoolean("embed");
+        final String MIXER_PATTERN = Constants.HTTPS_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN2 = Constants.HTTP_MIXER_COM + notif.getStreamerName();
+        boolean containsLink = false;
 
-        String MIXER_PATTERN = "https://mixer.com/" + dbStreamerName;
+        if (notif.getMessage().contains(MIXER_PATTERN)) containsLink = true;
+        if (notif.getMessage().contains(MIXER_PATTERN2)) containsLink = true;
 
-        if (dbNotifMessage.contains(MIXER_PATTERN)) {
-            commandEvent.reply("Your notification message does not contain a link to the steamer. Please include one, and try again.");
+        if (!containsLink) {
+            commandEvent.reply("Your notification message does not contain a link to the streamer. Please include one, and try again.");
             return;
         }
 
-        if (dbEmbed == newEmbedValue) {
+        if (notif.isEmbed() == newEmbedValue) {
             commandEvent.reply("This embed configuration is already set.");
             return;
         }
 
-        Mixcord.getDatabase().updateEmbed(dbDocumentId, newEmbedValue);
+        DatabaseFactory.getDatabase().updateEmbed(notif.getId(), newEmbedValue);
 
         StringBuilder response = new StringBuilder();
-        response.append("Notification format was changed for the following notification: `").append(dbStreamerName).append("`");
+        response.append("Notification format was changed for the following notification: `").append(notif.getStreamerName()).append("`");
         if (newEmbedValue) {
             response.append("\nThis notification will be sent as an embed in the future.");
         } else {

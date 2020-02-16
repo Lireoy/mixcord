@@ -1,16 +1,18 @@
 package bot.commands.notifications;
 
-import bot.Mixcord;
+import bot.Constants;
+import bot.factories.DatabaseFactory;
+import bot.factories.HexUtilFactory;
 import bot.structure.CommandCategory;
-import bot.utils.HexUtil;
+import bot.structure.Notification;
 import bot.utils.StringUtil;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 /**
  * Edits a specific notifications embed color.
@@ -33,21 +35,25 @@ public class NotifColorEdit extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String example = "\nExample: `" + Constants.PREFIX + "NotifColorEdit shroud, 32a852`";
 
         String streamerName = "";
         String newColor = "";
 
-        if (args.length > 1) {
-            streamerName = args[0].trim();
-            newColor = HexUtil.formatHex(args[1].trim());
+        if (args.length < 2) {
+            commandEvent.reply("Please provide a full configuration." + example);
+            return;
         }
+
+        streamerName = args[0].trim();
+        newColor = args[1].trim();
+
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -59,35 +65,36 @@ public class NotifColorEdit extends Command {
             return;
         }
 
-        HexUtil hexValidator = new HexUtil();
-        if (!hexValidator.validateHex(newColor.trim())) {
+        if(newColor.isEmpty()){
             commandEvent.reply("Please provide a valid hex color.");
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        if (!HexUtilFactory.getHexUtil().validateHex(newColor.trim())) {
+            commandEvent.reply("Please provide a valid hex color.");
+            return;
+        }
+
+        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There are no notifications in this channel");
             return;
         }
 
-        JSONObject dbNotification = new JSONObject(cursor.next().toString());
+        Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        String dbDocumentId = dbNotification.getString("id");
-        String dbStreamerName = dbNotification.getString("streamerName");
-        String dbEmbedColor = dbNotification.getString("embedColor");
-
-        if (dbEmbedColor.equals(newColor)) {
+        newColor = HexUtilFactory.getHexUtil().formatHex(newColor).trim();
+        if (notif.getEmbedColor().equals(newColor)) {
             commandEvent.reply("Your new color is same as the old one!");
             return;
         }
 
-        Mixcord.getDatabase().updateColor(dbDocumentId, newColor);
+        DatabaseFactory.getDatabase().updateColor(notif.getId(), newColor);
 
         String response = "";
-        response += "Notification color was changed for the following notification: `" + dbStreamerName + "`";
-        response += "\nOld color:\n```" + dbEmbedColor + "```\n\n";
+        response += "Notification color was changed for the following notification: `" + notif.getStreamerName() + "`";
+        response += "\nOld color:\n```" + notif.getEmbedColor() + "```\n\n";
         response += "New color:\n```" + newColor + "```";
         commandEvent.reply(response);
     }

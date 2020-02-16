@@ -3,6 +3,7 @@ package bot.utils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -12,14 +13,13 @@ import java.util.regex.Pattern;
 @Slf4j
 public class HexUtil {
 
-    private static final String HEX_PATTERN = "(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
-
-    private Pattern pattern;
+    private static Pattern pattern;
 
     /**
      * Creates a new instance for {@link HexUtil} and compiles the pattern for validating HEX color values.
      */
     public HexUtil() {
+        String HEX_PATTERN = "(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
         pattern = Pattern.compile(HEX_PATTERN);
     }
 
@@ -39,7 +39,7 @@ public class HexUtil {
      * @param hex hex to convert to {@link Color}
      * @return the rgb {@link Color} component
      */
-    private static Color hex2Rgb(final String hex) {
+    private Color hex2Rgb(final String hex) {
         return new Color(
                 Integer.valueOf(hex.substring(0, 2), 16),
                 Integer.valueOf(hex.substring(2, 4), 16),
@@ -52,8 +52,8 @@ public class HexUtil {
      * @param hex hex to convert to {@link Color}
      * @return the rgb {@link Color} component
      */
-    public static Color formatForEmbed(final String hex) {
-        return HexUtil.hex2Rgb(formatHex(hex));
+    public Color formatForEmbed(final String hex) {
+        return this.hex2Rgb(formatHex(hex));
     }
 
     /**
@@ -62,7 +62,7 @@ public class HexUtil {
      * @param hex the hex value to format
      * @return a hex value in a {@link String} without a hash symbol
      */
-    public static String formatHex(final String hex) {
+    public String formatHex(final String hex) {
         if (hex.startsWith("#")) {
             return hex.substring(1);
         } else {

@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.factories.NotifServiceFactory;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,18 +31,17 @@ public class Shutdown extends Command {
      */
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
-        String reason = commandEvent.getArgs();
+        final User commandAuthor = commandEvent.getAuthor();
+        final String reason = commandEvent.getArgs();
 
         if (reason.isEmpty()) {
             log.info("{} attempted to shutdown the bot, but failed because there was no reason provided.", commandAuthor);
             commandEvent.reply("You need to provide a reason.");
         } else {
             log.info("Command ran by {}. Reason: {}", commandAuthor, reason);
-            if (Mixcord.getNotifierService().getState()) {
-                Mixcord.getNotifierService().stop();
-                log.info("Notifier service was shut down due to system shutdown request...");
-            }
+            NotifServiceFactory.getNotifService().stop();
+            log.info("Notifier service was shut down due to system shutdown request...");
+
             Mixcord.getJda().shutdown();
             log.info("JDA instance was shutdown due to system shutdown request...");
 

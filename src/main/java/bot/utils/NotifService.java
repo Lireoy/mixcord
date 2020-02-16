@@ -2,7 +2,7 @@ package bot.utils;
 
 import bot.Constants;
 import bot.DatabaseDriver;
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.Notification;
 import bot.structure.Streamer;
 import com.google.gson.Gson;
@@ -16,11 +16,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class NotifService implements Runnable {
 
-    private DatabaseDriver databaseDriver;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public NotifService(DatabaseDriver driver) {
-        this.databaseDriver = driver;
+    public NotifService() {
     }
 
     public void run() {
@@ -29,11 +27,10 @@ public class NotifService implements Runnable {
         MetricsUtil metrics = new MetricsUtil();
         try {
             while (running.get()) {
-                Gson gson = new Gson();
-                Cursor streamers = getDatabaseDriver().selectAllStreamers();
+                Cursor streamers = DatabaseFactory.getDatabase().selectAllStreamers();
                 for (Object streamerObj : streamers) {
                     // Checking one streamer at a time
-                    Streamer streamer = gson.fromJson(new JSONObject(streamerObj.toString()).toString(), Streamer.class);
+                    Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
 
                     // Mixer query
                     JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
@@ -44,16 +41,15 @@ public class NotifService implements Runnable {
                         // Was offline, is now online
 
                         log.info("{} ({}) is streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
-                        getDatabaseDriver().updateIsStreaming(streamer.getId(), true);
+                        DatabaseFactory.getDatabase().updateIsStreaming(streamer.getId(), true);
                         log.info("Updated streaming to TRUE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
                         log.info("Queueing notifications...");
 
                         // Select all notifications for this streamer from database
-                        Cursor notifications = getDatabaseDriver().selectStreamerNotifs(streamer.getStreamerId());
+                        Cursor notifications = DatabaseFactory.getDatabase().selectStreamerNotifs(streamer.getStreamerId());
                         for (Object notificationObj : notifications) {
 
-                            Notification notif = gson.fromJson(
-                                    new JSONObject(notificationObj.toString()).toString(), Notification.class);
+                            Notification notif = new Gson().fromJson(notificationObj.toString(), Notification.class);
 
                             boolean dbEmbed = notif.isEmbed();
                             if (dbEmbed) {
@@ -70,15 +66,14 @@ public class NotifService implements Runnable {
                         // Was online, is now offline
 
                         log.info("{} ({}) is not streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
-                        getDatabaseDriver().updateIsStreaming(streamer.getId(), false);
+                        DatabaseFactory.getDatabase().updateIsStreaming(streamer.getId(), false);
                         log.info("Updated streaming to FALSE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
                         log.info("Queueing event end message...");
 
                         // Select all notifications for this streamer from database
-                        Cursor notifications = getDatabaseDriver().selectStreamerNotifs(streamer.getStreamerId());
+                        Cursor notifications = DatabaseFactory.getDatabase().selectStreamerNotifs(streamer.getStreamerId());
                         for (Object notificationObj : notifications) {
-                            Notification notif = gson.fromJson(
-                                    new JSONObject(notificationObj.toString()).toString(), Notification.class);
+                            Notification notif = new Gson().fromJson(notificationObj.toString(), Notification.class);
                             NotifSender.sendOfflineMsg(notif);
                             metrics.incrementNotifsSent();
                         }
@@ -104,7 +99,7 @@ public class NotifService implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
             log.info("Okay so we caught some ugly exception, we should carry on, no stopping with the notifs.");
-            Mixcord.getNotifierService().restart();
+            this.restart();
             // lmao
         }
     }
@@ -128,9 +123,5 @@ public class NotifService implements Runnable {
 
     public boolean getState() {
         return running.get();
-    }
-
-    private DatabaseDriver getDatabaseDriver() {
-        return databaseDriver;
     }
 }

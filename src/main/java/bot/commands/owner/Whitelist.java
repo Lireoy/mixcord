@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Server;
 import bot.utils.StringUtil;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,57 +35,58 @@ public class Whitelist extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
-
-        Gson gson = new Gson();
         if (argList.get(0).trim().equalsIgnoreCase("all")) {
+            final Cursor cursor = DatabaseFactory.getDatabase().selectAllGuilds();
             StringBuilder serversDetails = new StringBuilder();
-            Cursor cursor = Mixcord.getDatabase().selectAllGuilds();
             for (Object o : cursor) {
-                Server server = gson.fromJson(new JSONObject(o.toString()).toString(), Server.class);
+                final Server server = new Gson().fromJson(o.toString(), Server.class);
+                final Guild guild = Mixcord.getJda().getGuildById(server.getServerId());
 
-                Guild guild = Mixcord.getJda().getGuildById(server.getServerId());
-                serversDetails.append("· <@")
-                        .append(guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)")
-                        .append("> - `")
-                        .append(guild != null ? guild.getName() : "(Could not retrieve name)")
-                        .append("` - `")
-                        .append(server.getServerId())
-                        .append("` - `")
-                        .append(guild != null ? guild.getMembers().size() : -1)
-                        .append(" members`\n");
+                String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
+                String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
+                String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
+
+                String line = "· <@%s> - `%s` - `%s` - `%s members`\n";
+                serversDetails.append(String.format(line, guildOwnerId, guildName, server.getServerId(), guildMemberCount));
             }
 
+            cursor.close();
             commandEvent.replyFormatted(serversDetails.toString());
             return;
         }
 
-        String serverId = argList.get(0).trim();
+        final String serverId = argList.get(0).trim();
         boolean newWhitelistVal = false;
         if (argList.get(1).trim().equalsIgnoreCase("true")) {
             newWhitelistVal = true;
         }
 
-
-        Guild guild = Mixcord.getJda().getGuildById(serverId);
+        final Guild guild = Mixcord.getJda().getGuildById(serverId);
 
         if (!Mixcord.getJda().getGuilds().contains(guild)) {
-            commandEvent.reply("The bot is not in this server.");
+            commandEvent.reply("The bot is not in that server.");
             commandEvent.reactError();
+
+            String docId = DatabaseFactory.getDatabase().getGuildDocId(serverId);
+            DatabaseFactory.getDatabase().deleteGuild(docId);
+
+            log.info("Guild is not reachable. G:{}. Deleted from database.", serverId);
+            commandEvent.reply("Deleted G:`" + serverId + "` from database.");
             return;
         }
 
-        Cursor whitelistCursor = Mixcord.getDatabase().selectOneServer(serverId);
+        final Cursor whitelistCursor = DatabaseFactory.getDatabase().selectOneServer(serverId);
         if (whitelistCursor.hasNext()) {
-            Server server = gson.fromJson(new JSONObject(whitelistCursor.next().toString()).toString(), Server.class);
+            final Server server = new Gson().fromJson(whitelistCursor.next().toString(), Server.class);
             boolean oldWhitelistVal = server.isWhitelisted();
 
-            Mixcord.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
 
             if (oldWhitelistVal == newWhitelistVal) {
                 commandEvent.reply("`" + serverId + "` is already set to `" + newWhitelistVal + "`");
@@ -93,16 +94,14 @@ public class Whitelist extends Command {
                 return;
             }
 
-            Mixcord.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully updated `" + serverId + "` to `" + newWhitelistVal + "`.");
             commandEvent.reactSuccess();
         } else {
-            Mixcord.getDatabase().addServer(serverId);
-            Server server = gson.fromJson(new JSONObject(
-                    Mixcord.getDatabase().selectOneServer(serverId).next().toString())
-                    .toString(), Server.class);
+            DatabaseFactory.getDatabase().addServer(serverId);
+            final Server server = new Gson().fromJson(DatabaseFactory.getDatabase().selectOneServer(serverId).next().toString(), Server.class);
 
-            Mixcord.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully whitelisted `" + serverId + "`.");
             commandEvent.reactSuccess();
         }

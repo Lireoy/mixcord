@@ -1,7 +1,6 @@
 package bot.commands.informative;
 
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ public class WhoCanUseMe extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
         List<Role> roleWithManageServer = new ArrayList<>();
@@ -54,7 +53,7 @@ public class WhoCanUseMe extends Command {
                 description.append(">\n");
             }
         }
-        description.append("\n").append("=================================\n\ny");
+        description.append("\n").append("=================================\n\n");
         description.append("Roles which can use basic commands:\n\n");
 
         for (Role role : roleToUse) {

@@ -2,6 +2,7 @@ package bot.commands.notifications;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;
 import com.google.gson.Gson;
@@ -11,7 +12,6 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 /**
  * Resets all the fields in a database entry to the default values.
@@ -34,12 +34,12 @@ public class MakeDefault extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String streamerName = commandEvent.getArgs().trim();
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String streamerName = commandEvent.getArgs().trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -51,23 +51,16 @@ public class MakeDefault extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel.");
             return;
         }
 
-        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
+        DatabaseFactory.getDatabase().resetNotification(notif.getId(), notif.getStreamerName());
         cursor.close();
 
-        String message = String.format(Constants.NOTIF_MESSAGE_DEFAULT, notif.getStreamerName());
-        String endMessage = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, notif.getStreamerName());
-
-        Mixcord.getDatabase().updateEmbed(notif.getId(), Constants.NOTIF_EMBED_DEFAULT);
-        Mixcord.getDatabase().updateColor(notif.getId(), Constants.NOTIF_EMBED_COLOR_DEFAULT);
-        Mixcord.getDatabase().updateMessage(notif.getId(), message);
-        Mixcord.getDatabase().updateEndAction(notif.getId(), Constants.NOTIF_END_ACTION);
-        Mixcord.getDatabase().updateEndMessage(notif.getId(), endMessage);
 
         commandEvent.reply("Notification configuration was reset for `" + notif.getStreamerName() + "`.");
     }

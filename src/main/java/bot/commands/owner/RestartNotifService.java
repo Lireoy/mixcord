@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.Mixcord;
+import bot.factories.NotifServiceFactory;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,15 +25,11 @@ public class RestartNotifService extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        if (Mixcord.getNotifierService().getState()) {
-            commandEvent.reply("The notifier service is already running.");
-            commandEvent.reactError();
-        } else {
-            Mixcord.getNotifierService().start();
-            commandEvent.reactSuccess();
-        }
+        NotifServiceFactory.getNotifService().stop();
+        NotifServiceFactory.getNotifService().start();
+        commandEvent.reactSuccess();
     }
 }

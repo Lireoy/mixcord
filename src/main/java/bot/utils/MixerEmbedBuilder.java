@@ -2,6 +2,7 @@ package bot.utils;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.factories.HexUtilFactory;
 import bot.structure.Notification;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONObject;
@@ -12,7 +13,7 @@ import java.time.Instant;
  * This class extends {@link EmbedBuilder} and provides additional methods, which are customized
  * for Mixcord's use case.
  */
-public class EmbedSender extends EmbedBuilder {
+public class MixerEmbedBuilder extends EmbedBuilder {
 
     private JSONObject mixerInfo;
     private Notification notif;
@@ -20,7 +21,14 @@ public class EmbedSender extends EmbedBuilder {
     /**
      * Sets the embed time and footer.
      */
-    public EmbedSender() {
+    public MixerEmbedBuilder() {
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setTimestamp(Instant.now());
+    }
+
+    public MixerEmbedBuilder(JSONObject mixerInfo) {
+        this.mixerInfo = mixerInfo;
+        this.setCustomColor();
         this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
@@ -33,22 +41,22 @@ public class EmbedSender extends EmbedBuilder {
      * @param notif     the JSON object which has information from the database
      * @param mixerInfo the JSON object which has information about the streamer from Mixer
      */
-    public EmbedSender(Notification notif, JSONObject mixerInfo) {
+    public MixerEmbedBuilder(Notification notif, JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
         this.notif = notif;
         this.setCustomColor();
         this.setImage(Constants.MIXER_BANNER_DEFAULT);
-        this.setFooter(Constants.MIXCORD_IO, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
     /**
-     * Sets the embed author and it's image based on the information in {@link EmbedSender#mixerInfo}.
+     * Sets the embed author and it's image based on the information in {@link MixerEmbedBuilder#mixerInfo}.
      * If there's no profile picture, this method provides a default picture instead.
      *
      * @return The EmbedSender instance. Useful for chaining.
      */
-    public EmbedSender setCustomAuthor() {
+    public MixerEmbedBuilder setCustomAuthor() {
         if (mixerInfo == null) return this;
 
         Object authorImg = null;
@@ -66,24 +74,50 @@ public class EmbedSender extends EmbedBuilder {
     }
 
     /**
-     * Sets the embed title based on the information in {@link EmbedSender#mixerInfo}.
+     * Sets the embed title based on the information in {@link MixerEmbedBuilder#mixerInfo}.
      *
      * @return The EmbedSender instance. Useful for chaining.
      */
-    public EmbedSender setCustomTitle() {
+    public MixerEmbedBuilder setCustomTitle() {
         if (mixerInfo == null) return this;
 
         this.setTitle(mixerInfo.getString("name"), getChannelLink());
         return this;
     }
 
+    public MixerEmbedBuilder setCustomImage() {
+        if (mixerInfo == null) {
+            this.setImage(Constants.MIXER_BANNER_DEFAULT);
+            return this;
+        }
+
+        final Object bannerUrl = mixerInfo.get("bannerUrl");
+        final String image = bannerUrl == JSONObject.NULL ? Constants.MIXER_BANNER_DEFAULT : bannerUrl.toString();
+
+        this.setImage(image);
+        return this;
+    }
+
+    public MixerEmbedBuilder setCustomThumbnail() {
+        if (mixerInfo == null) {
+            this.setThumbnail(Constants.MIXER_BANNER_DEFAULT);
+            return this;
+        }
+
+        final Object avatarObj = mixerInfo.getJSONObject("user").get("avatarUrl");
+        final String avatarUrl = avatarObj == JSONObject.NULL ? Constants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObj.toString();
+
+        this.setThumbnail(avatarUrl);
+        return this;
+    }
+
     /**
-     * Sets the embed description based on the information in {@link EmbedSender#mixerInfo}.
+     * Sets the embed description based on the information in {@link MixerEmbedBuilder#mixerInfo}.
      * The description includes game name, current viewers and a link.
      *
      * @return The EmbedSender instance. Useful for chaining.
      */
-    public EmbedSender setCustomDescription() {
+    public MixerEmbedBuilder setCustomDescription() {
         if (mixerInfo == null) return this;
 
         String gameName = mixerInfo.getJSONObject("type").getString("name");
@@ -97,22 +131,22 @@ public class EmbedSender extends EmbedBuilder {
     }
 
     /**
-     * Sets the embed color based on the information in {@link EmbedSender#mixerInfo}.
+     * Sets the embed color based on the information in {@link MixerEmbedBuilder#mixerInfo}.
      */
     private void setCustomColor() {
         if (notif == null) return;
 
-        this.setColor(HexUtil.formatForEmbed(notif.getEmbedColor()));
+        this.setColor(HexUtilFactory.getHexUtil().formatForEmbed(notif.getEmbedColor()));
     }
 
     /**
      * Constructs a valid link for a streamer by concatenating a static link and the streamer's name.
-     * The streamer name is from {@link EmbedSender#notif}.
+     * The streamer name is from {@link MixerEmbedBuilder#notif}.
      *
      * @return a String, which is a valid link for the streamer.
      */
     private String getChannelLink() {
         String streamerName = notif == null ? mixerInfo.getString("token") : notif.getStreamerName();
-        return Constants.MIXER_COM + streamerName;
+        return Constants.HTTPS_MIXER_COM + streamerName;
     }
 }

@@ -33,40 +33,80 @@ public class Notification {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getServerId() {
         return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public String getChannelId() {
         return channelId;
     }
 
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
     public String getStreamerId() {
         return streamerId;
+    }
+
+    public void setStreamerId(String streamerId) {
+        this.streamerId = streamerId;
     }
 
     public String getStreamerName() {
         return streamerName;
     }
 
+    public void setStreamerName(String streamerName) {
+        this.streamerName = streamerName;
+    }
+
     public boolean isEmbed() {
         return embed;
+    }
+
+    public void setEmbed(boolean embed) {
+        this.embed = embed;
     }
 
     public String getEmbedColor() {
         return embedColor;
     }
 
+    public void setEmbedColor(String embedColor) {
+        this.embedColor = embedColor;
+    }
+
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public int getStreamEndAction() {
         return streamEndAction;
     }
 
+    public void setStreamEndAction(int streamEndAction) {
+        this.streamEndAction = streamEndAction;
+    }
+
     public String getStreamEndMessage() {
         return streamEndMessage;
+    }
+
+    public void setStreamEndMessage(String streamEndMessage) {
+        this.streamEndMessage = streamEndMessage;
     }
 
     @Override

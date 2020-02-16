@@ -2,7 +2,7 @@ package bot.commands.informative;
 
 import bot.Mixcord;
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
+import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +30,13 @@ public class Invite extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String clientId = Mixcord.getJda().getSelfUser().getId();
+        final String clientId = Mixcord.getJda().getSelfUser().getId();
 
         commandEvent.reactSuccess();
-        commandEvent.reply(new EmbedSender()
+        commandEvent.reply(new MixerEmbedBuilder()
                 .setAuthor("Invite")
                 .setDescription("[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=" + clientId + "&permissions=347200&scope=bot)")
                 .build());

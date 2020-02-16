@@ -2,6 +2,8 @@ package bot.utils;
 
 import bot.Constants;
 import bot.Mixcord;
+import bot.factories.CredentialsFactory;
+import bot.structure.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
@@ -27,26 +29,26 @@ public class MixerQuery {
      * @return the JSON response, or null if failed
      */
     public static JSONObject queryChannel(String queryParam) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        String uri = Constants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
+        final CloseableHttpClient httpClient = HttpClients.createDefault();
+        final String uri = Constants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
 
         // Custom Timout values to avoid long stuck commands
-        RequestConfig requestConfig = RequestConfig.custom()
+        final RequestConfig requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.STANDARD) // avoids "Invalid 'expires' attribute" and "Invalid cookie header"
-                .setConnectionRequestTimeout(10000)
-                .setConnectTimeout(10000)
-                .setSocketTimeout(10000)
+                .setConnectionRequestTimeout(2000)
+                .setConnectTimeout(2000)
+                .setSocketTimeout(2000)
                 .build();
 
-        HttpUriRequest request = RequestBuilder.get().setUri(uri)
-                .setHeader("Client-ID", Mixcord.getCredentials().getMixerApiClientId())
+        final HttpUriRequest request = RequestBuilder.get().setUri(uri)
+                .setHeader("Client-ID", CredentialsFactory.getCredentials().getMixerApiClientId())
                 .setConfig(requestConfig)
                 .build();
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             int status = response.getStatusLine().getStatusCode();
             if (status >= 200 && status < 300) {
-                HttpEntity entity = response.getEntity();
+                final HttpEntity entity = response.getEntity();
                 return new JSONObject(EntityUtils.toString(entity));
             } else {
                 log.info("Request failed: {}", uri);

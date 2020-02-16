@@ -33,7 +33,7 @@ public class Ping extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
         commandEvent.reply("Ping: ...", (m) -> {

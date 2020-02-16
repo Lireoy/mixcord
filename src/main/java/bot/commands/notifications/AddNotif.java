@@ -1,6 +1,7 @@
 package bot.commands.notifications;
 
-import bot.Mixcord;
+import bot.Constants;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Server;
 import bot.utils.MixerQuery;
@@ -38,12 +39,12 @@ public class AddNotif extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String query = commandEvent.getArgs().trim();
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String query = commandEvent.getArgs().trim();
 
         // Empty args check
         if (query.isEmpty()) {
@@ -56,16 +57,16 @@ public class AddNotif extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneServer(serverId);
-        Gson gson = new Gson();
+        Cursor cursor = DatabaseFactory.getDatabase().selectOneServer(serverId);
         if (!cursor.hasNext()) {
-            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@331756964801544202>");
+            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@" + Constants.OWNER_ID + ">");
             return;
         }
 
 
-        Server server = gson.fromJson(new JSONObject(cursor.next().toString()).toString(), Server.class);
-        ArrayList list = Mixcord.getDatabase().selectServerNotifsOrdered(serverId);
+        Server server = new Gson().fromJson(cursor.next().toString(), Server.class);
+        cursor.close();
+        final ArrayList list = DatabaseFactory.getDatabase().selectServerNotifsOrdered(serverId);
         if (server.isWhitelisted()) {
             if (list.size() >= 25) {
                 commandEvent.reply("This server has reached the limit for the number of notifications.");
@@ -80,11 +81,11 @@ public class AddNotif extends Command {
 
 
         // Query Mixer to get case-correct streamer name, ID etc.
-        JSONObject channel = MixerQuery.queryChannel(query);
+        final JSONObject channel = MixerQuery.queryChannel(query);
         if (channel == JSONObject.NULL) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: <@331756964801544202>");
+                    "please contact the developer: <@" + Constants.OWNER_ID + ">");
             return;
         }
 
@@ -93,25 +94,27 @@ public class AddNotif extends Command {
             commandEvent.reply("There is no such streamer...");
             return;
         }
-        String streamerId = String.valueOf(channel.getInt("userId"));
-        String streamerName = channel.getString("token");
+
+        final String streamerId = String.valueOf(channel.getInt("userId"));
+        final String streamerName = channel.getString("token");
 
         if (streamerName.isEmpty() || streamerId.isEmpty()) {
-            commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@331756964801544202>");
+            commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@" + Constants.OWNER_ID + ">");
             log.info("Streamer name or ID was empty.");
             return;
         }
 
-        if (Mixcord.getDatabase().addStreamer(streamerName, streamerId)) {
+        if (DatabaseFactory.getDatabase().addStreamer(streamerName, streamerId)) {
             log.info("New streamer detected, added to database...");
         }
 
-        if (Mixcord.getDatabase().addNotif(serverId, channelId, streamerName, streamerId)) {
+        final boolean response = DatabaseFactory.getDatabase().addNotif(serverId, channelId, streamerName, streamerId);
+
+        if (response) {
             commandEvent.reply("From now, you will receive notifications for " + streamerName + " in this channel.");
             commandEvent.reactSuccess();
         } else {
             commandEvent.reply("You have already set up a notification for this streamer.");
         }
-
     }
 }

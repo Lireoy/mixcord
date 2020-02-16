@@ -1,15 +1,16 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
+import bot.structure.Notification;
+import bot.utils.MixerEmbedBuilder;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -34,11 +35,11 @@ public class ServerNotifs extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        ArrayList list = Mixcord.getDatabase().selectServerNotifsOrdered(serverId);
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final ArrayList list = DatabaseFactory.getDatabase().selectServerNotifsOrdered(serverId);
 
         String prevChannel = "";
         if (list.isEmpty()) {
@@ -49,43 +50,32 @@ public class ServerNotifs extends Command {
 
         StringBuilder description = new StringBuilder();
         for (Object doc : list) {
-            JSONObject entry = new JSONObject(doc.toString());
-            String streamer = entry.getString("streamerName");
-            String channel = entry.getString("channelId");
+            Notification notif = new Gson().fromJson(doc.toString(), Notification.class);
+            String channelLine = "\n<#%s>\n";
+            String streamerLine = "· [%s](" + Constants.HTTPS_MIXER_COM + "%s)\n";
 
-            if (!prevChannel.equals(channel)) {
-                description
-                        .append("\n")
-                        .append("<#")
-                        .append(channel)
-                        .append(">\n");
+            if (!prevChannel.equals(notif.getChannelId())) {
+                description.append(String.format(channelLine, notif.getChannelId()));
             }
-            prevChannel = channel;
-            description
-                    .append("· [")
-                    .append(streamer)
-                    .append("](")
-                    .append(Constants.MIXER_COM)
-                    .append(streamer).append(")\n");
+            prevChannel = notif.getChannelId();
+            description.append(String.format(streamerLine, notif.getStreamerName(), notif.getStreamerName()));
         }
 
         if (list.size() == 1) {
             commandEvent.reply("There's only 1 notification in this server.");
-            commandEvent.reply(
-                    new EmbedSender()
-                            .setTitle("Channel Notifications")
-                            .setDescription(description)
-                            .build());
+            commandEvent.reply(new MixerEmbedBuilder()
+                    .setTitle("Channel Notifications")
+                    .setDescription(description)
+                    .build());
         }
 
         if (list.size() > 1) {
             String message = "There's a total of " + list.size() + " notifications in this server.";
             commandEvent.reply(message);
-            commandEvent.reply(
-                    new EmbedSender()
-                            .setTitle("Server Notifications")
-                            .setDescription(description.toString())
-                            .build());
+            commandEvent.reply(new MixerEmbedBuilder()
+                    .setTitle("Server Notifications")
+                    .setDescription(description.toString())
+                    .build());
         }
     }
 }

@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;
 import bot.utils.StringUtil;
@@ -12,7 +12,6 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 /**
  * Changes the notification message for a specific notification.
@@ -35,20 +34,24 @@ public class NotifMessageEdit extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String example = "\nExample: `" + Constants.PREFIX + "NotifMessageEdit shroud, Shroud went live again lolzzzz`";
 
         String streamerName = "";
         String newMessage = "";
 
-        if (args.length > 1) {
-            streamerName = args[0].trim();
-            newMessage = args[1].trim();
+        if (args.length < 2) {
+            commandEvent.reply("Please provide a full configuration." + example);
+            return;
         }
+
+        streamerName = args[0].trim();
+        newMessage = args[1].trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -70,13 +73,13 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
-        if (cursor.hasNext()) {
+        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;
         }
 
-        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
         if (notif.getMessage().equals(newMessage)) {
@@ -84,23 +87,23 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        String MIXER_PATTERN = "https://mixer.com/" + notif.getStreamerName();
+        final String MIXER_PATTERN = Constants.HTTPS_MIXER_COM + notif.getStreamerName();
 
         if (notif.isEmbed()) {
-            if (StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+            if (StringUtil.containsIgnoreCase(newMessage, Constants.HTTPS_MIXER_COM)) {
                 if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                    commandEvent.reply("Your notification message contains a link to a different steamer.");
+                    commandEvent.reply("Your notification message contains a link to a different streamer.");
                     return;
                 }
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
         } else {
-            if (!StringUtil.containsIgnoreCase(newMessage, Constants.MIXER_COM)) {
+            if (!StringUtil.containsIgnoreCase(newMessage, Constants.HTTPS_MIXER_COM)) {
                 commandEvent.reply("Your notification message does not contain a link to the streamer.");
                 return;
             }
             if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                commandEvent.reply("Your notification message contains a link to a different steamer.");
+                commandEvent.reply("Your notification message contains a link to a different streamer.");
                 return;
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
@@ -108,7 +111,7 @@ public class NotifMessageEdit extends Command {
     }
 
     private void updateMsgAndRespond(CommandEvent event, String newMessage, String docId, String streamerName, String oldMessage) {
-        Mixcord.getDatabase().updateMessage(docId, newMessage);
+        DatabaseFactory.getDatabase().updateMessage(docId, newMessage);
 
         StringBuilder response = new StringBuilder();
 

@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.Mixcord;
+import bot.factories.NotifServiceFactory;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,16 +26,11 @@ public class StopNotifService extends Command {
     // This command stops the notifier service manually
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        if(Mixcord.getNotifierService().getState()) {
-            Mixcord.getNotifierService().stop();
-            commandEvent.reactSuccess();
-        } else {
-            commandEvent.reply("The notifier service is not running.");
-            commandEvent.reactError();
-        }
+        NotifServiceFactory.getNotifService().stop();
+        commandEvent.reactSuccess();
     }
 }
 

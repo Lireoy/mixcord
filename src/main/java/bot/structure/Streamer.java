@@ -21,16 +21,32 @@ public class Streamer {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getStreamerName() {
         return streamerName;
+    }
+
+    public void setStreamerName(String streamerName) {
+        this.streamerName = streamerName;
     }
 
     public String getStreamerId() {
         return streamerId;
     }
 
+    public void setStreamerId(String streamerId) {
+        this.streamerId = streamerId;
+    }
+
     public boolean isStreaming() {
         return isStreaming;
+    }
+
+    public void setStreaming(boolean streaming) {
+        isStreaming = streaming;
     }
 
     @Override

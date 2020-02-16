@@ -1,19 +1,17 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
+import bot.structure.Streamer;
+import bot.utils.MixerEmbedBuilder;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
-
-import java.time.Instant;
 
 /**
  * Lists all notifications already set up in a specific Discord channel.
@@ -36,12 +34,12 @@ public class ChannelNotifs extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        Cursor cursor = Mixcord.getDatabase().selectChannelNotifs(serverId, channelId);
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        Cursor cursor = DatabaseFactory.getDatabase().selectChannelNotifs(serverId, channelId);
 
         StringBuilder description = new StringBuilder();
         int notifCount = 0;
@@ -53,14 +51,9 @@ public class ChannelNotifs extends Command {
         }
 
         for (Object doc : cursor) {
-            JSONObject entry = new JSONObject(doc.toString());
-            String streamer = entry.getString("streamerName");
-            description
-                    .append("· [")
-                    .append(streamer)
-                    .append("](")
-                    .append(Constants.MIXER_COM)
-                    .append(streamer).append(")\n");
+            Streamer streamer = new Gson().fromJson(doc.toString(), Streamer.class);
+            String line = "· [%s](" + Constants.HTTPS_MIXER_COM + "%s)\n";
+            description.append(String.format(line, streamer.getStreamerName(), streamer.getStreamerName()));
             notifCount++;
             if (notifCount % 5 == 0) {
                 description.append("\n");
@@ -70,20 +63,18 @@ public class ChannelNotifs extends Command {
 
         if (notifCount == 1) {
             commandEvent.reply("There's only 1 notification in this channel.");
-            commandEvent.reply(
-                    new EmbedSender()
-                            .setTitle("Channel Notifications")
-                            .setDescription(description)
-                            .build());
+            commandEvent.reply(new MixerEmbedBuilder()
+                    .setTitle("Channel Notifications")
+                    .setDescription(description)
+                    .build());
         }
 
         if (notifCount > 1) {
             commandEvent.reply("There's a total of " + notifCount + " notifications in this channel.");
-            commandEvent.reply(
-                    new EmbedSender()
-                            .setTitle("Channel Notifications")
-                            .setDescription(description)
-                            .build());
+            commandEvent.reply(new MixerEmbedBuilder()
+                    .setTitle("Channel Notifications")
+                    .setDescription(description)
+                    .build());
         }
     }
 }

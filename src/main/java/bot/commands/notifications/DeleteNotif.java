@@ -1,8 +1,12 @@
 package bot.commands.notifications;
 
+import bot.Constants;
 import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
+import bot.structure.Notification;
 import bot.utils.MixerQuery;
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
@@ -33,16 +37,17 @@ public class DeleteNotif extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String username = commandEvent.getArgs().trim();
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String username = commandEvent.getArgs().trim();
 
         // Empty args check
         if (username.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
+            return;
         }
 
         if (username.length() > 20) {
@@ -50,17 +55,19 @@ public class DeleteNotif extends Command {
             return;
         }
 
-        if (!Mixcord.getDatabase().selectOneNotification(serverId, channelId, username).hasNext()) {
+        final Cursor notificationCursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, username);
+        if (!notificationCursor.hasNext()) {
             commandEvent.reply("There is no such notification...");
             return;
         }
 
+        /*
         // Query Mixer to get case-correct streamer name, ID etc.
-        JSONObject channel = MixerQuery.queryChannel(username);
+        final JSONObject channel = MixerQuery.queryChannel(username);
         if (channel == JSONObject.NULL) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when deleting a notification, " +
-                    "please contact the developer: <@331756964801544202>");
+                    "please contact the developer: <@" + Constants.OWNER_ID + ">");
             return;
         }
 
@@ -70,26 +77,28 @@ public class DeleteNotif extends Command {
             return;
         }
 
-        String streamerId = String.valueOf(channel.getInt("userId"));
-        String streamerName = channel.getString("token");
+        final String streamerId = String.valueOf(channel.getInt("userId"));
+        final String streamerName = channel.getString("token");
+         */
 
-        // Response to user
-        if (!Mixcord.getDatabase().deleteNotif(serverId, channelId, streamerId)) {
-            commandEvent.reply("Something went wrong. Could not delete the notification.");
-            commandEvent.reactError();
-            return;
-        }
+        Notification notif = new Gson().fromJson(notificationCursor.next().toString(), Notification.class);
+        notificationCursor.close();
 
-        Cursor cursor = Mixcord.getDatabase().selectStreamerNotifs(streamerId);
+        DatabaseFactory.getDatabase().deleteNotif(notif.getId());
+        log.info("Deleted the notification in G:{} C:{} for {} ({})",
+                notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
+        commandEvent.reply("Notification was deleted.");
+        commandEvent.reactSuccess();
+
+        Cursor cursor = DatabaseFactory.getDatabase().selectStreamerNotifs(notif.getStreamerId());
         if (!cursor.hasNext()) {
-            if (Mixcord.getDatabase().deleteStreamer(streamerId)) {
-                log.info("There are no more notifications for {} - {}. Deleted from database.", streamerName, streamerId);
-            } else {
-                log.info("Deletion failed for some reason. Streamer: {} - {}", streamerName, streamerId);
-            }
+            boolean streamerDeleteResponse = DatabaseFactory.getDatabase().deleteStreamer(notif.getStreamerId());
 
-            commandEvent.reply("Notification was deleted.");
-            commandEvent.reactSuccess();
+            if (streamerDeleteResponse) {
+                log.info("There are no more notifications for {} - {}. Deleted from database.",
+                        notif.getStreamerName(), notif.getStreamerId());
+            }
         }
+        cursor.close();
     }
 }

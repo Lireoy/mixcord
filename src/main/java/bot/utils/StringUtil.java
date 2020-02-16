@@ -39,7 +39,7 @@ public class StringUtil {
         return args.trim().split(",", 2);
     }
 
-    public static String replaceLastComa(final String text) {
+    public static String replaceLastComma(final String text) {
         return text.replaceFirst("(?s)(.*)" + ", ", "$1" + "");
     }
 }

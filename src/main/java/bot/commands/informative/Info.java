@@ -2,7 +2,7 @@ package bot.commands.informative;
 
 import bot.Constants;
 import bot.structure.CommandCategory;
-import bot.utils.EmbedSender;
+import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -35,7 +35,7 @@ public class Info extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
         // Calculate uptime
@@ -56,12 +56,12 @@ public class Info extends Command {
                         (days == 0 ? "" : days + " days, ") +
                         (hours == 0 ? "" : hours + " hours, ") +
                         (minutes == 0 ? "" : minutes + " minutes, ") +
-                        (seconds == 0 ? "" : seconds + " seconds");
+                        (seconds == 0 ? "" : seconds + " seconds, ");
 
-        uptime = StringUtil.replaceLastComa(uptime);
+        uptime = StringUtil.replaceLastComma(uptime);
 
         // Usage segment
-        int guildCount = commandEvent.getJDA().getGuilds().size();
+        final int guildCount = commandEvent.getJDA().getGuilds().size();
         int memberCount = 0;
 
         // Count members in each guild.
@@ -74,43 +74,36 @@ public class Info extends Command {
         String version = "· Java " + System.getProperty("java.version");
 
         // Shards
-        long ping = commandEvent.getJDA().getGatewayPing();
-        int shardId = commandEvent.getJDA().getShardInfo().getShardId();
-        int totalShards = commandEvent.getJDA().getShardInfo().getShardTotal();
+        final long ping = commandEvent.getJDA().getGatewayPing();
+        final int shardId = commandEvent.getJDA().getShardInfo().getShardId();
+        final int totalShards = commandEvent.getJDA().getShardInfo().getShardTotal();
         String shards = "· Current shard: " + shardId + "\n· Shard latency: "
                 + ping + "ms\n· Total shards: " + totalShards;
 
         // System
         Runtime rt = Runtime.getRuntime();
-        String systemInfo = rt.freeMemory() / 1024 / 1024 + "MB / " + rt.maxMemory() / 1024 / 1024 + "MB";
+        final String systemInfo = rt.freeMemory() / 1024 / 1024 + "MB / " + rt.maxMemory() / 1024 / 1024 + "MB";
 
         // Links
-        String links = "· Website: " + Constants.WEBSITE + " \n" +
+        final String links = "· Website: " + Constants.MIXCORD_IO + " \n" +
                 "· Discord: " + Constants.DISCORD;
 
         // Developers
-        String developers = "Lead Dev: Lireoy#4444\nConsultant: Akira#8185";
+        final String developers = "Lead Dev: Lireoy#4444\nConsultant: Akira#8185";
 
         // Infrastructure
-        String infrastructure = "Provided by Akira#8185";
+        final String infrastructure = "Provided by Akira#8185";
 
-        // Footer
-        String footer = commandEvent.getAuthor().getName() + "#" + commandEvent.getAuthor().getDiscriminator();
-        String footerImg = commandEvent.getAuthor().getAvatarUrl();
-
-
-        commandEvent.getTextChannel().sendMessage(
-                new EmbedSender()
-                        .setTitle("Mixcord")
-                        .addField("Uptime", uptime, false)
-                        .addField("Usage", usage, true)
-                        .addField("Version", version, true)
-                        .addField("Shards", shards, true)
-                        .addField("System", systemInfo, false)
-                        .addField("Links", links, false)
-                        .addField("Developers", developers, false)
-                        .addField("Infrastructure", infrastructure, false)
-                        .build()
-        ).queue();
+        commandEvent.reply(new MixerEmbedBuilder()
+                .setTitle("Mixcord")
+                .addField("Uptime", uptime, false)
+                .addField("Usage", usage, true)
+                .addField("Version", version, true)
+                .addField("Shards", shards, true)
+                .addField("System", systemInfo, false)
+                .addField("Links", links, false)
+                .addField("Developers", developers, false)
+                .addField("Infrastructure", infrastructure, false)
+                .build());
     }
 }

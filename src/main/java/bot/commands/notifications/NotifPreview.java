@@ -1,9 +1,9 @@
 package bot.commands.notifications;
 
-import bot.Mixcord;
+import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;
-import bot.utils.EmbedSender;
+import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -37,12 +37,12 @@ public class NotifPreview extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        User commandAuthor = commandEvent.getAuthor();
+        final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        String serverId = commandEvent.getMessage().getGuild().getId();
-        String channelId = commandEvent.getMessage().getChannel().getId();
-        String streamerName = commandEvent.getArgs().trim();
+        final String serverId = commandEvent.getMessage().getGuild().getId();
+        final String channelId = commandEvent.getMessage().getChannel().getId();
+        final String streamerName = commandEvent.getArgs().trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -54,23 +54,23 @@ public class NotifPreview extends Command {
             return;
         }
 
-        Cursor cursor = Mixcord.getDatabase().selectOneNotification(serverId, channelId, streamerName);
-        if (cursor.hasNext()) {
+        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel.");
             return;
         }
-        Notification notif = new Gson().fromJson(new JSONObject(cursor.next().toString()).toString(), Notification.class);
+
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
-        JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
 
         if (notif.isEmbed()) {
+            final JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
             commandEvent.reply(notif.getMessage());
-            commandEvent.reply(
-                    new EmbedSender(notif, queryJson)
-                            .setCustomAuthor()
-                            .setCustomTitle()
-                            .setCustomDescription()
-                            .build());
+            commandEvent.reply(new MixerEmbedBuilder(notif, queryJson)
+                    .setCustomAuthor()
+                    .setCustomTitle()
+                    .setCustomDescription()
+                    .build());
         } else {
             commandEvent.reply(notif.getMessage());
         }

@@ -1,5 +1,9 @@
 package bot;
 
+import bot.structure.Notification;
+import bot.structure.Server;
+import bot.structure.Streamer;
+import com.google.gson.Gson;
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.gen.ast.Table;
@@ -11,13 +15,15 @@ import java.util.ArrayList;
 
 public class DatabaseDriver {
 
+    //r.db("Mixcord").table("notifications").get("2c8b5bbf-80f9-4d04-86b8-dcea77933f51").update({embed: false, streamEndAction: 2})
+
     private final RethinkDB rethink = RethinkDB.r; // RethinkDB instance for all operations
     private Connection connection; // connection link
     private Table notifications; // notifications table
     private Table streamers; // streamers table
     private Table guilds; // servers table
 
-    DatabaseDriver() {
+    public DatabaseDriver() {
         this.notifications = rethink.db("Mixcord").table("notifications");
         this.streamers = rethink.db("Mixcord").table("streamers");
         this.guilds = rethink.db("Mixcord").table("guilds");
@@ -83,7 +89,7 @@ public class DatabaseDriver {
     /**
      * Gets a streamer entry's document ID with the specified parameters.
      *
-     * @param streamerId   the ID of the streamer
+     * @param streamerId the ID of the streamer
      * @return the unique ID of the document if found, otherwise null
      */
     private String getStreamerDocId(String streamerId) {
@@ -91,8 +97,8 @@ public class DatabaseDriver {
                 .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
-            JSONObject document = new JSONObject(cursor.next().toString());
-            return document.getString("id");
+            Streamer streamer = new Gson().fromJson(cursor.next().toString(), Streamer.class);
+            return streamer.getId();
         }
         cursor.close();
         return null;
@@ -101,7 +107,7 @@ public class DatabaseDriver {
     /**
      * Deletes a document from the streamers table with the specified parameters.
      *
-     * @param streamerId   the ID of the streamer
+     * @param streamerId the ID of the streamer
      * @return true if deletion is successful
      */
     public boolean deleteStreamer(String streamerId) {
@@ -155,6 +161,19 @@ public class DatabaseDriver {
         } else {
             return false;
         }
+    }
+
+    public void resetNotification(String documentId, String streamerName) {
+        final String message = String.format(Constants.NOTIF_MESSAGE_DEFAULT, streamerName);
+        final String endMessage = String.format(Constants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
+
+        notifications.get(documentId).update(
+                rethink.hashMap("embed", Constants.NOTIF_EMBED_DEFAULT)
+                        .with("embedColor", Constants.NOTIF_EMBED_COLOR_DEFAULT)
+                        .with("message", message)
+                        .with("streamEndAction", Constants.NOTIF_END_ACTION)
+                        .with("streamEndMessage", endMessage)
+        ).run(connection);
     }
 
     /**
@@ -339,8 +358,8 @@ public class DatabaseDriver {
                 .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
-            JSONObject document = new JSONObject(cursor.next().toString());
-            return document.getString("id");
+            Notification notification = new Gson().fromJson(cursor.next().toString(), Notification.class);
+            return notification.getId();
         }
         cursor.close();
         return null;
@@ -411,13 +430,13 @@ public class DatabaseDriver {
      * @param serverId the ID of the server
      * @return the unique ID of the document if found, otherwise null
      */
-    private String getGuildDocId(String serverId) {
+    public String getGuildDocId(String serverId) {
         Cursor cursor = guilds.filter(row -> row.g("serverId").eq(serverId))
                 .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {
-            JSONObject document = new JSONObject(cursor.next().toString());
-            return document.getString("id");
+            Server server = new Gson().fromJson(cursor.next().toString(), Server.class);
+            return server.getId();
         }
         cursor.close();
         return null;
