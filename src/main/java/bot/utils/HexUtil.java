@@ -40,6 +40,7 @@ public class HexUtil {
      * @return the rgb {@link Color} component
      */
     private Color hex2Rgb(final String hex) {
+        //TODO: Handle 3 length hex values
         return new Color(
                 Integer.valueOf(hex.substring(0, 2), 16),
                 Integer.valueOf(hex.substring(2, 4), 16),

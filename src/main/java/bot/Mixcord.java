@@ -1,19 +1,12 @@
 package bot;
 
-import bot.commands.informative.Info;
-import bot.commands.informative.Invite;
-import bot.commands.informative.Ping;
-import bot.commands.informative.WhoCanUseMe;
-import bot.commands.mixer.MixerUser;
-import bot.commands.mixer.MixerUserSocials;
-import bot.commands.notifications.*;
-import bot.commands.owner.*;
+import bot.commands.Commands;
 import bot.factories.*;
 import bot.structure.Credentials;
-import bot.utils.NotifService;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -53,74 +46,8 @@ public class Mixcord {
                 .setCoOwnerIds(Constants.CO_OWNER_ID, Constants.CO_OWNER_ID2)
                 .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
                 .setServerInvite(Constants.DISCORD)
-                .addCommands(
-                        // Informative
-                        new Ping(),
-                        new Info(),
-                        new Invite(),
-                        new WhoCanUseMe(),
-
-                        // Notifications
-                        new AddNotif(),
-                        new DeleteNotif(),
-                        new ChannelNotifs(),
-                        new ServerNotifs(),
-                        new MakeDefault(),
-                        new NotifDetails(),
-                        new NotifPreview(),
-                        new NotifMessageEdit(),
-                        new NotifColorEdit(),
-                        new NotifEmbedConfig(),
-
-                        // Mixer
-                        new MixerUser(),
-                        new MixerUserSocials(),
-
-                        // Owner
-                        new Whitelist(),
-                        new NotifServiceStatus(),
-                        new StartNotifService(),
-                        new StopNotifService(),
-                        new RestartNotifService(),
-                        new RoleInfo(),
-                        new ServerInfo(),
-                        new Shutdown())
-                .setHelpConsumer(event -> {
-                    StringBuilder helpBuilder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
-                    Command.Category category = null;
-                    for (Command command : client.getCommands()) {
-                        if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
-                            if (!Objects.equals(category, command.getCategory())) {
-                                category = command.getCategory();
-                                helpBuilder.append("\n\n  __").append(category == null ? "No Category" : category.getName()).append("__:\n");
-                            }
-                            helpBuilder.append("\n`").append(client.getPrefix()).append(client.getPrefix() == null ? " " : "").append(command.getName())
-                                    .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
-                                    .append(" - ").append(command.getHelp());
-                        }
-                    }
-                    try {
-                        if (event.isFromType(ChannelType.TEXT)) {
-                            event.reply(helpBuilder.toString());
-                            event.reactSuccess();
-
-                            User owner = event.getJDA().getUserById(client.getOwnerId());
-                            if (owner != null) {
-                                StringBuilder contact = new StringBuilder();
-                                contact.append("For additional help, contact **")
-                                        .append(owner.getName())
-                                        .append("**#")
-                                        .append(owner.getDiscriminator())
-                                        .append(" or join ")
-                                        .append(Constants.DISCORD);
-                                event.reply(contact.toString());
-                            }
-                        }
-                    } catch (InsufficientPermissionException ex) {
-                        event.reactError();
-                        event.replyInDm("Help cannot be sent. I don't have permission to write in that channel.");
-                    }
-                })
+                .addCommands(Commands.getCommands())
+                .setHelpConsumer(Mixcord::accept)
                 .build();
         client.getCommands().forEach((command) -> log.info("Added command: {}", command.getName()));
         log.info("Total number of commands available: {}", client.getCommands().size());
@@ -172,7 +99,54 @@ public class Mixcord {
         }
     }
 
+    //TODO: Move to / create a service this.
     public static JDA getJda() {
         return jda;
+    }
+
+    private static void accept(CommandEvent event) {
+        //TODO: group commands by category, and not by order
+        StringBuilder helpBuilder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
+        Command.Category category = null;
+        for (Command command : client.getCommands()) {
+            if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
+                if (!Objects.equals(category, command.getCategory())) {
+                    category = command.getCategory();
+                    helpBuilder
+                            .append("\n\n  __")
+                            .append(category == null ? "No Category" : category.getName())
+                            .append("__:\n");
+                }
+                helpBuilder
+                        .append("\n`")
+                        .append(client.getPrefix())
+                        .append(client.getPrefix() == null ? " " : "")
+                        .append(command.getName())
+                        .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
+                        .append(" - ")
+                        .append(command.getHelp());
+            }
+        }
+        try {
+            if (event.isFromType(ChannelType.TEXT)) {
+                event.reply(helpBuilder.toString());
+                event.reactSuccess();
+
+                User owner = event.getJDA().getUserById(client.getOwnerId());
+                if (owner != null) {
+                    StringBuilder contact = new StringBuilder();
+                    contact.append("For additional help, contact **")
+                            .append(owner.getName())
+                            .append("**#")
+                            .append(owner.getDiscriminator())
+                            .append(" or join ")
+                            .append(Constants.DISCORD);
+                    event.reply(contact.toString());
+                }
+            }
+        } catch (InsufficientPermissionException ex) {
+            event.reactError();
+            event.replyInDm("Help cannot be sent. I don't have permission to write in that channel.");
+        }
     }
 }

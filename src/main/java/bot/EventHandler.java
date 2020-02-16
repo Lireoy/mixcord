@@ -74,7 +74,6 @@ public class EventHandler extends ListenerAdapter {
         } else {
             log.info("Failed to add G:{} on join event", event.getGuild().getId());
         }
-
     }
 
     /**
