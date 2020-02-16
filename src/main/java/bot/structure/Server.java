@@ -10,13 +10,6 @@ public class Server {
     public Server() {
     }
 
-    public Server(String id, String serverId, boolean whitelisted, String prefix) {
-        this.id = id;
-        this.serverId = serverId;
-        this.whitelisted = whitelisted;
-        this.prefix = prefix;
-    }
-
     public String getId() {
         return id;
     }

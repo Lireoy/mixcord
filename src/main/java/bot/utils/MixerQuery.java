@@ -1,9 +1,7 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.Mixcord;
 import bot.factories.CredentialsFactory;
-import bot.structure.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;

@@ -8,7 +8,6 @@ import bot.structure.Notification;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;

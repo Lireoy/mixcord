@@ -10,13 +10,6 @@ public class Streamer {
     public Streamer() {
     }
 
-    public Streamer(String id, String streamerName, String streamerId, boolean isStreaming) {
-        this.id = id;
-        this.streamerName = streamerName;
-        this.streamerId = streamerId;
-        this.isStreaming = isStreaming;
-    }
-
     public String getId() {
         return id;
     }

@@ -16,19 +16,6 @@ public class Credentials {
     public Credentials() {
     }
 
-    public Credentials(boolean isProductionBuild, String discordBotToken, String discordBotTokenCanary, String mixerApiClientId, String mixerApiClientSecret, String databaseIp, int databasePort, String databaseUser, String databasePassword, int numberOfShards) {
-        this.isProductionBuild = isProductionBuild;
-        this.discordBotToken = discordBotToken;
-        this.discordBotTokenCanary = discordBotTokenCanary;
-        this.mixerApiClientId = mixerApiClientId;
-        this.mixerApiClientSecret = mixerApiClientSecret;
-        this.databaseIp = databaseIp;
-        this.databasePort = databasePort;
-        this.databaseUser = databaseUser;
-        this.databasePassword = databasePassword;
-        this.numberOfShards = numberOfShards;
-    }
-
     public boolean isProductionBuild() {
         return isProductionBuild;
     }

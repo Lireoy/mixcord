@@ -1,11 +1,8 @@
 package bot.commands.notifications;
 
-import bot.Constants;
-import bot.Mixcord;
 import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;
-import bot.utils.MixerQuery;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -13,7 +10,6 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 /**
  * Deletes a specific notification entry from the database.

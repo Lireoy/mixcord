@@ -1,7 +1,8 @@
 package bot;
 
 import bot.commands.Commands;
-import bot.factories.*;
+import bot.factories.CredentialsFactory;
+import bot.factories.NotifServiceFactory;
 import bot.structure.Credentials;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;

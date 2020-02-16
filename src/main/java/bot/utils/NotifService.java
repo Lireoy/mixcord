@@ -1,7 +1,6 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.DatabaseDriver;
 import bot.factories.DatabaseFactory;
 import bot.structure.Notification;
 import bot.structure.Streamer;

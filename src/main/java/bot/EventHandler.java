@@ -5,7 +5,6 @@ import bot.factories.NotifServiceFactory;
 import bot.structure.Notification;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;

@@ -3,7 +3,6 @@ package bot.factories;
 import bot.structure.Credentials;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,6 +1,5 @@
 package bot.commands.owner;
 
-import bot.Mixcord;
 import bot.factories.NotifServiceFactory;
 import bot.structure.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;

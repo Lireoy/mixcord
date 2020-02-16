@@ -9,7 +9,6 @@ import com.rethinkdb.gen.ast.ReqlExpr;
 import com.rethinkdb.gen.ast.Table;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.net.Cursor;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 

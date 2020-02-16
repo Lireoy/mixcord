@@ -1,7 +1,5 @@
 package bot.commands.notifications;
 
-import bot.Constants;
-import bot.Mixcord;
 import bot.factories.DatabaseFactory;
 import bot.structure.CommandCategory;
 import bot.structure.Notification;

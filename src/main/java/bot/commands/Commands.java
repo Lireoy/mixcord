@@ -7,6 +7,7 @@ import bot.commands.informative.WhoCanUseMe;
 import bot.commands.mixer.MixerUser;
 import bot.commands.mixer.MixerUserSocials;
 import bot.commands.notifications.*;
+import bot.commands.owner.Shutdown;
 import bot.commands.owner.*;
 import com.jagrosh.jdautilities.command.Command;
 

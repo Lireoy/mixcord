@@ -16,19 +16,6 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String id, String serverId, String channelId, String streamerId, String streamerName, boolean embed, String embedColor, String message, int streamEndAction, String streamEndMessage) {
-        this.id = id;
-        this.serverId = serverId;
-        this.channelId = channelId;
-        this.streamerId = streamerId;
-        this.streamerName = streamerName;
-        this.embed = embed;
-        this.embedColor = embedColor;
-        this.message = message;
-        this.streamEndAction = streamEndAction;
-        this.streamEndMessage = streamEndMessage;
-    }
-
     public String getId() {
         return id;
     }
