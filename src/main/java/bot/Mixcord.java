@@ -2,21 +2,19 @@ package bot;
 
 import bot.commands.Commands;
 import bot.factories.CredentialsFactory;
-import bot.factories.NotifServiceFactory;
 import bot.structure.Credentials;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.AccountType;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
 
 import javax.security.auth.login.LoginException;
 import java.io.FileReader;
@@ -28,7 +26,7 @@ import java.util.Objects;
 public class Mixcord {
 
     private static CommandClient client;
-    private static JDA jda;
+    private static ShardManager shards;
 
     public static void main(String[] args) {
         displayAscii();
@@ -61,30 +59,21 @@ public class Mixcord {
         EventHandler eventHandler = new EventHandler();
 
         try {
-            for (int i = 0; i < credentials.getNumberOfShards(); i++) {
-                JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
-                        .setToken(BOT_TOKEN)
-                        .useSharding(i, credentials.getNumberOfShards())
-                        .setStatus(OnlineStatus.ONLINE)
-                        .setActivity(Activity.playing("Type .help"))
-                        .addEventListeners(client)
-                        .addEventListeners(eventHandler)
-                        .setAutoReconnect(true);
-                jda = jdaBuilder.build().awaitReady();
-
-                log.info("Shard {} is ready!", i);
-
-                // Discord has a rate limit of 5 seconds between separate identification
-                if (credentials.getNumberOfShards() > 1) {
-                    Thread.sleep(5001);
-                }
-            }
+            shards = new DefaultShardManagerBuilder()
+                    .setToken(BOT_TOKEN)
+                    .setShardsTotal(credentials.getNumberOfShards())
+                    .setStatus(OnlineStatus.ONLINE)
+                    .setActivity(Activity.playing("Type .help"))
+                    .addEventListeners(client)
+                    .addEventListeners(eventHandler)
+                    .setAutoReconnect(true)
+                    .build();
 
             // Starts the automatic notification system
             // If you delete this, then you have to start
             // the notifier service manually on every startup
-            NotifServiceFactory.getNotifService().run();
-        } catch (LoginException | InterruptedException e) {
+            //NotifServiceFactory.getNotifService().run();
+        } catch (LoginException e) {
             log.error(e.getMessage());
         }
     }
@@ -101,8 +90,8 @@ public class Mixcord {
     }
 
     //TODO: Move to / create a service this.
-    public static JDA getJda() {
-        return jda;
+    public static ShardManager getShards() {
+        return shards;
     }
 
     private static void accept(CommandEvent event) {
@@ -135,14 +124,13 @@ public class Mixcord {
 
                 User owner = event.getJDA().getUserById(client.getOwnerId());
                 if (owner != null) {
-                    StringBuilder contact = new StringBuilder();
-                    contact.append("For additional help, contact **")
-                            .append(owner.getName())
-                            .append("**#")
-                            .append(owner.getDiscriminator())
-                            .append(" or join ")
-                            .append(Constants.DISCORD);
-                    event.reply(contact.toString());
+                    String contact = "For additional help, contact **" +
+                            owner.getName() +
+                            "**#" +
+                            owner.getDiscriminator() +
+                            " or join " +
+                            Constants.DISCORD;
+                    event.reply(contact);
                 }
             }
         } catch (InsufficientPermissionException ex) {

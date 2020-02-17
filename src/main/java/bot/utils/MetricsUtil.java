@@ -92,7 +92,7 @@ public class MetricsUtil {
      * @param channelId Discord channel ID
      */
     public void postMetrics(String channelId) {
-        TextChannel channel = Mixcord.getJda().getTextChannelById(channelId);
+        TextChannel channel = Mixcord.getShards().getTextChannelById(channelId);
 
         String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
         String description = String.format(line, streamersProcessed, notifsSent, getSecs());

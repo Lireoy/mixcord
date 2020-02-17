@@ -2,8 +2,8 @@ package bot.commands.owner;
 
 import bot.Mixcord;
 import bot.factories.DatabaseFactory;
-import bot.structure.enums.CommandCategory;
 import bot.structure.Server;
+import bot.structure.enums.CommandCategory;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -46,7 +46,7 @@ public class Whitelist extends Command {
             StringBuilder serversDetails = new StringBuilder();
             for (Object o : cursor) {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
-                final Guild guild = Mixcord.getJda().getGuildById(server.getServerId());
+                final Guild guild = Mixcord.getShards().getGuildById(server.getServerId());
 
                 String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
                 String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
@@ -67,9 +67,9 @@ public class Whitelist extends Command {
             newWhitelistVal = true;
         }
 
-        final Guild guild = Mixcord.getJda().getGuildById(serverId);
+        final Guild guild = Mixcord.getShards().getGuildById(serverId);
 
-        if (!Mixcord.getJda().getGuilds().contains(guild)) {
+        if (!Mixcord.getShards().getGuilds().contains(guild)) {
             commandEvent.reply("The bot is not in that server.");
             commandEvent.reactError();
 

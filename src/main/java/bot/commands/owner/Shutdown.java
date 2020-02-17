@@ -42,7 +42,7 @@ public class Shutdown extends Command {
             NotifServiceFactory.getNotifService().stop();
             log.info("Notifier service was shut down due to system shutdown request...");
 
-            Mixcord.getJda().shutdown();
+            Mixcord.getShards().shutdown();
             log.info("JDA instance was shutdown due to system shutdown request...");
 
             log.info("Shutting down application...");

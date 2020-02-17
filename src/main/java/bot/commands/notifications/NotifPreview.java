@@ -1,8 +1,8 @@
 package bot.commands.notifications;
 
 import bot.factories.DatabaseFactory;
-import bot.structure.enums.CommandCategory;
 import bot.structure.Notification;
+import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.google.gson.Gson;

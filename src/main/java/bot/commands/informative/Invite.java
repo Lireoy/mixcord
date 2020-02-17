@@ -1,6 +1,5 @@
 package bot.commands.informative;
 
-import bot.Mixcord;
 import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -33,7 +32,7 @@ public class Invite extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String clientId = Mixcord.getJda().getSelfUser().getId();
+        final String clientId = commandEvent.getSelfUser().getId();
 
         commandEvent.reactSuccess();
         commandEvent.reply(new MixerEmbedBuilder()

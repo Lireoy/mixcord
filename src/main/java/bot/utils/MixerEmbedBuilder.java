@@ -22,14 +22,14 @@ public class MixerEmbedBuilder extends EmbedBuilder {
      * Sets the embed time and footer.
      */
     public MixerEmbedBuilder() {
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
     public MixerEmbedBuilder(JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
         this.setCustomColor();
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -46,7 +46,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         this.notif = notif;
         this.setCustomColor();
         this.setImage(Constants.MIXER_BANNER_DEFAULT);
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getJda().getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 

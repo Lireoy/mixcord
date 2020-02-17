@@ -2,8 +2,8 @@ package bot.commands.notifications;
 
 import bot.Constants;
 import bot.factories.DatabaseFactory;
-import bot.structure.enums.CommandCategory;
 import bot.structure.Notification;
+import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
