@@ -1,9 +1,16 @@
 package bot.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * This class is a complementary class for the {@link String} class,
  * with custom methods, written for Mixcord's use cases.
  */
+
+@Slf4j
 public class StringUtil {
 
     /**
@@ -41,5 +48,16 @@ public class StringUtil {
 
     public static String replaceLastComma(final String text) {
         return text.replaceFirst("(?s)(.*)" + ", ", "$1" + "");
+    }
+
+    public static void displayAscii() {
+        try (FileReader fr = new FileReader("MixcordASCII.txt")) {
+            int i;
+            while ((i = fr.read()) != -1) {
+                System.out.print((char) i);
+            }
+        } catch (IOException e) {
+            log.warn("Could not find ASCII art.");
+        }
     }
 }
