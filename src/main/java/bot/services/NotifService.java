@@ -1,9 +1,12 @@
-package bot.utils;
+package bot.services;
 
 import bot.Constants;
 import bot.factories.DatabaseFactory;
 import bot.structure.Notification;
 import bot.structure.Streamer;
+import bot.utils.MetricsUtil;
+import bot.utils.MixerQuery;
+import bot.utils.NotifSender;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;

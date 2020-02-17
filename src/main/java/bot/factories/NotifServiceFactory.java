@@ -1,6 +1,6 @@
 package bot.factories;
 
-import bot.utils.NotifService;
+import bot.services.NotifService;
 
 public class NotifServiceFactory {
 

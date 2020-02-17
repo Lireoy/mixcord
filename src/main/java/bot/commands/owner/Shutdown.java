@@ -2,6 +2,7 @@ package bot.commands.owner;
 
 import bot.Mixcord;
 import bot.factories.NotifServiceFactory;
+import bot.services.ShardService;
 import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -42,7 +43,7 @@ public class Shutdown extends Command {
             NotifServiceFactory.getNotifService().stop();
             log.info("Notifier service was shut down due to system shutdown request...");
 
-            Mixcord.getShards().shutdown();
+            ShardService.manager().shutdown();
             log.info("JDA instance was shutdown due to system shutdown request...");
 
             log.info("Shutting down application...");

@@ -1,6 +1,7 @@
 package bot.utils;
 
 import bot.Mixcord;
+import bot.services.ShardService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -21,10 +22,9 @@ public class MetricsUtil {
     private int notifsSent;
     private int streamersProcessed;
 
-    MetricsUtil() {
+    public MetricsUtil() {
         initReset();
     }
-
 
     /**
      * Starts the {@link MetricsUtil} timer
@@ -92,7 +92,7 @@ public class MetricsUtil {
      * @param channelId Discord channel ID
      */
     public void postMetrics(String channelId) {
-        TextChannel channel = Mixcord.getShards().getTextChannelById(channelId);
+        TextChannel channel = ShardService.manager().getTextChannelById(channelId);
 
         String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
         String description = String.format(line, streamersProcessed, notifsSent, getSecs());

@@ -3,6 +3,7 @@ package bot.utils;
 import bot.Constants;
 import bot.Mixcord;
 import bot.factories.HexUtilFactory;
+import bot.services.ShardService;
 import bot.structure.Notification;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONObject;
@@ -22,14 +23,14 @@ public class MixerEmbedBuilder extends EmbedBuilder {
      * Sets the embed time and footer.
      */
     public MixerEmbedBuilder() {
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.manager().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
     public MixerEmbedBuilder(JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
         this.setCustomColor();
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.manager().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -46,7 +47,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         this.notif = notif;
         this.setCustomColor();
         this.setImage(Constants.MIXER_BANNER_DEFAULT);
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, Mixcord.getShards().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.manager().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 

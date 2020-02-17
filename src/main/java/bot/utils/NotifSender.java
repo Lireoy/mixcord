@@ -1,8 +1,8 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.Mixcord;
 import bot.factories.DatabaseFactory;
+import bot.services.ShardService;
 import bot.structure.Notification;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class NotifSender {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
         final String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
 
-        final Guild guild = Mixcord.getShards().getGuildById(notif.getServerId());
-        final TextChannel textChannel = Mixcord.getShards().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -49,8 +49,8 @@ public class NotifSender {
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendNonEmbed(Notification notif) {
-        final Guild guild = Mixcord.getShards().getGuildById(notif.getServerId());
-        final TextChannel textChannel = Mixcord.getShards().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -67,8 +67,8 @@ public class NotifSender {
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendOfflineMsg(Notification notif) {
-        final Guild guild = Mixcord.getShards().getGuildById(notif.getServerId());
-        final TextChannel textChannel = Mixcord.getShards().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -78,7 +78,7 @@ public class NotifSender {
     }
 
     private static boolean isGuildReachable(Notification notif, Guild guild) {
-        if (!Mixcord.getShards().getGuilds().contains(guild)) {
+        if (!ShardService.manager().getGuilds().contains(guild)) {
             log.info("Guild is not reachable. G:{}", notif.getServerId());
             return false;
         }
@@ -87,7 +87,7 @@ public class NotifSender {
     }
 
     private static boolean isChannelReachable(Notification notif, TextChannel textChannel) {
-        if (!Objects.requireNonNull(Mixcord.getShards().getGuildById(notif.getServerId()))
+        if (!Objects.requireNonNull(ShardService.manager().getGuildById(notif.getServerId()))
                 .getTextChannels().contains(textChannel)) {
             log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
             DatabaseFactory.getDatabase().deleteNotif(notif.getId());
