@@ -1,6 +1,5 @@
 package bot.utils;
 
-import bot.Mixcord;
 import bot.services.ShardService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.TextChannel;

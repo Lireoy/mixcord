@@ -1,6 +1,5 @@
 package bot.commands.owner;
 
-import bot.Mixcord;
 import bot.factories.DatabaseFactory;
 import bot.services.ShardService;
 import bot.structure.Server;

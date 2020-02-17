@@ -1,7 +1,6 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.Mixcord;
 import bot.factories.HexUtilFactory;
 import bot.services.ShardService;
 import bot.structure.Notification;

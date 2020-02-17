@@ -4,7 +4,6 @@ import bot.services.ClientService;
 import bot.services.ShardService;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.security.auth.login.LoginException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;

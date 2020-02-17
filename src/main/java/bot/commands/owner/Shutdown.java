@@ -1,6 +1,5 @@
 package bot.commands.owner;
 
-import bot.Mixcord;
 import bot.factories.NotifServiceFactory;
 import bot.services.ShardService;
 import bot.structure.enums.CommandCategory;
