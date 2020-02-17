@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.ResumedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -22,6 +23,16 @@ import java.util.List;
  */
 @Slf4j
 public class EventHandler extends ListenerAdapter {
+
+    @Override
+    public void onReady(@Nonnull ReadyEvent event) {
+        int shardId = event.getJDA().getShardInfo().getShardId();
+        int total = event.getGuildTotalCount();
+        int available = event.getGuildAvailableCount();
+        int unAvailable = event.getGuildUnavailableCount();
+        log.info("Ready event for shard {}. Total guilds {}, Available {}, Unavailable {}",
+                shardId, total, available, unAvailable);
+    }
 
     /**
      * Starts back up the notification service.
