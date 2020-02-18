@@ -8,8 +8,10 @@ import bot.utils.MetricsUtil;
 import bot.utils.MixerQuery;
 import bot.utils.NotifSender;
 import com.google.gson.Gson;
+import com.rethinkdb.gen.exc.ReqlOpFailedError;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class NotifService implements Runnable {
 
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private static volatile AtomicBoolean running = new AtomicBoolean(false);
 
     public NotifService() {
     }
@@ -97,12 +99,28 @@ public class NotifService implements Runnable {
 
                 metrics.initReset();
             }
+        } catch (Exception ex) {
+            if (ex instanceof InterruptedException) {
+                this.stop();
+                log.info("Interrupted Exception: {}", ex.getMessage());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("Okay so we caught some ugly exception, we should carry on, no stopping with the notifs.");
-            this.restart();
-            // lmao
+                String message = Constants.WARNING + Constants.WARNING + Constants.WARNING +
+                        "Interrupted exception.\nTerminating the notifier service." +
+                        Constants.WARNING + Constants.WARNING + Constants.WARNING;
+
+                sendReportInDm(Constants.OWNER_ID, message);
+            } else if (ex instanceof ReqlOpFailedError) {
+                this.stop();
+                log.info("Database error: {}", ex.getMessage());
+
+                String message = Constants.WARNING + Constants.WARNING + Constants.WARNING +
+                        "There is a database issue.\nTerminating the notifier service." +
+                        Constants.WARNING + Constants.WARNING + Constants.WARNING;
+
+                sendReportInDm(Constants.OWNER_ID, message);
+            } else {
+                log.info("General exception: {}", ex.getMessage());
+            }
         }
     }
 
@@ -117,13 +135,14 @@ public class NotifService implements Runnable {
         log.info("Stopping notifier service...");
     }
 
-    public void restart() {
-        log.info("Restarting notifier service...");
-        stop();
-        start();
-    }
-
     public boolean getState() {
         return running.get();
+    }
+
+    private void sendReportInDm(String userId, String message) {
+        User owner = ShardService.manager().getUserById(userId);
+        assert owner != null;
+        owner.openPrivateChannel().queue(
+                channel -> channel.sendMessage(message).queue());
     }
 }
