@@ -119,6 +119,7 @@ public class NotifService implements Runnable {
 
                 sendReportInDm(Constants.OWNER_ID, message);
             } else {
+                this.stop();
                 log.info("General exception: {}", ex.getMessage());
             }
         }
