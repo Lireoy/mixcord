@@ -1,7 +1,7 @@
 package bot.services;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.Streamer;
 import bot.utils.MetricsUtil;
@@ -15,53 +15,65 @@ import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class NotifService implements Runnable {
 
-    private static volatile AtomicBoolean running = new AtomicBoolean(false);
+    private static NotifService instance;
+    private Thread worker;
 
-    public NotifService() {
+    private NotifService() {
+        log.info("NotifService constructor called.");
+        worker = new Thread(this);
+        WorkStatus.getInstance().markStarted();
+        this.start();
+    }
+
+    public static NotifService getInstance() {
+        if (instance == null)
+            instance = new NotifService();
+
+        return instance;
     }
 
     public void run() {
-        log.info("Notifier service was started.");
-        running.set(true);
-        MetricsUtil metrics = new MetricsUtil();
-        try {
-            while (running.get()) {
-                Cursor streamers = DatabaseFactory.getDatabase().selectAllStreamers();
-                for (Object streamerObj : streamers) {
-                    // Checking one streamer at a time
-                    Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
+        log.info("run()");
+        MetricsUtil.getInstance().startTimer();
 
-                    // Mixer query
+        try {
+            while (WorkStatus.getInstance().isRunning()) {
+                Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
+
+                for (Object streamerObj : streamers) {
+                    Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
+
                     assert queryJson != null;
                     boolean queryIsOnline = queryJson.getBoolean("online");
 
                     if (queryIsOnline && !streamer.isStreaming()) {
                         // Was offline, is now online
 
-                        log.info("{} ({}) is streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
-                        DatabaseFactory.getDatabase().updateIsStreaming(streamer.getId(), true);
-                        log.info("Updated streaming to TRUE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
+                        log.info("{} ({}) is streaming. Processing...",
+                                streamer.getStreamerName(), streamer.getStreamerId());
+                        DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), true);
+
+                        log.info("Updated streaming to TRUE for {} ({})",
+                                streamer.getStreamerName(), streamer.getStreamerId());
                         log.info("Queueing notifications...");
 
                         // Select all notifications for this streamer from database
-                        Cursor notifications = DatabaseFactory.getDatabase().selectStreamerNotifs(streamer.getStreamerId());
-                        for (Object notificationObj : notifications) {
+                        Cursor notifications = DatabaseDriver.getInstance()
+                                .selectStreamerNotifs(streamer.getStreamerId());
 
-                            Notification notif = new Gson().fromJson(notificationObj.toString(), Notification.class);
+                        for (Object notificationObj : notifications) {
+                            Notification notif = new Gson().fromJson(
+                                    notificationObj.toString(), Notification.class);
 
                             boolean dbEmbed = notif.isEmbed();
-                            if (dbEmbed) {
-                                NotifSender.sendEmbed(notif, queryJson);
-                            } else {
-                                NotifSender.sendNonEmbed(notif);
-                            }
-                            metrics.incrementNotifsSent();
+                            if (dbEmbed) NotifSender.sendEmbed(notif, queryJson);
+                            else NotifSender.sendNonEmbed(notif);
+                            MetricsUtil.getInstance().incrementNotifsSent();
                         }
                         notifications.close();
                     }
@@ -69,79 +81,128 @@ public class NotifService implements Runnable {
                     if (!queryIsOnline && streamer.isStreaming()) {
                         // Was online, is now offline
 
-                        log.info("{} ({}) is not streaming. Processing...", streamer.getStreamerName(), streamer.getStreamerId());
-                        DatabaseFactory.getDatabase().updateIsStreaming(streamer.getId(), false);
-                        log.info("Updated streaming to FALSE for {} ({})", streamer.getStreamerName(), streamer.getStreamerId());
+                        log.info("{} ({}) is not streaming. Processing...",
+                                streamer.getStreamerName(), streamer.getStreamerId());
+
+                        DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), false);
+
+                        log.info("Updated streaming to FALSE for {} ({})",
+                                streamer.getStreamerName(), streamer.getStreamerId());
                         log.info("Queueing event end message...");
 
                         // Select all notifications for this streamer from database
-                        Cursor notifications = DatabaseFactory.getDatabase().selectStreamerNotifs(streamer.getStreamerId());
+                        Cursor notifications = DatabaseDriver.getInstance()
+                                .selectStreamerNotifs(streamer.getStreamerId());
+
                         for (Object notificationObj : notifications) {
-                            Notification notif = new Gson().fromJson(notificationObj.toString(), Notification.class);
+                            Notification notif = new Gson().fromJson(
+                                    notificationObj.toString(), Notification.class);
                             NotifSender.sendOfflineMsg(notif);
-                            metrics.incrementNotifsSent();
+                            MetricsUtil.getInstance().incrementNotifsSent();
                         }
                         notifications.close();
                     }
-                    metrics.incrementStreamersProcessed();
+                    MetricsUtil.getInstance().incrementStreamersProcessed();
                     streamers.close();
                 }
 
-                metrics.stopTimer();
-                metrics.postMetrics(Constants.METRICS_CHANNEL);
+                MetricsUtil.getInstance().stopTimer();
+                MetricsUtil.getInstance().postMetrics(Constants.METRICS_CHANNEL);
                 log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
-                log.info("Checked {} streamers in {}s", metrics.getStreamersProcessed(), metrics.getSecs());
+                log.info("Checked {} streamers in {}s",
+                        MetricsUtil.getInstance().getStreamersProcessed(),
+                        MetricsUtil.getInstance().getSecs());
 
-                if (metrics.getSecs() <= 40) {
+                if (MetricsUtil.getInstance().getSecs() <= 40) {
                     log.info("Sleeping the notifier service...");
                     TimeUnit.SECONDS.sleep(60);
                 }
 
-                metrics.initReset();
+                MetricsUtil.getInstance().reset();
             }
         } catch (Exception ex) {
             if (ex instanceof InterruptedException) {
+                //TODO: create a central class to support app-wide DM report sending to owners
                 this.stop();
-                log.info("Interrupted Exception: {}", ex.getMessage());
+                log.info("InterruptedException");
+                ex.printStackTrace();
 
-                String message = Constants.WARNING + Constants.WARNING + Constants.WARNING +
-                        "Interrupted exception.\nTerminating the notifier service." +
-                        Constants.WARNING + Constants.WARNING + Constants.WARNING;
+                String message = Constants.WARNING + Constants.WARNING +
+                        "The notifier service was interrupted. Terminating the notifier service." +
+                        Constants.WARNING + Constants.WARNING;
 
                 sendReportInDm(Constants.OWNER_ID, message);
             } else if (ex instanceof ReqlOpFailedError) {
                 this.stop();
-                log.info("Database error: {}", ex.getMessage());
+                log.info("ReqlOpFailedError");
+                ex.printStackTrace();
 
-                String message = Constants.WARNING + Constants.WARNING + Constants.WARNING +
-                        "There is a database issue.\nTerminating the notifier service." +
-                        Constants.WARNING + Constants.WARNING + Constants.WARNING;
+                String message = Constants.WARNING + Constants.WARNING +
+                        "There is a database issue. Stopping the notifier service." +
+                        Constants.WARNING + Constants.WARNING;
 
                 sendReportInDm(Constants.OWNER_ID, message);
             } else {
                 this.stop();
-                log.info("General exception: {}", ex.getMessage());
+                log.info("General exception");
+                ex.printStackTrace();
             }
         }
     }
 
-    public void start() {
-        Thread worker = new Thread(this);
-        worker.start();
-        log.info("Starting notifier service...");
+    public String start() {
+        String msg;
+
+        if (worker.getState().equals(Thread.State.NEW)) {
+            worker.start();
+            worker.setName("NotifierService");
+            msg = "Started worker...";
+            log.info(msg);
+            return msg;
+        }
+
+        if (worker.isInterrupted()) {
+            WorkStatus.getInstance().markStarted();
+            worker.start();
+            msg = "Thread is in interrupted state. Started worker...";
+            log.info(msg);
+            return msg;
+        }
+
+        if (worker.isAlive()) {
+            if (WorkStatus.getInstance().isRunning()) {
+                msg = "Thread is alive and is running.";
+                log.info(msg);
+                return msg;
+            } else {
+                WorkStatus.getInstance().markStarted();
+                worker.start();
+                msg = "Thread is alive but not running. Started it.";
+                log.info(msg);
+                return msg;
+            }
+        }
+
+        return "Nothing";
     }
 
     public void stop() {
-        running.set(false);
-        log.info("Stopping notifier service...");
+        try {
+            WorkStatus.getInstance().markFinished();
+            worker = null;
+            log.info("Stopping notifier service...");
+        } catch (SecurityException ex) {
+            log.info("Security exception.");
+            ex.printStackTrace();
+        }
     }
 
-    public boolean getState() {
-        return running.get();
+    public String getState() {
+        return worker.getState().name();
     }
 
     private void sendReportInDm(String userId, String message) {
-        User owner = ShardService.manager().getUserById(userId);
+        User owner = ShardService.getInstance().getUserById(userId);
         assert owner != null;
         owner.openPrivateChannel().queue(
                 channel -> channel.sendMessage(message).queue());

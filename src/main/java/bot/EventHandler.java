@@ -1,7 +1,6 @@
 package bot;
 
-import bot.factories.DatabaseFactory;
-import bot.factories.NotifServiceFactory;
+import bot.services.NotifService;
 import bot.structure.Notification;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
@@ -42,8 +41,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onResume(@Nonnull ResumedEvent event) {
         log.info("Resumed session...");
-        NotifServiceFactory.getNotifService().start();
-        log.info("Resume event: Starting notifier service...");
+        NotifService.getInstance().start();
     }
 
     /**
@@ -54,8 +52,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onReconnect(@Nonnull ReconnectedEvent event) {
         log.info("Reconnected to session...");
-        NotifServiceFactory.getNotifService().start();
-        log.info("Reconnect event: Starting notifier service...");
+        NotifService.getInstance().start();
     }
 
     /**
@@ -67,7 +64,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onDisconnect(@Nonnull DisconnectEvent event) {
         log.info("Disconnected from session...");
-        NotifServiceFactory.getNotifService().stop();
+        NotifService.getInstance().stop();
         log.info("Stopping notifier service due to disconnect event...");
     }
 
@@ -78,7 +75,7 @@ public class EventHandler extends ListenerAdapter {
      */
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
-        final boolean addResponse = DatabaseFactory.getDatabase().addServer(event.getGuild().getId());
+        final boolean addResponse = DatabaseDriver.getInstance().addServer(event.getGuild().getId());
         if (addResponse) {
             log.info("Joined guild {}", event.getGuild().getId());
         } else {
@@ -95,16 +92,16 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
         log.info("Leaving guild {}", event.getGuild().getId());
-        DatabaseFactory.getDatabase().deleteGuild(event.getGuild().getId());
+        DatabaseDriver.getInstance().deleteGuild(event.getGuild().getId());
         log.info("Deleting server configuration from database...");
 
         List<String> streamerIds = new ArrayList<>();
-        Cursor notifs = DatabaseFactory.getDatabase().selectServerNotifs(event.getGuild().getId());
+        Cursor notifs = DatabaseDriver.getInstance().selectServerNotifs(event.getGuild().getId());
 
         int deletedNotifs = 0;
         for (Object object : notifs) {
             Notification notif = new Gson().fromJson(object.toString(), Notification.class);
-            DatabaseFactory.getDatabase().deleteNotif(notif.getId());
+            DatabaseDriver.getInstance().deleteNotif(notif.getId());
             deletedNotifs++;
 
             if (!streamerIds.contains(notif.getStreamerId())) {
@@ -115,9 +112,9 @@ public class EventHandler extends ListenerAdapter {
 
         int deletedStreamers = 0;
         for (String streamerId : streamerIds) {
-            Cursor cursor = DatabaseFactory.getDatabase().selectStreamerNotifs(streamerId);
+            Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(streamerId);
             if (!cursor.hasNext()) {
-                DatabaseFactory.getDatabase().deleteStreamer(streamerId);
+                DatabaseDriver.getInstance().deleteStreamer(streamerId);
                 deletedStreamers++;
             }
             cursor.close();

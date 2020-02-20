@@ -13,15 +13,23 @@ import java.util.regex.Pattern;
 @Slf4j
 public class HexUtil {
 
+    private static HexUtil instance;
     private static Pattern pattern;
 
     /**
      * Creates a new instance for {@link HexUtil} and compiles the pattern for validating HEX color values.
      */
-    public HexUtil() {
+    private HexUtil() {
         //String HEX_PATTERN = "(^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$)|^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
         String HEX_PATTERN = "(^#([A-Fa-f0-9]{6})$)|^([A-Fa-f0-9]{6})$";
         pattern = Pattern.compile(HEX_PATTERN);
+    }
+
+    public static HexUtil getInstance() {
+        if (pattern == null)
+            instance = new HexUtil();
+
+        return instance;
     }
 
     /**

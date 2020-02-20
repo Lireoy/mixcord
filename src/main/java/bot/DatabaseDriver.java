@@ -1,5 +1,6 @@
 package bot;
 
+import bot.structure.Credentials;
 import bot.structure.Notification;
 import bot.structure.Server;
 import bot.structure.Streamer;
@@ -16,16 +17,43 @@ public class DatabaseDriver {
 
     //r.db("Mixcord").table("notifications").get("2c8b5bbf-80f9-4d04-86b8-dcea77933f51").update({embed: false, streamEndAction: 2})
 
+    private static DatabaseDriver databaseDriver;
+
     private final RethinkDB rethink = RethinkDB.r; // RethinkDB instance for all operations
     private Connection connection; // connection link
     private Table notifications; // notifications table
     private Table streamers; // streamers table
     private Table guilds; // servers table
 
-    public DatabaseDriver() {
+    private DatabaseDriver() {
         this.notifications = rethink.db("Mixcord").table("notifications");
         this.streamers = rethink.db("Mixcord").table("streamers");
         this.guilds = rethink.db("Mixcord").table("guilds");
+    }
+
+    public static DatabaseDriver getInstance() {
+        if (databaseDriver == null) {
+            DatabaseConnectionBuilder dcb = new DatabaseConnectionBuilder()
+                    .setDatabaseIp(Credentials.getInstance().getDatabaseIp())
+                    .setDatabasePort(Credentials.getInstance().getDatabasePort())
+                    .setDatabaseUser(Credentials.getInstance().getDatabaseUser())
+                    .setDatabasePassword(Credentials.getInstance().getDatabasePassword());
+
+            databaseDriver = new DatabaseDriver().setConnection(dcb.build());
+        }
+
+        return databaseDriver;
+    }
+
+    /**
+     * Sets the connection for the {@link DatabaseDriver}
+     *
+     * @param connection the RethinkDB connection
+     * @return the DatabaseDriver instance
+     */
+    public DatabaseDriver setConnection(Connection connection) {
+        this.connection = connection;
+        return this;
     }
 
     /**
@@ -439,16 +467,5 @@ public class DatabaseDriver {
         }
         cursor.close();
         return null;
-    }
-
-    /**
-     * Sets the connection for the {@link DatabaseDriver}
-     *
-     * @param connection the RethinkDB connection
-     * @return the DatabaseDriver instance
-     */
-    public DatabaseDriver setConnection(Connection connection) {
-        this.connection = connection;
-        return this;
     }
 }

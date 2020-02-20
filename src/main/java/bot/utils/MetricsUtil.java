@@ -16,13 +16,34 @@ import net.dv8tion.jda.api.entities.TextChannel;
 @Slf4j
 public class MetricsUtil {
 
+    private static MetricsUtil instance;
+
     private long startTime;
     private long endTime;
     private int notifsSent;
     private int streamersProcessed;
 
-    public MetricsUtil() {
-        initReset();
+    private MetricsUtil() {
+        this.startTime = 0;
+        this.endTime = 0;
+        this.notifsSent = 0;
+        this.streamersProcessed = 0;
+    }
+
+    public static MetricsUtil getInstance() {
+        if (instance == null)
+            instance = new MetricsUtil();
+
+        return instance;
+    }
+
+    /**
+     * Resets all values for {@link MetricsUtil}
+     */
+    public void reset() {
+        this.endTime = 0;
+        this.notifsSent = 0;
+        this.streamersProcessed = 0;
     }
 
     /**
@@ -37,16 +58,6 @@ public class MetricsUtil {
      */
     public void stopTimer() {
         this.endTime = System.nanoTime();
-    }
-
-    /**
-     * Resets all values for {@link MetricsUtil}
-     */
-    public void initReset() {
-        this.endTime = 0;
-        this.notifsSent = 0;
-        this.streamersProcessed = 0;
-        startTimer();
     }
 
     /**
@@ -91,7 +102,7 @@ public class MetricsUtil {
      * @param channelId Discord channel ID
      */
     public void postMetrics(String channelId) {
-        TextChannel channel = ShardService.manager().getTextChannelById(channelId);
+        TextChannel channel = ShardService.getInstance().getTextChannelById(channelId);
 
         String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
         String description = String.format(line, streamersProcessed, notifsSent, getSecs());

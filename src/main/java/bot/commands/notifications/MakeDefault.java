@@ -1,6 +1,6 @@
 package bot.commands.notifications;
 
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import com.google.gson.Gson;
@@ -49,14 +49,14 @@ public class MakeDefault extends Command {
             return;
         }
 
-        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel.");
             return;
         }
 
         final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
-        DatabaseFactory.getDatabase().resetNotification(notif.getId(), notif.getStreamerName());
+        DatabaseDriver.getInstance().resetNotification(notif.getId(), notif.getStreamerName());
         cursor.close();
 
 

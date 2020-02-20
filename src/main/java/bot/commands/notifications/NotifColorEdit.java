@@ -1,10 +1,10 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
-import bot.factories.HexUtilFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HexUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -70,12 +70,12 @@ public class NotifColorEdit extends Command {
             return;
         }
 
-        if (!HexUtilFactory.getHexUtil().validateHex(newColor.trim())) {
+        if (!HexUtil.getInstance().validateHex(newColor.trim())) {
             commandEvent.reply("Please provide a valid hex color.");
             return;
         }
 
-        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There are no notifications in this channel");
             return;
@@ -84,13 +84,13 @@ public class NotifColorEdit extends Command {
         Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        newColor = HexUtilFactory.getHexUtil().formatHex(newColor).trim();
+        newColor = HexUtil.getInstance().formatHex(newColor).trim();
         if (notif.getEmbedColor().equals(newColor)) {
             commandEvent.reply("Your new color is same as the old one!");
             return;
         }
 
-        DatabaseFactory.getDatabase().updateColor(notif.getId(), newColor);
+        DatabaseDriver.getInstance().updateColor(notif.getId(), newColor);
 
         String response = "";
         response += "Notification color was changed for the following notification: `" + notif.getStreamerName() + "`";

@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Streamer;
 import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
@@ -38,7 +38,7 @@ public class ChannelNotifs extends Command {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        Cursor cursor = DatabaseFactory.getDatabase().selectChannelNotifs(serverId, channelId);
+        Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(serverId, channelId);
 
         StringBuilder description = new StringBuilder();
         int notifCount = 0;

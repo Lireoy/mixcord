@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.factories.NotifServiceFactory;
+import bot.services.NotifService;
 import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -22,13 +22,12 @@ public class StartNotifService extends Command {
                 Permission.MESSAGE_ADD_REACTION};
     }
 
-    // This command start the notifier service manually
     @Override
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-
-        NotifServiceFactory.getNotifService().start();
+        String response = NotifService.getInstance().start();
+        commandEvent.reply(response);
         commandEvent.reactSuccess();
     }
 }

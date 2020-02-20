@@ -1,6 +1,19 @@
 package bot.structure;
 
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+@Slf4j
 public class Credentials {
+
+    private static Credentials instance;
+    private static final String credentialsFileName = "credentials.json";
 
     private boolean isProductionBuild;
     private String discordBotToken;
@@ -14,6 +27,27 @@ public class Credentials {
     private int numberOfShards;
 
     public Credentials() {
+    }
+
+    public static Credentials getInstance() {
+        if (instance == null) {
+            File credentialsJson = new File(credentialsFileName);
+
+            if (!credentialsJson.exists()) {
+                log.info("Could not find 'credentials.json' file.");
+                log.info("Shutting down application...");
+                System.exit(0);
+            }
+
+            String text = null;
+            try {
+                text = new String(Files.readAllBytes(Paths.get(credentialsFileName)), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            instance = new Gson().fromJson(text, Credentials.class);
+        }
+        return instance;
     }
 
     public boolean isProductionBuild() {

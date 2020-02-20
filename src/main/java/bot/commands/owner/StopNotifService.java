@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.factories.NotifServiceFactory;
+import bot.services.WorkStatus;
 import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -27,8 +27,7 @@ public class StopNotifService extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-
-        NotifServiceFactory.getNotifService().stop();
+        WorkStatus.getInstance().markFinished();
         commandEvent.reactSuccess();
     }
 }

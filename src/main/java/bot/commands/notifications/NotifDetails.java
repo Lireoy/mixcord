@@ -1,10 +1,10 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
-import bot.factories.HexUtilFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HexUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -70,7 +70,7 @@ public class NotifDetails extends Command {
                 return;
             }
 
-            final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+            final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
             if (!cursor.hasNext()) {
                 commandEvent.reply("There is no such notification...");
                 return;
@@ -96,7 +96,7 @@ public class NotifDetails extends Command {
             return;
         }
 
-        final Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, username);
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, username);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification...");
             return;
@@ -107,7 +107,7 @@ public class NotifDetails extends Command {
 
         commandEvent.reply(new MixerEmbedBuilder()
                 .setTitle("Notification details")
-                .setColor(HexUtilFactory.getHexUtil().formatForEmbed(notif.getEmbedColor()))
+                .setColor(HexUtil.getInstance().formatForEmbed(notif.getEmbedColor()))
                 .addField("Name", notif.getStreamerName(), false)
                 .addField("Send in embed", String.valueOf(notif.isEmbed()), false)
                 .addField("Embed color", "#" + notif.getEmbedColor(), false)

@@ -1,6 +1,6 @@
 package bot.commands.notifications;
 
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import com.google.gson.Gson;
@@ -51,7 +51,7 @@ public class DeleteNotif extends Command {
             return;
         }
 
-        final Cursor notificationCursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, username);
+        final Cursor notificationCursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, username);
         if (!notificationCursor.hasNext()) {
             commandEvent.reply("There is no such notification...");
             return;
@@ -80,15 +80,15 @@ public class DeleteNotif extends Command {
         Notification notif = new Gson().fromJson(notificationCursor.next().toString(), Notification.class);
         notificationCursor.close();
 
-        DatabaseFactory.getDatabase().deleteNotif(notif.getId());
+        DatabaseDriver.getInstance().deleteNotif(notif.getId());
         log.info("Deleted the notification in G:{} C:{} for {} ({})",
                 notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
         commandEvent.reply("Notification was deleted.");
         commandEvent.reactSuccess();
 
-        Cursor cursor = DatabaseFactory.getDatabase().selectStreamerNotifs(notif.getStreamerId());
+        Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());
         if (!cursor.hasNext()) {
-            boolean streamerDeleteResponse = DatabaseFactory.getDatabase().deleteStreamer(notif.getStreamerId());
+            boolean streamerDeleteResponse = DatabaseDriver.getInstance().deleteStreamer(notif.getStreamerId());
 
             if (streamerDeleteResponse) {
                 log.info("There are no more notifications for {} - {}. Deleted from database.",

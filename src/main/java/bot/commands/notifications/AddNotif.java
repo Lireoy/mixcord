@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Server;
 import bot.structure.enums.CommandCategory;
 import bot.utils.MixerQuery;
@@ -57,7 +57,7 @@ public class AddNotif extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseFactory.getDatabase().selectOneServer(serverId);
+        Cursor cursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (!cursor.hasNext()) {
             commandEvent.reply("This server does not exist in the database. Please contact the developer: <@" + Constants.OWNER_ID + ">");
             return;
@@ -66,7 +66,7 @@ public class AddNotif extends Command {
 
         Server server = new Gson().fromJson(cursor.next().toString(), Server.class);
         cursor.close();
-        final ArrayList list = DatabaseFactory.getDatabase().selectServerNotifsOrdered(serverId);
+        final ArrayList list = DatabaseDriver.getInstance().selectServerNotifsOrdered(serverId);
         if (server.isWhitelisted()) {
             if (list.size() >= 25) {
                 commandEvent.reply("This server has reached the limit for the number of notifications.");
@@ -104,11 +104,11 @@ public class AddNotif extends Command {
             return;
         }
 
-        if (DatabaseFactory.getDatabase().addStreamer(streamerName, streamerId)) {
+        if (DatabaseDriver.getInstance().addStreamer(streamerName, streamerId)) {
             log.info("New streamer detected, added to database...");
         }
 
-        final boolean response = DatabaseFactory.getDatabase().addNotif(serverId, channelId, streamerName, streamerId);
+        final boolean response = DatabaseDriver.getInstance().addNotif(serverId, channelId, streamerName, streamerId);
 
         if (response) {
             commandEvent.reply("From now, you will receive notifications for " + streamerName + " in this channel.");

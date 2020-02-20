@@ -42,7 +42,6 @@ public class Commands {
                 new NotifServiceStatus(),
                 new StartNotifService(),
                 new StopNotifService(),
-                new RestartNotifService(),
                 new RoleInfo(),
                 new ServerInfo(),
                 new Shutdown()};

@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import bot.utils.StringUtil;
@@ -73,7 +73,7 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;
@@ -111,7 +111,7 @@ public class NotifMessageEdit extends Command {
     }
 
     private void updateMsgAndRespond(CommandEvent event, String newMessage, String docId, String streamerName, String oldMessage) {
-        DatabaseFactory.getDatabase().updateMessage(docId, newMessage);
+        DatabaseDriver.getInstance().updateMessage(docId, newMessage);
 
         StringBuilder response = new StringBuilder();
 

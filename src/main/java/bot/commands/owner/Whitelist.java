@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structure.Server;
 import bot.structure.enums.CommandCategory;
@@ -42,11 +42,11 @@ public class Whitelist extends Command {
         final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
         if (argList.get(0).trim().equalsIgnoreCase("all")) {
-            final Cursor cursor = DatabaseFactory.getDatabase().selectAllGuilds();
+            final Cursor cursor = DatabaseDriver.getInstance().selectAllGuilds();
             StringBuilder serversDetails = new StringBuilder();
             for (Object o : cursor) {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
-                final Guild guild = ShardService.manager().getGuildById(server.getServerId());
+                final Guild guild = ShardService.getInstance().getGuildById(server.getServerId());
 
                 String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
                 String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
@@ -67,26 +67,26 @@ public class Whitelist extends Command {
             newWhitelistVal = true;
         }
 
-        final Guild guild = ShardService.manager().getGuildById(serverId);
+        final Guild guild = ShardService.getInstance().getGuildById(serverId);
 
-        if (!ShardService.manager().getGuilds().contains(guild)) {
+        if (!ShardService.getInstance().getGuilds().contains(guild)) {
             commandEvent.reply("The bot is not in that server.");
             commandEvent.reactError();
 
-            String docId = DatabaseFactory.getDatabase().getGuildDocId(serverId);
-            DatabaseFactory.getDatabase().deleteGuild(docId);
+            String docId = DatabaseDriver.getInstance().getGuildDocId(serverId);
+            DatabaseDriver.getInstance().deleteGuild(docId);
 
             log.info("Guild is not reachable. G:{}. Deleted from database.", serverId);
             commandEvent.reply("Deleted G:`" + serverId + "` from database.");
             return;
         }
 
-        final Cursor whitelistCursor = DatabaseFactory.getDatabase().selectOneServer(serverId);
+        final Cursor whitelistCursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (whitelistCursor.hasNext()) {
             final Server server = new Gson().fromJson(whitelistCursor.next().toString(), Server.class);
             boolean oldWhitelistVal = server.isWhitelisted();
 
-            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
 
             if (oldWhitelistVal == newWhitelistVal) {
                 commandEvent.reply("`" + serverId + "` is already set to `" + newWhitelistVal + "`");
@@ -94,14 +94,14 @@ public class Whitelist extends Command {
                 return;
             }
 
-            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully updated `" + serverId + "` to `" + newWhitelistVal + "`.");
             commandEvent.reactSuccess();
         } else {
-            DatabaseFactory.getDatabase().addServer(serverId);
-            final Server server = new Gson().fromJson(DatabaseFactory.getDatabase().selectOneServer(serverId).next().toString(), Server.class);
+            DatabaseDriver.getInstance().addServer(serverId);
+            final Server server = new Gson().fromJson(DatabaseDriver.getInstance().selectOneServer(serverId).next().toString(), Server.class);
 
-            DatabaseFactory.getDatabase().updateWhitelist(server.getId(), newWhitelistVal);
+            DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully whitelisted `" + serverId + "`.");
             commandEvent.reactSuccess();
         }

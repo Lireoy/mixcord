@@ -1,7 +1,7 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.factories.CredentialsFactory;
+import bot.structure.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
@@ -39,7 +39,7 @@ public class MixerQuery {
                 .build();
 
         final HttpUriRequest request = RequestBuilder.get().setUri(uri)
-                .setHeader("Client-ID", CredentialsFactory.getCredentials().getMixerApiClientId())
+                .setHeader("Client-ID", Credentials.getInstance().getMixerApiClientId())
                 .setConfig(requestConfig)
                 .build();
 

@@ -1,7 +1,7 @@
 package bot.utils;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structure.Notification;
 import com.rethinkdb.net.Cursor;
@@ -26,8 +26,8 @@ public class NotifSender {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
         final String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
 
-        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -49,8 +49,8 @@ public class NotifSender {
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendNonEmbed(Notification notif) {
-        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -67,8 +67,8 @@ public class NotifSender {
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
     public static void sendOfflineMsg(Notification notif) {
-        final Guild guild = ShardService.manager().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.manager().getTextChannelById(notif.getChannelId());
+        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
+        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
@@ -78,7 +78,7 @@ public class NotifSender {
     }
 
     private static boolean isGuildReachable(Notification notif, Guild guild) {
-        if (!ShardService.manager().getGuilds().contains(guild)) {
+        if (!ShardService.getInstance().getGuilds().contains(guild)) {
             log.info("Guild is not reachable. G:{}", notif.getServerId());
             return false;
         }
@@ -87,16 +87,16 @@ public class NotifSender {
     }
 
     private static boolean isChannelReachable(Notification notif, TextChannel textChannel) {
-        if (!Objects.requireNonNull(ShardService.manager().getGuildById(notif.getServerId()))
+        if (!Objects.requireNonNull(ShardService.getInstance().getGuildById(notif.getServerId()))
                 .getTextChannels().contains(textChannel)) {
             log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            DatabaseFactory.getDatabase().deleteNotif(notif.getId());
+            DatabaseDriver.getInstance().deleteNotif(notif.getId());
             log.info("Deleted the notification in G:{} C:{} for {} ({})",
                     notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
 
-            final Cursor cursor = DatabaseFactory.getDatabase().selectStreamerNotifs(notif.getStreamerId());
+            final Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());
             if (!cursor.hasNext()) {
-                DatabaseFactory.getDatabase().deleteStreamer(notif.getStreamerId());
+                DatabaseDriver.getInstance().deleteStreamer(notif.getStreamerId());
                 log.info("There are no more notifications for {} - {}. Deleted from database.",
                         notif.getStreamerName(), notif.getStreamerId());
             }

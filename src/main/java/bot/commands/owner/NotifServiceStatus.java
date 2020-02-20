@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.factories.NotifServiceFactory;
+import bot.services.NotifService;
 import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -26,14 +26,9 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final boolean state = NotifServiceFactory.getNotifService().getState();
-
-        if (state) {
-            commandEvent.reply("Notifier service is running. ✅");
-            log.info("Notifier service is running.");
-        } else {
-            commandEvent.reply("The notifier service is not running. ❌");
-            log.info("The notifier service is not running.");
-        }
+        final String state = NotifService.getInstance().getState();
+        String message = "Notifier service state: " + state;
+        commandEvent.reply(message);
+        log.info(message);
     }
 }

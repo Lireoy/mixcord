@@ -1,6 +1,6 @@
 package bot.commands.notifications;
 
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
@@ -54,7 +54,7 @@ public class NotifPreview extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel.");
             return;

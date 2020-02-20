@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.factories.NotifServiceFactory;
+import bot.services.NotifService;
 import bot.services.ShardService;
 import bot.structure.enums.CommandCategory;
 import com.jagrosh.jdautilities.command.Command;
@@ -39,10 +39,10 @@ public class Shutdown extends Command {
             commandEvent.reply("You need to provide a reason.");
         } else {
             log.info("Command ran by {}. Reason: {}", commandAuthor, reason);
-            NotifServiceFactory.getNotifService().stop();
+            NotifService.getInstance().stop();
             log.info("Notifier service was shut down due to system shutdown request...");
 
-            ShardService.manager().shutdown();
+            ShardService.getInstance().shutdown();
             log.info("JDA instance was shutdown due to system shutdown request...");
 
             log.info("Shutting down application...");

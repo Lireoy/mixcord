@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import bot.utils.MixerEmbedBuilder;
@@ -38,7 +38,7 @@ public class ServerNotifs extends Command {
         log.info("Command ran by {}", commandAuthor);
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
-        final ArrayList list = DatabaseFactory.getDatabase().selectServerNotifsOrdered(serverId);
+        final ArrayList list = DatabaseDriver.getInstance().selectServerNotifsOrdered(serverId);
 
         String prevChannel = "";
         if (list.isEmpty()) {

@@ -1,7 +1,7 @@
 package bot.services;
 
 import bot.EventHandler;
-import bot.factories.CredentialsFactory;
+import bot.structure.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -13,40 +13,40 @@ import javax.security.auth.login.LoginException;
 @Slf4j
 public class ShardService {
 
-    private static ShardManager shards;
+    private static ShardManager instance;
 
     private ShardService() throws LoginException {
-        shards = new DefaultShardManagerBuilder()
+        instance = new DefaultShardManagerBuilder()
                 .setToken(ShardService.getBotToken())
                 .setShardsTotal(ShardService.getShardNumber())
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("Type .help"))
-                .addEventListeners(ClientService.getClient())
+                .addEventListeners(ClientService.getInstance())
                 .addEventListeners(new EventHandler())
                 .setAutoReconnect(true)
                 .build();
     }
 
-    public static ShardManager manager() {
-        if (shards == null) {
+    public static ShardManager getInstance() {
+        if (instance == null) {
             try {
                 new ShardService();
             } catch (LoginException e) {
                 log.error(e.getMessage());
             }
         }
-        return shards;
+        return instance;
     }
 
     private static String getBotToken() {
-        if (CredentialsFactory.getCredentials().isProductionBuild()) {
-            return CredentialsFactory.getCredentials().getDiscordBotToken();
+        if (Credentials.getInstance().isProductionBuild()) {
+            return Credentials.getInstance().getDiscordBotToken();
         } else {
-            return CredentialsFactory.getCredentials().getDiscordBotTokenCanary();
+            return Credentials.getInstance().getDiscordBotTokenCanary();
         }
     }
 
     private static int getShardNumber() {
-        return CredentialsFactory.getCredentials().getNumberOfShards();
+        return Credentials.getInstance().getNumberOfShards();
     }
 }

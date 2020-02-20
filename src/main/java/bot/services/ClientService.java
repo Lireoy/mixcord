@@ -14,10 +14,10 @@ import java.util.Objects;
 
 public class ClientService {
 
-    private static CommandClient client;
+    private static CommandClient instance;
 
     private ClientService() {
-        client = new CommandClientBuilder()
+        instance = new CommandClientBuilder()
                 .setPrefix(Constants.PREFIX)
                 .setAlternativePrefix("@mention")
                 .setOwnerId(Constants.OWNER_ID)
@@ -29,18 +29,18 @@ public class ClientService {
                 .build();
     }
 
-    public static CommandClient getClient() {
-        if (client == null) {
+    public static CommandClient getInstance() {
+        if (instance == null) {
             new ClientService();
         }
-        return client;
+        return instance;
     }
 
     public static void help(CommandEvent event) {
         //TODO: group commands by category, and not by order
         StringBuilder helpBuilder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
         Command.Category category = null;
-        for (Command command : ClientService.client.getCommands()) {
+        for (Command command : ClientService.instance.getCommands()) {
             if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
                 if (!Objects.equals(category, command.getCategory())) {
                     category = command.getCategory();
@@ -51,8 +51,8 @@ public class ClientService {
                 }
                 helpBuilder
                         .append("\n`")
-                        .append(ClientService.client.getPrefix())
-                        .append(ClientService.client.getPrefix() == null ? " " : "")
+                        .append(ClientService.instance.getPrefix())
+                        .append(ClientService.instance.getPrefix() == null ? " " : "")
                         .append(command.getName())
                         .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
                         .append(" - ")
@@ -64,7 +64,7 @@ public class ClientService {
                 event.reply(helpBuilder.toString());
                 event.reactSuccess();
 
-                User owner = event.getJDA().getUserById(ClientService.client.getOwnerId());
+                User owner = event.getJDA().getUserById(ClientService.instance.getOwnerId());
                 if (owner != null) {
                     String contact = "For additional help, contact **" +
                             owner.getName() +

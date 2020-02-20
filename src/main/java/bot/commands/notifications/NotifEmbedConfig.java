@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.Constants;
-import bot.factories.DatabaseFactory;
+import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
 import bot.utils.StringUtil;
@@ -84,7 +84,7 @@ public class NotifEmbedConfig extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseFactory.getDatabase().selectOneNotification(serverId, channelId, streamerName);
+        Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;
@@ -110,7 +110,7 @@ public class NotifEmbedConfig extends Command {
             return;
         }
 
-        DatabaseFactory.getDatabase().updateEmbed(notif.getId(), newEmbedValue);
+        DatabaseDriver.getInstance().updateEmbed(notif.getId(), newEmbedValue);
 
         StringBuilder response = new StringBuilder();
         response.append("Notification format was changed for the following notification: `").append(notif.getStreamerName()).append("`");
