@@ -1,9 +1,9 @@
 package bot.commands.mixer;
 
-import bot.constants.BasicConstants;
 import bot.constants.BotConstants;
 import bot.constants.DeveloperConstants;
 import bot.constants.HelpConstants;
+import bot.constants.MixerConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
@@ -63,12 +63,12 @@ public class MixerUser extends Command {
             }
 
             final int id = channel.getInt("id");
-            final String liveThumbnail = BasicConstants.MIXER_THUMB_PRE + id + BasicConstants.MIXER_THUMB_POST;
+            final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id + MixerConstants.MIXER_THUMB_POST;
             final String username = channel.getString("token");
 
             final JSONObject user = channel.getJSONObject("user");
             final Object avatarObject = user.get("avatarUrl");
-            final String avatarUrl = avatarObject == JSONObject.NULL ? BasicConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
+            final String avatarUrl = avatarObject == JSONObject.NULL ? MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
             final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
             final String isVerified = user.getBoolean("verified") ? BotConstants.SUCCESS : BotConstants.ERROR;
             final String isPartnered = channel.getBoolean("partnered") ? BotConstants.SUCCESS : BotConstants.ERROR;
@@ -90,7 +90,7 @@ public class MixerUser extends Command {
             final String language = channel.getString("languageId").toUpperCase();
             final String targetAudience = channel.getString("audience").toUpperCase();
             final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
-            final String channelUrl = BasicConstants.HTTPS_MIXER_COM + username;
+            final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
             final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
 
 

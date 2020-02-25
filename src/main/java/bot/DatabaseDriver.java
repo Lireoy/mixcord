@@ -1,6 +1,6 @@
 package bot;
 
-import bot.constants.BasicConstants;
+import bot.constants.NotificationDefaultConstants;
 import bot.structures.Credentials;
 import bot.structures.Notification;
 import bot.structures.Server;
@@ -169,8 +169,8 @@ public class DatabaseDriver {
      */
     public boolean addNotif(String serverId, String channelId, String streamerName, String streamerId) {
         //String defaultMsg = "<" + Constants.MIXER_COM + streamerName + "> is now live on Mixer!";
-        String defaultMsg = String.format(BasicConstants.NOTIF_MESSAGE_DEFAULT, streamerName);
-        String defaultEndMsg = String.format(BasicConstants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
+        String defaultMsg = String.format(NotificationDefaultConstants.NOTIF_MESSAGE_DEFAULT, streamerName);
+        String defaultEndMsg = String.format(NotificationDefaultConstants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
         // Check if entry is in the database
         if (getNotifDocId(serverId, channelId, streamerId) == null) {
             // If not in database, insert the data.
@@ -178,10 +178,10 @@ public class DatabaseDriver {
                     .with("channelId", channelId)
                     .with("streamerId", streamerId)
                     .with("streamerName", streamerName)
-                    .with("embed", BasicConstants.NOTIF_EMBED_DEFAULT)
-                    .with("embedColor", BasicConstants.NOTIF_EMBED_COLOR_DEFAULT)
+                    .with("embed", NotificationDefaultConstants.NOTIF_EMBED_DEFAULT)
+                    .with("embedColor", NotificationDefaultConstants.NOTIF_EMBED_COLOR_DEFAULT)
                     .with("message", defaultMsg)
-                    .with("streamEndAction", BasicConstants.NOTIF_END_ACTION)
+                    .with("streamEndAction", NotificationDefaultConstants.NOTIF_END_ACTION)
                     .with("streamEndMessage", defaultEndMsg)
             ).run(connection);
 
@@ -192,14 +192,14 @@ public class DatabaseDriver {
     }
 
     public void resetNotification(String documentId, String streamerName) {
-        final String message = String.format(BasicConstants.NOTIF_MESSAGE_DEFAULT, streamerName);
-        final String endMessage = String.format(BasicConstants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
+        final String message = String.format(NotificationDefaultConstants.NOTIF_MESSAGE_DEFAULT, streamerName);
+        final String endMessage = String.format(NotificationDefaultConstants.NOTIF_END_MESSAGE_DEFAULT, streamerName);
 
         notifications.get(documentId).update(
-                rethink.hashMap("embed", BasicConstants.NOTIF_EMBED_DEFAULT)
-                        .with("embedColor", BasicConstants.NOTIF_EMBED_COLOR_DEFAULT)
+                rethink.hashMap("embed", NotificationDefaultConstants.NOTIF_EMBED_DEFAULT)
+                        .with("embedColor", NotificationDefaultConstants.NOTIF_EMBED_COLOR_DEFAULT)
                         .with("message", message)
-                        .with("streamEndAction", BasicConstants.NOTIF_END_ACTION)
+                        .with("streamEndAction", NotificationDefaultConstants.NOTIF_END_ACTION)
                         .with("streamEndMessage", endMessage)
         ).run(connection);
     }

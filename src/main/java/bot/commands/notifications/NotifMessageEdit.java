@@ -1,9 +1,9 @@
 package bot.commands.notifications;
 
 import bot.DatabaseDriver;
-import bot.constants.BasicConstants;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.constants.MixerConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -97,10 +97,10 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        final String MIXER_PATTERN = BasicConstants.HTTPS_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN = MixerConstants.HTTPS_MIXER_COM + notif.getStreamerName();
 
         if (notif.isEmbed()) {
-            if (StringUtil.containsIgnoreCase(newMessage, BasicConstants.HTTPS_MIXER_COM)) {
+            if (StringUtil.containsIgnoreCase(newMessage, MixerConstants.HTTPS_MIXER_COM)) {
                 if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
                     commandEvent.reply("Your notification message contains a link to a different streamer.");
                     return;
@@ -108,7 +108,7 @@ public class NotifMessageEdit extends Command {
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
         } else {
-            if (!StringUtil.containsIgnoreCase(newMessage, BasicConstants.HTTPS_MIXER_COM)) {
+            if (!StringUtil.containsIgnoreCase(newMessage, MixerConstants.HTTPS_MIXER_COM)) {
                 commandEvent.reply("Your notification message does not contain a link to the streamer.");
                 return;
             }

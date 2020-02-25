@@ -1,9 +1,9 @@
 package bot.commands.notifications;
 
 import bot.DatabaseDriver;
-import bot.constants.BasicConstants;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.constants.MixerConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -102,8 +102,8 @@ public class NotifEmbedConfig extends Command {
         final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        final String MIXER_PATTERN = BasicConstants.HTTPS_MIXER_COM + notif.getStreamerName();
-        final String MIXER_PATTERN2 = BasicConstants.HTTP_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN = MixerConstants.HTTPS_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN2 = MixerConstants.HTTP_MIXER_COM + notif.getStreamerName();
         boolean containsLink = false;
 
         if (notif.getMessage().contains(MIXER_PATTERN)) containsLink = true;

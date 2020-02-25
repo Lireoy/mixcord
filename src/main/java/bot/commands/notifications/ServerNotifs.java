@@ -1,9 +1,9 @@
 package bot.commands.notifications;
 
 import bot.DatabaseDriver;
-import bot.constants.BasicConstants;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.constants.MixerConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -60,7 +60,7 @@ public class ServerNotifs extends Command {
         for (Object doc : list) {
             Notification notif = new Gson().fromJson(doc.toString(), Notification.class);
             String channelLine = "\n<#%s>\n";
-            String streamerLine = "· [%s](" + BasicConstants.HTTPS_MIXER_COM + "%s)\n";
+            String streamerLine = "· [%s](" + MixerConstants.HTTPS_MIXER_COM + "%s)\n";
 
             if (!prevChannel.equals(notif.getChannelId())) {
                 description.append(String.format(channelLine, notif.getChannelId()));

@@ -1,7 +1,7 @@
 package bot.utils;
 
 import bot.DatabaseDriver;
-import bot.constants.BasicConstants;
+import bot.constants.MixerConstants;
 import bot.services.ShardService;
 import bot.structures.Notification;
 import com.rethinkdb.net.Cursor;
@@ -24,7 +24,7 @@ public class NotifSender {
      */
     public static void sendEmbed(Notification notif, JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
-        final String embLiveThumbnail = BasicConstants.MIXER_THUMB_PRE + queryChId + BasicConstants.MIXER_THUMB_POST;
+        final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE + queryChId + MixerConstants.MIXER_THUMB_POST;
 
         final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
         final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
