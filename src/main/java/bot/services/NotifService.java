@@ -1,7 +1,7 @@
 package bot.services;
 
-import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.BotConstants;
 import bot.constants.DeveloperConstants;
 import bot.structures.Notification;
 import bot.structures.Streamer;
@@ -130,9 +130,9 @@ public class NotifService implements Runnable {
                 log.info("InterruptedException");
                 ex.printStackTrace();
 
-                String message = BasicConstants.WARNING + BasicConstants.WARNING +
+                String message = BotConstants.WARNING + BotConstants.WARNING +
                         "The notifier service was interrupted. Terminating the notifier service." +
-                        BasicConstants.WARNING + BasicConstants.WARNING;
+                        BotConstants.WARNING + BotConstants.WARNING;
 
                 sendReportInDm(DeveloperConstants.OWNER_ID, message);
             } else if (ex instanceof ReqlOpFailedError) {
@@ -140,9 +140,9 @@ public class NotifService implements Runnable {
                 log.info("ReqlOpFailedError");
                 ex.printStackTrace();
 
-                String message = BasicConstants.WARNING + BasicConstants.WARNING +
+                String message = BotConstants.WARNING + BotConstants.WARNING +
                         "There is a database issue. Stopping the notifier service." +
-                        BasicConstants.WARNING + BasicConstants.WARNING;
+                        BotConstants.WARNING + BotConstants.WARNING;
 
                 sendReportInDm(DeveloperConstants.OWNER_ID, message);
             } else {

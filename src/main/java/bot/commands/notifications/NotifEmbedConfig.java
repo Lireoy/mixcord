@@ -2,6 +2,7 @@ package bot.commands.notifications;
 
 import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
@@ -38,7 +39,7 @@ public class NotifEmbedConfig extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name + " shroud, true";
+        final String commandExample = BotConstants.PREFIX + this.name + " shroud, true";
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);
@@ -47,7 +48,7 @@ public class NotifEmbedConfig extends Command {
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + BasicConstants.PREFIX + this.name + " shroud, true`";
+        final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, true`";
 
         String streamerName = "";
         String sendAsEmbed = "";
