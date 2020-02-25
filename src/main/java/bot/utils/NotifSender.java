@@ -1,7 +1,7 @@
 package bot.utils;
 
-import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.BasicConstants;
 import bot.services.ShardService;
 import bot.structures.Notification;
 import com.rethinkdb.net.Cursor;

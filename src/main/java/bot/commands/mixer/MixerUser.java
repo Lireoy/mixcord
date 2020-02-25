@@ -1,6 +1,7 @@
 package bot.commands.mixer;
 
 import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.DeveloperConstants;
 import bot.constants.HelpConstants;
 import bot.structures.enums.CommandCategory;
@@ -39,7 +40,7 @@ public class MixerUser extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+        final String commandExample = BotConstants.PREFIX + this.name + " shroud";
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);
@@ -69,11 +70,11 @@ public class MixerUser extends Command {
             final Object avatarObject = user.get("avatarUrl");
             final String avatarUrl = avatarObject == JSONObject.NULL ? BasicConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
             final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
-            final String isVerified = user.getBoolean("verified") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
-            final String isPartnered = channel.getBoolean("partnered") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
+            final String isVerified = user.getBoolean("verified") ? BotConstants.SUCCESS : BotConstants.ERROR;
+            final String isPartnered = channel.getBoolean("partnered") ? BotConstants.SUCCESS : BotConstants.ERROR;
             final boolean streaming = channel.getBoolean("online");
-            final String isOnline = channel.getBoolean("online") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
-            final String isFeatured = channel.getBoolean("featured") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
+            final String isOnline = channel.getBoolean("online") ? BotConstants.SUCCESS : BotConstants.ERROR;
+            final String isFeatured = channel.getBoolean("featured") ? BotConstants.SUCCESS : BotConstants.ERROR;
 
             final String trusted =
                     "Verified: " + isVerified + "\n" +

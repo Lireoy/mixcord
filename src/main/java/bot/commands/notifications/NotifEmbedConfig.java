@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
-import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.BasicConstants;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.structures.Notification;

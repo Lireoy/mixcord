@@ -1,6 +1,6 @@
 package bot.commands.mixer;
 
-import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -38,7 +38,7 @@ public class MixerUserSocials extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+        final String commandExample = BotConstants.PREFIX + this.name + " shroud";
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);

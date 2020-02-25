@@ -1,6 +1,6 @@
 package bot.commands.informative;
 
-import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -40,7 +40,7 @@ public class Info extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name;
+        final String commandExample = BotConstants.PREFIX + this.name;
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);
@@ -91,8 +91,8 @@ public class Info extends Command {
         final String systemInfo = rt.freeMemory() / 1024 / 1024 + "MB / " + rt.maxMemory() / 1024 / 1024 + "MB";
 
         // Links
-        final String links = "· Website: " + BasicConstants.MIXCORD_IO + " \n" +
-                "· Discord: " + BasicConstants.DISCORD;
+        final String links = "· Website: " + BotConstants.MIXCORD_IO + " \n" +
+                "· Discord: " + BotConstants.DISCORD;
 
         // Developers
         final String developers = "Lead Dev: Lireoy#4444\nConsultant: Akira#8185";

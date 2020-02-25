@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.services.WorkStatus;
 import bot.structures.enums.CommandCategory;
@@ -31,7 +31,7 @@ public class StopNotifService extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name;
+        final String commandExample = BotConstants.PREFIX + this.name;
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);

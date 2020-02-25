@@ -1,6 +1,6 @@
 package bot.commands.owner;
 
-import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.services.NotifService;
 import bot.services.ShardService;
@@ -38,7 +38,7 @@ public class Shutdown extends Command {
         log.info("Command ran by {}", commandAuthor);
         final String reason = commandEvent.getArgs();
 
-        final String commandExample = BasicConstants.PREFIX + this.name + " This is an example reason.";
+        final String commandExample = BotConstants.PREFIX + this.name + " This is an example reason.";
 
         boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;

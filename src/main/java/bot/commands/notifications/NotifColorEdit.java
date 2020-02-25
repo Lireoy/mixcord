@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
-import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
@@ -40,7 +40,7 @@ public class NotifColorEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BasicConstants.PREFIX + this.name + " shroud, f2ff00";
+        final String commandExample = BotConstants.PREFIX + this.name + " shroud, f2ff00";
 
         boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExample);
@@ -49,7 +49,7 @@ public class NotifColorEdit extends Command {
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + BasicConstants.PREFIX + this.name + " shroud, 32a852`";
+        final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, 32a852`";
 
         String streamerName = "";
         String newColor = "";

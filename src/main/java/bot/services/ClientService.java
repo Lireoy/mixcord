@@ -1,7 +1,7 @@
 package bot.services;
 
-import bot.constants.BasicConstants;
 import bot.commands.Commands;
+import bot.constants.BotConstants;
 import bot.constants.DeveloperConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.StringUtil;
@@ -19,12 +19,12 @@ public class ClientService {
 
     private ClientService() {
         instance = new CommandClientBuilder()
-                .setPrefix(BasicConstants.PREFIX)
+                .setPrefix(BotConstants.PREFIX)
                 .setAlternativePrefix("@mention")
                 .setOwnerId(DeveloperConstants.OWNER_ID)
                 .setCoOwnerIds(DeveloperConstants.CO_OWNER_ID, DeveloperConstants.CO_OWNER_ID2)
-                .setEmojis(BasicConstants.SUCCESS, BasicConstants.WARNING, BasicConstants.ERROR)
-                .setServerInvite(BasicConstants.DISCORD)
+                .setEmojis(BotConstants.SUCCESS, BotConstants.WARNING, BotConstants.ERROR)
+                .setServerInvite(BotConstants.DISCORD)
                 .addCommands(Commands.getCommands())
                 .setHelpConsumer(ClientService::help)
                 .build();
@@ -85,7 +85,7 @@ public class ClientService {
                             "**#" +
                             owner.getDiscriminator() +
                             " or join " +
-                            BasicConstants.DISCORD;
+                            BotConstants.DISCORD;
                     event.reply(contact);
                 }
             }

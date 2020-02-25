@@ -1,6 +1,5 @@
 package bot;
 
-import bot.constants.BasicConstants;
 import bot.constants.DeveloperConstants;
 import bot.services.ClientService;
 import bot.services.NotifService;

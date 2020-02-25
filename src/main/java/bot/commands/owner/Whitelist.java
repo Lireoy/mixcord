@@ -1,7 +1,7 @@
 package bot.commands.owner;
 
 import bot.DatabaseDriver;
-import bot.constants.BasicConstants;
+import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.services.ShardService;
 import bot.structures.Server;
@@ -37,8 +37,8 @@ public class Whitelist extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-        final String commandExample = "\nExample: `" + BasicConstants.PREFIX + this.name + " 637724317672669184, true`"
-                + "\nExample: `" + BasicConstants.PREFIX + this.name + " all`";
+        final String commandExample = "\nExample: `" + BotConstants.PREFIX + this.name + " 637724317672669184, true`"
+                + "\nExample: `" + BotConstants.PREFIX + this.name + " all`";
 
         boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
