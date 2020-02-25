@@ -1,8 +1,8 @@
 package bot.services;
 
-import bot.DatabaseDriver;
 import bot.constants.BotConstants;
 import bot.constants.DeveloperConstants;
+import bot.database.DatabaseDriver;
 import bot.structures.Notification;
 import bot.structures.Streamer;
 import bot.utils.MetricsUtil;

@@ -1,4 +1,4 @@
-package bot;
+package bot.database;
 
 import bot.constants.NotificationDefaultConstants;
 import bot.structures.Credentials;

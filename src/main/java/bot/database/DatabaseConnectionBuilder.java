@@ -1,4 +1,4 @@
-package bot;
+package bot.database;
 
 import com.rethinkdb.RethinkDB;
 import com.rethinkdb.net.Connection;

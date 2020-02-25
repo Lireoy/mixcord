@@ -1,8 +1,8 @@
 package bot.commands.notifications;
 
-import bot.DatabaseDriver;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.database.DatabaseDriver;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;

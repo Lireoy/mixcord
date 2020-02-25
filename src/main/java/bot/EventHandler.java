@@ -1,5 +1,6 @@
 package bot;
 
+import bot.database.DatabaseDriver;
 import bot.services.NotifService;
 import bot.structures.Notification;
 import com.google.gson.Gson;

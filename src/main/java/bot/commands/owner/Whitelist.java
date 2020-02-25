@@ -1,8 +1,8 @@
 package bot.commands.owner;
 
-import bot.DatabaseDriver;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Server;
 import bot.structures.enums.CommandCategory;
