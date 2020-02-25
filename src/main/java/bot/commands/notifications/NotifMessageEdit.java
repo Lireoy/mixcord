@@ -40,11 +40,11 @@ public class NotifMessageEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BotConstants.PREFIX + this.name +
-                " shroud, Hey guys! shroud is streaming, and this is a new notification message!";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name +
+                " shroud, Hey guys! shroud is streaming, and this is a new notification message!"};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();

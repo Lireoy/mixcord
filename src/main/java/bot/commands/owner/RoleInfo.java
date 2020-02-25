@@ -37,10 +37,10 @@ public class RoleInfo extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BotConstants.PREFIX + this.name + " testers";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " testers"};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         if (commandEvent.getArgs().isEmpty()) {

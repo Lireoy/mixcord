@@ -42,10 +42,10 @@ public class NotifDetails extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BotConstants.PREFIX + this.name + " shroud";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();

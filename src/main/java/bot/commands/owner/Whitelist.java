@@ -37,10 +37,14 @@ public class Whitelist extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-        final String commandExample = "\nExample: `" + BotConstants.PREFIX + this.name + " 637724317672669184, true`"
-                + "\nExample: `" + BotConstants.PREFIX + this.name + " all`";
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
+        final String[] commandExamples = {
+                BotConstants.PREFIX + this.name + " 637724317672669184, true",
+                BotConstants.PREFIX + this.name + " all"
+        };
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
@@ -52,7 +56,12 @@ public class Whitelist extends Command {
 
         if (args.length == 1) {
             if (!args[0].trim().equalsIgnoreCase("all")) {
-                commandEvent.reply("Please provide a full configuration." + commandExample);
+                StringBuilder builder = new StringBuilder();
+                for (String example : commandExamples) {
+                    builder.append("`").append(example).append("`\n");
+                }
+
+                commandEvent.reply("Please provide a full configuration.\n" + builder.toString());
                 return;
             }
 
@@ -79,12 +88,12 @@ public class Whitelist extends Command {
 
         if (args.length == 2) {
             if (args[0].trim().isEmpty()) {
-                commandEvent.reply("First parameter was empty." + commandExample);
+                commandEvent.reply("First parameter was empty.\n`" + commandExamples[1] + "`");
                 return;
             }
 
             if (args[1].trim().isEmpty()) {
-                commandEvent.reply("Second parameter was empty." + commandExample);
+                commandEvent.reply("Second parameter was empty.\n" + commandExamples[0] + "`");
                 return;
             }
         }

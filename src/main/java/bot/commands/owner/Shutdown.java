@@ -38,9 +38,10 @@ public class Shutdown extends Command {
         log.info("Command ran by {}", commandAuthor);
         final String reason = commandEvent.getArgs();
 
-        final String commandExample = BotConstants.PREFIX + this.name + " This is an example reason.";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " This is an example reason."};
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         if (reason.isEmpty()) {

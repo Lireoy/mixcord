@@ -20,15 +20,23 @@ public class HelpUtil {
         return helpUtil;
     }
 
-    public boolean sendCommandHelp(Command command, CommandEvent commandEvent, String commandExample) {
+    public boolean sendCommandHelp(Command command, CommandEvent commandEvent, String[] commandExamples) {
         if (commandEvent.getArgs().equals("--help")) {
             EmbedBuilder embedBuilder = new MixerEmbedBuilder()
                     .setTitle(command.getName() + " command")
-                    .addField("Name", command.getName(), false)
-                    .addField("Category", command.getCategory().getName(), false);
+                    .addField("Category", command.getCategory().getName(), false)
+                    .addField("Name", command.getName(), false);
+
 
             if (command.getArguments() != null)
                 embedBuilder.addField("Parameters", command.getArguments(), false);
+
+            StringBuilder example = new StringBuilder();
+            for (String commandExample : commandExamples) {
+                example.append("`").append(commandExample).append("`\n");
+            }
+
+            embedBuilder.addField("Command usage example", example.toString(), false);
 
             if (command.getAliases().length != 0) {
                 StringBuilder builder = new StringBuilder();

@@ -33,10 +33,10 @@ public class WhoCanUseMe extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BotConstants.PREFIX + this.name + "";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         List<Role> roleWithManageServer = new ArrayList<>();

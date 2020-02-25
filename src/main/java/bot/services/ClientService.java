@@ -52,7 +52,8 @@ public class ClientService {
         helpMessage.append("`").append(instance.getPrefix()).append("Info --help`\n");
 
         for (CommandCategory category : CommandCategory.values()) {
-            helpMessage.append("\n  **").append(category.getText()).append("**\n");
+            if (!category.getText().equalsIgnoreCase("Owner") || event.isOwner())
+                helpMessage.append("\n  **").append(category.getText()).append("**\n");
 
             StringBuilder builder = new StringBuilder();
             for (Command command : instance.getCommands()) {
@@ -71,23 +72,23 @@ public class ClientService {
             helpMessage.append(StringUtil.replaceLastComma(builder.toString())).append("\n");
         }
 
+        if (!event.isOwner()) {
+            User owner = event.getJDA().getUserById(instance.getOwnerId());
+            if (owner != null) {
+                helpMessage
+                        .append("\nFor additional help, contact **")
+                        .append(owner.getName())
+                        .append("**#")
+                        .append(owner.getDiscriminator())
+                        .append(" or join ")
+                        .append(BotConstants.DISCORD);
+            }
+        }
+
         try {
             if (event.isFromType(ChannelType.TEXT)) {
                 event.replyFormatted(helpMessage.toString());
                 event.reactSuccess();
-            }
-
-            if (!event.isOwner()) {
-                User owner = event.getJDA().getUserById(instance.getOwnerId());
-                if (owner != null) {
-                    String contact = "For additional help, contact **" +
-                            owner.getName() +
-                            "**#" +
-                            owner.getDiscriminator() +
-                            " or join " +
-                            BotConstants.DISCORD;
-                    event.reply(contact);
-                }
             }
         } catch (InsufficientPermissionException ex) {
             event.reactError();

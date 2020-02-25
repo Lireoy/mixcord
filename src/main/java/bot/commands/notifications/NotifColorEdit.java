@@ -40,10 +40,10 @@ public class NotifColorEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String commandExample = BotConstants.PREFIX + this.name + " shroud, f2ff00";
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud, f2ff00"};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();

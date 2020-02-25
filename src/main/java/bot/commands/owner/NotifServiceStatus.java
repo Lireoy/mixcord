@@ -31,10 +31,10 @@ public class NotifServiceStatus extends Command {
         final String state = NotifService.getInstance().getState();
         String message = "Notifier service state: " + state;
 
-        final String commandExample = BotConstants.PREFIX + this.name;
+        final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
         boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExample);
+                .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         commandEvent.reply(message);
