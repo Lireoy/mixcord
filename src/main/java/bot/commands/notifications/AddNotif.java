@@ -2,6 +2,7 @@ package bot.commands.notifications;
 
 import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.DeveloperConstants;
 import bot.constants.HelpConstants;
 import bot.structures.Server;
 import bot.structures.enums.CommandCategory;
@@ -67,7 +68,8 @@ public class AddNotif extends Command {
 
         Cursor cursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (!cursor.hasNext()) {
-            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
+            commandEvent.reply("This server does not exist in the database. " +
+                    "Please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
             return;
         }
 
@@ -93,7 +95,7 @@ public class AddNotif extends Command {
         if (channel == JSONObject.NULL) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
+                    "please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
             return;
         }
 
@@ -107,7 +109,8 @@ public class AddNotif extends Command {
         final String streamerName = channel.getString("token");
 
         if (streamerName.isEmpty() || streamerId.isEmpty()) {
-            commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
+            commandEvent.reply("Streamer name or ID is empty. " +
+                    "Please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
             log.info("Streamer name or ID was empty.");
             return;
         }

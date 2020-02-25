@@ -2,6 +2,7 @@ package bot.services;
 
 import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.DeveloperConstants;
 import bot.structures.Notification;
 import bot.structures.Streamer;
 import bot.utils.MetricsUtil;
@@ -108,8 +109,9 @@ public class NotifService implements Runnable {
                 }
 
                 MetricsUtil.getInstance().stopTimer();
-                MetricsUtil.getInstance().postMetrics(BasicConstants.METRICS_CHANNEL);
-                log.info("Posting metrics to {} - {}", BasicConstants.METRICS_GUILD, BasicConstants.METRICS_CHANNEL);
+                MetricsUtil.getInstance().postMetrics(DeveloperConstants.METRICS_CHANNEL);
+                log.info("Posting metrics to {} - {}",
+                        DeveloperConstants.METRICS_GUILD, DeveloperConstants.METRICS_CHANNEL);
                 log.info("Checked {} streamers in {}s",
                         MetricsUtil.getInstance().getStreamersProcessed(),
                         MetricsUtil.getInstance().getSecs());
@@ -132,7 +134,7 @@ public class NotifService implements Runnable {
                         "The notifier service was interrupted. Terminating the notifier service." +
                         BasicConstants.WARNING + BasicConstants.WARNING;
 
-                sendReportInDm(BasicConstants.OWNER_ID, message);
+                sendReportInDm(DeveloperConstants.OWNER_ID, message);
             } else if (ex instanceof ReqlOpFailedError) {
                 this.stop();
                 log.info("ReqlOpFailedError");
@@ -142,7 +144,7 @@ public class NotifService implements Runnable {
                         "There is a database issue. Stopping the notifier service." +
                         BasicConstants.WARNING + BasicConstants.WARNING;
 
-                sendReportInDm(BasicConstants.OWNER_ID, message);
+                sendReportInDm(DeveloperConstants.OWNER_ID, message);
             } else {
                 this.stop();
                 log.info("General exception");

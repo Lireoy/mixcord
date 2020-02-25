@@ -30,7 +30,7 @@ public class StopNotifService extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-        
+
         final String commandExample = BasicConstants.PREFIX + this.name;
 
         boolean helpResponse = HelpUtil.getInstance()

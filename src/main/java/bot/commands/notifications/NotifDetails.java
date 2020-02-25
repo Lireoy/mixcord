@@ -2,6 +2,7 @@ package bot.commands.notifications;
 
 import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
+import bot.constants.DeveloperConstants;
 import bot.constants.HelpConstants;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
@@ -51,9 +52,9 @@ public class NotifDetails extends Command {
         final String channelId = commandEvent.getMessage().getChannel().getId();
 
 
-        if (commandAuthor.getId().equals(BasicConstants.OWNER_ID) ||
-                commandAuthor.getId().equals(BasicConstants.CO_OWNER_ID) ||
-                commandAuthor.getId().equals(BasicConstants.CO_OWNER_ID2)) {
+        if (commandAuthor.getId().equals(DeveloperConstants.OWNER_ID) ||
+                commandAuthor.getId().equals(DeveloperConstants.CO_OWNER_ID) ||
+                commandAuthor.getId().equals(DeveloperConstants.CO_OWNER_ID2)) {
 
             final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
             final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
