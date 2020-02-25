@@ -2,6 +2,7 @@ package bot.commands.owner;
 
 import bot.services.NotifService;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,10 @@ public class NotifServiceStatus extends Command {
     protected void execute(CommandEvent commandEvent) {
         final String state = NotifService.getInstance().getState();
         String message = "Notifier service state: " + state;
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
         commandEvent.reply(message);
         log.info(message);
     }

@@ -1,6 +1,7 @@
 package bot.commands.informative;
 
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,9 @@ public class WhoCanUseMe extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         List<Role> roleWithManageServer = new ArrayList<>();
         List<Role> roleToUse = new ArrayList<>();

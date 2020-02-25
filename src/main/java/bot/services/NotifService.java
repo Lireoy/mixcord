@@ -38,10 +38,11 @@ public class NotifService implements Runnable {
 
     public void run() {
         log.info("run()");
-        MetricsUtil.getInstance().startTimer();
+
 
         try {
             while (WorkStatus.getInstance().isRunning()) {
+                MetricsUtil.getInstance().startTimer();
                 Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
 
                 for (Object streamerObj : streamers) {
@@ -150,7 +151,7 @@ public class NotifService implements Runnable {
         }
     }
 
-    public String start() {
+    public void start() {
         String msg;
 
         if (worker.getState().equals(Thread.State.NEW)) {
@@ -158,7 +159,6 @@ public class NotifService implements Runnable {
             worker.setName("NotifierService");
             msg = "Started worker...";
             log.info(msg);
-            return msg;
         }
 
         if (worker.isInterrupted()) {
@@ -166,24 +166,19 @@ public class NotifService implements Runnable {
             worker.start();
             msg = "Thread is in interrupted state. Started worker...";
             log.info(msg);
-            return msg;
         }
 
         if (worker.isAlive()) {
             if (WorkStatus.getInstance().isRunning()) {
                 msg = "Thread is alive and is running.";
                 log.info(msg);
-                return msg;
             } else {
                 WorkStatus.getInstance().markStarted();
                 worker.start();
                 msg = "Thread is alive but not running. Started it.";
                 log.info(msg);
-                return msg;
             }
         }
-
-        return "Nothing";
     }
 
     public void stop() {

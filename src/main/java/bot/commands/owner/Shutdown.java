@@ -3,6 +3,7 @@ package bot.commands.owner;
 import bot.services.NotifService;
 import bot.services.ShardService;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ public class Shutdown extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         final String reason = commandEvent.getArgs();
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         if (reason.isEmpty()) {
             log.info("{} attempted to shutdown the bot, but failed because there was no reason provided.", commandAuthor);

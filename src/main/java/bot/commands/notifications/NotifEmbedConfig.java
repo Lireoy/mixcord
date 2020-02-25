@@ -4,6 +4,7 @@ import bot.Constants;
 import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -36,10 +37,13 @@ public class NotifEmbedConfig extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + "NotifEmbedConfig shroud, true`";
+        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, true`";
 
         String streamerName = "";
         String sendAsEmbed = "";
@@ -101,7 +105,8 @@ public class NotifEmbedConfig extends Command {
         if (notif.getMessage().contains(MIXER_PATTERN2)) containsLink = true;
 
         if (!containsLink) {
-            commandEvent.reply("Your notification message does not contain a link to the streamer. Please include one, and try again.");
+            commandEvent.reply("Your notification message does not contain a link to the streamer. " +
+                    "Please include one, and try again.");
             return;
         }
 
@@ -113,7 +118,8 @@ public class NotifEmbedConfig extends Command {
         DatabaseDriver.getInstance().updateEmbed(notif.getId(), newEmbedValue);
 
         StringBuilder response = new StringBuilder();
-        response.append("Notification format was changed for the following notification: `").append(notif.getStreamerName()).append("`");
+        response.append("Notification format was changed for the following notification: `")
+                .append(notif.getStreamerName()).append("`");
         if (newEmbedValue) {
             response.append("\nThis notification will be sent as an embed in the future.");
         } else {

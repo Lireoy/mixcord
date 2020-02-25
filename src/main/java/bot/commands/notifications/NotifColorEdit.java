@@ -4,6 +4,7 @@ import bot.Constants;
 import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -38,10 +39,13 @@ public class NotifColorEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + "NotifColorEdit shroud, 32a852`";
+        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, 32a852`";
 
         String streamerName = "";
         String newColor = "";
@@ -65,7 +69,7 @@ public class NotifColorEdit extends Command {
             return;
         }
 
-        if(newColor.isEmpty()){
+        if (newColor.isEmpty()) {
             commandEvent.reply("Please provide a valid hex color.");
             return;
         }

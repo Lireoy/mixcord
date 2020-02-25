@@ -4,6 +4,7 @@ import bot.Constants;
 import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -36,6 +37,9 @@ public class ServerNotifs extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final ArrayList list = DatabaseDriver.getInstance().selectServerNotifsOrdered(serverId);

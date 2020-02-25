@@ -2,6 +2,7 @@ package bot.commands.owner;
 
 import bot.structure.enums.CommandCategory;
 import bot.structure.enums.ServerFeatures;
+import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -31,6 +32,9 @@ public class ServerInfo extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         //TODO: Request info about a specific server
         //TODO: Optional arg for server ID, and look it with JDA if the bot is in the server

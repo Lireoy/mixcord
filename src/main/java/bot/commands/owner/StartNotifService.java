@@ -2,6 +2,7 @@ package bot.commands.owner;
 
 import bot.services.NotifService;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,11 @@ public class StartNotifService extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-        String response = NotifService.getInstance().start();
-        commandEvent.reply(response);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
+        NotifService.getInstance();
         commandEvent.reactSuccess();
     }
 }

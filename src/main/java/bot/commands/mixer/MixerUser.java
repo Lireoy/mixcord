@@ -2,6 +2,7 @@ package bot.commands.mixer;
 
 import bot.Constants;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
@@ -35,6 +36,9 @@ public class MixerUser extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         final String query = commandEvent.getArgs().trim();
 
@@ -82,7 +86,6 @@ public class MixerUser extends Command {
             final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
             final String channelUrl = Constants.HTTPS_MIXER_COM + username;
             final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
-
 
 
             if (streaming) {

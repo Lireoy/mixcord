@@ -41,6 +41,7 @@ public class MetricsUtil {
      * Resets all values for {@link MetricsUtil}
      */
     public void reset() {
+        this.startTime = 0;
         this.endTime = 0;
         this.notifsSent = 0;
         this.streamersProcessed = 0;

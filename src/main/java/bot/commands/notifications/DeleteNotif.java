@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,7 +20,7 @@ public class DeleteNotif extends Command {
 
     public DeleteNotif() {
         this.name = "DeleteNotif";
-        this.aliases = new String[]{"DelNotif"};
+        this.aliases = new String[]{"DeleteNotif", "DelNotif", "RemoveNotif"};
         this.help = "Deletes a streamer notification in the channel where the command is used.";
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
@@ -35,6 +36,9 @@ public class DeleteNotif extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();

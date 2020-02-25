@@ -1,9 +1,11 @@
 package bot.utils;
 
 import bot.Constants;
+import bot.services.NotifService;
 import bot.structure.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -15,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 @Slf4j
 public class MixerQuery {
@@ -33,9 +36,9 @@ public class MixerQuery {
         // Custom Timout values to avoid long stuck commands
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.STANDARD) // avoids "Invalid 'expires' attribute" and "Invalid cookie header"
-                .setConnectionRequestTimeout(2000)
-                .setConnectTimeout(2000)
-                .setSocketTimeout(2000)
+                .setConnectionRequestTimeout(10000)
+                .setConnectTimeout(10000)
+                .setSocketTimeout(10000)
                 .build();
 
         final HttpUriRequest request = RequestBuilder.get().setUri(uri)
@@ -55,8 +58,14 @@ public class MixerQuery {
                 //log.info("Full response: {}", response);
                 return null;
             }
-        } catch (IOException e) {
+        } catch (SocketTimeoutException | ClientProtocolException e) {
+            log.info("Caught an exception: {}", e.getMessage());
             e.printStackTrace();
+            NotifService.getInstance();
+        } catch (IOException e) {
+            log.info("Caught an IOException: {}", e.getMessage());
+            e.printStackTrace();
+            NotifService.getInstance();
         }
 
         return null;

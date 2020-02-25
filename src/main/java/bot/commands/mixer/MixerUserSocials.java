@@ -1,6 +1,7 @@
 package bot.commands.mixer;
 
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
@@ -34,6 +35,9 @@ public class MixerUserSocials extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         final String streamerName = commandEvent.getArgs().trim();
 

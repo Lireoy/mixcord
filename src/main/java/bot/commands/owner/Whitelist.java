@@ -1,9 +1,11 @@
 package bot.commands.owner;
 
+import bot.Constants;
 import bot.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structure.Server;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -13,9 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Slf4j
 public class Whitelist extends Command {
@@ -37,11 +36,25 @@ public class Whitelist extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+        final String example = "\nExample: `" + Constants.PREFIX + this.name + " 637724317672669184, true`";
+        final String example2 = "\nExample: `" + Constants.PREFIX + this.name + " all`";
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
+        if (commandEvent.getArgs().trim().isEmpty()) {
+            commandEvent.reply("Please provide the required parameters.");
+            return;
+        }
 
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
-        if (argList.get(0).trim().equalsIgnoreCase("all")) {
+        if (args.length == 1) {
+            if (!args[0].trim().equalsIgnoreCase("all")) {
+                commandEvent.reply("Please provide a full configuration." + example + example2);
+                return;
+            }
+
             final Cursor cursor = DatabaseDriver.getInstance().selectAllGuilds();
             StringBuilder serversDetails = new StringBuilder();
             for (Object o : cursor) {
@@ -53,7 +66,9 @@ public class Whitelist extends Command {
                 String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
 
                 String line = "· <@%s> - `%s` - `%s` - `%s members`\n";
-                serversDetails.append(String.format(line, guildOwnerId, guildName, server.getServerId(), guildMemberCount));
+                String formattedLine = String.format(line,
+                        guildOwnerId, guildName, server.getServerId(), guildMemberCount);
+                serversDetails.append(formattedLine);
             }
 
             cursor.close();
@@ -61,9 +76,21 @@ public class Whitelist extends Command {
             return;
         }
 
-        final String serverId = argList.get(0).trim();
+        if (args.length == 2) {
+            if (args[0].trim().isEmpty()) {
+                commandEvent.reply("First parameter was empty." + example + example2);
+                return;
+            }
+
+            if (args[1].trim().isEmpty()) {
+                commandEvent.reply("Second parameter was empty." + example + example2);
+                return;
+            }
+        }
+
+        final String serverId = args[0].trim();
         boolean newWhitelistVal = false;
-        if (argList.get(1).trim().equalsIgnoreCase("true")) {
+        if (args[1].trim().equalsIgnoreCase("true")) {
             newWhitelistVal = true;
         }
 
@@ -99,7 +126,8 @@ public class Whitelist extends Command {
             commandEvent.reactSuccess();
         } else {
             DatabaseDriver.getInstance().addServer(serverId);
-            final Server server = new Gson().fromJson(DatabaseDriver.getInstance().selectOneServer(serverId).next().toString(), Server.class);
+            final Server server = new Gson().fromJson(
+                    DatabaseDriver.getInstance().selectOneServer(serverId).next().toString(), Server.class);
 
             DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
             commandEvent.reply("Successfully whitelisted `" + serverId + "`.");

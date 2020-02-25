@@ -41,7 +41,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onResume(@Nonnull ResumedEvent event) {
         log.info("Resumed session...");
-        NotifService.getInstance().start();
+        NotifService.getInstance();
     }
 
     /**
@@ -52,7 +52,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onReconnect(@Nonnull ReconnectedEvent event) {
         log.info("Reconnected to session...");
-        NotifService.getInstance().start();
+        NotifService.getInstance();
     }
 
     /**

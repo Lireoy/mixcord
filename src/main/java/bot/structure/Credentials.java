@@ -12,9 +12,8 @@ import java.nio.file.Paths;
 @Slf4j
 public class Credentials {
 
-    private static Credentials instance;
     private static final String credentialsFileName = "credentials.json";
-
+    private static Credentials instance;
     private boolean isProductionBuild;
     private String discordBotToken;
     private String discordBotTokenCanary;

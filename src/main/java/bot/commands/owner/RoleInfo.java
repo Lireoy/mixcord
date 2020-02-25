@@ -1,6 +1,7 @@
 package bot.commands.owner;
 
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -33,6 +34,9 @@ public class RoleInfo extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
 
         if (commandEvent.getArgs().isEmpty()) {
             commandEvent.replyError("Please provide the name of a role!");

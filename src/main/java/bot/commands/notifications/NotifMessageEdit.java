@@ -4,6 +4,7 @@ import bot.Constants;
 import bot.DatabaseDriver;
 import bot.structure.Notification;
 import bot.structure.enums.CommandCategory;
+import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -37,10 +38,13 @@ public class NotifMessageEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        if (helpResponse) return;
+
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + "NotifMessageEdit shroud, Shroud went live again lolzzzz`";
+        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
 
         String streamerName = "";
         String newMessage = "";
