@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -24,7 +25,7 @@ public class ServerNotifs extends Command {
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};
-        this.help = "Lists all available notifications for this server.";
+        this.help = HelpConstants.SERVER_NOTIFS_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -38,7 +39,10 @@ public class ServerNotifs extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name;
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
@@ -55,7 +59,7 @@ public class ServerNotifs extends Command {
         for (Object doc : list) {
             Notification notif = new Gson().fromJson(doc.toString(), Notification.class);
             String channelLine = "\n<#%s>\n";
-            String streamerLine = "· [%s](" + Constants.HTTPS_MIXER_COM + "%s)\n";
+            String streamerLine = "· [%s](" + BasicConstants.HTTPS_MIXER_COM + "%s)\n";
 
             if (!prevChannel.equals(notif.getChannelId())) {
                 description.append(String.format(channelLine, notif.getChannelId()));

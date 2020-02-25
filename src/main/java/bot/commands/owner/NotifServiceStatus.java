@@ -1,7 +1,9 @@
 package bot.commands.owner;
 
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
 import bot.services.NotifService;
-import bot.structure.enums.CommandCategory;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -14,9 +16,8 @@ public class NotifServiceStatus extends Command {
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
-        this.help = "Creates a new notification for a Mixer streamer in the channel where the command is used.";
+        this.help = HelpConstants.NOTIF_SERVICE_STATUS_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
-        this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -30,7 +31,10 @@ public class NotifServiceStatus extends Command {
         final String state = NotifService.getInstance().getState();
         String message = "Notifier service state: " + state;
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name;
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         commandEvent.reply(message);

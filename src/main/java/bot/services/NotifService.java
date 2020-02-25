@@ -1,9 +1,9 @@
 package bot.services;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.Streamer;
+import bot.structures.Notification;
+import bot.structures.Streamer;
 import bot.utils.MetricsUtil;
 import bot.utils.MixerQuery;
 import bot.utils.NotifSender;
@@ -108,8 +108,8 @@ public class NotifService implements Runnable {
                 }
 
                 MetricsUtil.getInstance().stopTimer();
-                MetricsUtil.getInstance().postMetrics(Constants.METRICS_CHANNEL);
-                log.info("Posting metrics to {} - {}", Constants.METRICS_GUILD, Constants.METRICS_CHANNEL);
+                MetricsUtil.getInstance().postMetrics(BasicConstants.METRICS_CHANNEL);
+                log.info("Posting metrics to {} - {}", BasicConstants.METRICS_GUILD, BasicConstants.METRICS_CHANNEL);
                 log.info("Checked {} streamers in {}s",
                         MetricsUtil.getInstance().getStreamersProcessed(),
                         MetricsUtil.getInstance().getSecs());
@@ -128,21 +128,21 @@ public class NotifService implements Runnable {
                 log.info("InterruptedException");
                 ex.printStackTrace();
 
-                String message = Constants.WARNING + Constants.WARNING +
+                String message = BasicConstants.WARNING + BasicConstants.WARNING +
                         "The notifier service was interrupted. Terminating the notifier service." +
-                        Constants.WARNING + Constants.WARNING;
+                        BasicConstants.WARNING + BasicConstants.WARNING;
 
-                sendReportInDm(Constants.OWNER_ID, message);
+                sendReportInDm(BasicConstants.OWNER_ID, message);
             } else if (ex instanceof ReqlOpFailedError) {
                 this.stop();
                 log.info("ReqlOpFailedError");
                 ex.printStackTrace();
 
-                String message = Constants.WARNING + Constants.WARNING +
+                String message = BasicConstants.WARNING + BasicConstants.WARNING +
                         "There is a database issue. Stopping the notifier service." +
-                        Constants.WARNING + Constants.WARNING;
+                        BasicConstants.WARNING + BasicConstants.WARNING;
 
-                sendReportInDm(Constants.OWNER_ID, message);
+                sendReportInDm(BasicConstants.OWNER_ID, message);
             } else {
                 this.stop();
                 log.info("General exception");

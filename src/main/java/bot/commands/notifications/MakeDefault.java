@@ -1,8 +1,10 @@
 package bot.commands.notifications;
 
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -20,7 +22,7 @@ public class MakeDefault extends Command {
 
     public MakeDefault() {
         this.name = "MakeDefault";
-        this.help = "Resets a notification's configuration to the defaults.";
+        this.help = HelpConstants.MAKE_DEFAULT_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -36,7 +38,10 @@ public class MakeDefault extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();

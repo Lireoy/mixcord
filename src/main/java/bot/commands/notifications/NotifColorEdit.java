@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.StringUtil;
@@ -24,7 +25,7 @@ public class NotifColorEdit extends Command {
     public NotifColorEdit() {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
-        this.help = "Edits the notification's embed color.";
+        this.help = HelpConstants.NOTIF_COLOR_EDIT_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;
@@ -39,13 +40,16 @@ public class NotifColorEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud, f2ff00";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, 32a852`";
+        final String example = "\nExample: `" + BasicConstants.PREFIX + this.name + " shroud, 32a852`";
 
         String streamerName = "";
         String newColor = "";

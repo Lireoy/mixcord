@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Streamer;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Streamer;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -23,7 +24,7 @@ public class ChannelNotifs extends Command {
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};
-        this.help = "Lists all available notifications for this channel.";
+        this.help = HelpConstants.CHANNEL_NOTIFS_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -37,7 +38,10 @@ public class ChannelNotifs extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name;
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
@@ -55,7 +59,7 @@ public class ChannelNotifs extends Command {
 
         for (Object doc : cursor) {
             Streamer streamer = new Gson().fromJson(doc.toString(), Streamer.class);
-            String line = "· [%s](" + Constants.HTTPS_MIXER_COM + "%s)\n";
+            String line = "· [%s](" + BasicConstants.HTTPS_MIXER_COM + "%s)\n";
             description.append(String.format(line, streamer.getStreamerName(), streamer.getStreamerName()));
             notifCount++;
             if (notifCount % 5 == 0) {

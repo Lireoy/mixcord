@@ -1,7 +1,8 @@
 package bot.commands.informative;
 
-import bot.Constants;
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
@@ -26,7 +27,7 @@ public class Info extends Command {
 
     public Info() {
         this.name = "Info";
-        this.help = "Shows information about the bot.";
+        this.help = HelpConstants.INFO_COMMAND_HELP;
         this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
@@ -39,12 +40,13 @@ public class Info extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name;
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         // Calculate uptime
-        // Taken from Almighty Alpaca
-        //https://github.com/Java-Discord-Bot-System/Plugin-Uptime/blob/master/src/main/java/com/almightyalpaca/discord/bot/plugin/uptime/UptimePlugin.java#L28-L42
         final long duration = ManagementFactory.getRuntimeMXBean().getUptime();
 
         final long years = duration / 31104000000L;
@@ -89,8 +91,8 @@ public class Info extends Command {
         final String systemInfo = rt.freeMemory() / 1024 / 1024 + "MB / " + rt.maxMemory() / 1024 / 1024 + "MB";
 
         // Links
-        final String links = "· Website: " + Constants.MIXCORD_IO + " \n" +
-                "· Discord: " + Constants.DISCORD;
+        final String links = "· Website: " + BasicConstants.MIXCORD_IO + " \n" +
+                "· Discord: " + BasicConstants.DISCORD;
 
         // Developers
         final String developers = "Lead Dev: Lireoy#4444\nConsultant: Akira#8185";
@@ -109,5 +111,9 @@ public class Info extends Command {
                 .addField("Developers", developers, false)
                 .addField("Infrastructure", infrastructure, false)
                 .build());
+    }
+
+    public String getExample() {
+        return "haha";
     }
 }

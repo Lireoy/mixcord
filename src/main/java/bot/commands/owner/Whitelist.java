@@ -1,10 +1,11 @@
 package bot.commands.owner;
 
-import bot.Constants;
 import bot.DatabaseDriver;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
 import bot.services.ShardService;
-import bot.structure.Server;
-import bot.structure.enums.CommandCategory;
+import bot.structures.Server;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -21,7 +22,7 @@ public class Whitelist extends Command {
 
     public Whitelist() {
         this.name = "Whitelist";
-        this.help = "Add / remove a server from the whitelist, or list all whitelisted servers.";
+        this.help = HelpConstants.WHITELIST_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = true;
@@ -36,10 +37,10 @@ public class Whitelist extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
-        final String example = "\nExample: `" + Constants.PREFIX + this.name + " 637724317672669184, true`";
-        final String example2 = "\nExample: `" + Constants.PREFIX + this.name + " all`";
+        final String commandExample = "\nExample: `" + BasicConstants.PREFIX + this.name + " 637724317672669184, true`"
+                + "\nExample: `" + BasicConstants.PREFIX + this.name + " all`";
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
@@ -51,7 +52,7 @@ public class Whitelist extends Command {
 
         if (args.length == 1) {
             if (!args[0].trim().equalsIgnoreCase("all")) {
-                commandEvent.reply("Please provide a full configuration." + example + example2);
+                commandEvent.reply("Please provide a full configuration." + commandExample);
                 return;
             }
 
@@ -78,12 +79,12 @@ public class Whitelist extends Command {
 
         if (args.length == 2) {
             if (args[0].trim().isEmpty()) {
-                commandEvent.reply("First parameter was empty." + example + example2);
+                commandEvent.reply("First parameter was empty." + commandExample);
                 return;
             }
 
             if (args[1].trim().isEmpty()) {
-                commandEvent.reply("Second parameter was empty." + example + example2);
+                commandEvent.reply("Second parameter was empty." + commandExample);
                 return;
             }
         }

@@ -1,4 +1,4 @@
-package bot.structure.enums;
+package bot.structures.enums;
 
 public enum CommandCategory {
 

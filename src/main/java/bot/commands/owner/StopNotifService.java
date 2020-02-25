@@ -1,7 +1,9 @@
 package bot.commands.owner;
 
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
 import bot.services.WorkStatus;
-import bot.structure.enums.CommandCategory;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -14,7 +16,7 @@ public class StopNotifService extends Command {
 
     public StopNotifService() {
         this.name = "StopNotifService";
-        this.help = "Stops the notifier service.";
+        this.help = HelpConstants.STOP_NOTIF_SERVICE_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -28,8 +30,11 @@ public class StopNotifService extends Command {
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
+        
+        final String commandExample = BasicConstants.PREFIX + this.name;
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         WorkStatus.getInstance().markFinished();

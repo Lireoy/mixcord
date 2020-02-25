@@ -1,6 +1,8 @@
 package bot.commands.owner;
 
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -20,7 +22,7 @@ public class RoleInfo extends Command {
 
     public RoleInfo() {
         this.name = "RoleInfo";
-        this.help = "Shows information about a role.";
+        this.help = HelpConstants.ROLE_INFO_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<role>";
         this.guildOnly = true;
@@ -35,7 +37,10 @@ public class RoleInfo extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " testers";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         if (commandEvent.getArgs().isEmpty()) {

@@ -1,8 +1,10 @@
 package bot.commands.notifications;
 
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -21,7 +23,7 @@ public class DeleteNotif extends Command {
     public DeleteNotif() {
         this.name = "DeleteNotif";
         this.aliases = new String[]{"DeleteNotif", "DelNotif", "RemoveNotif"};
-        this.help = "Deletes a streamer notification in the channel where the command is used.";
+        this.help = HelpConstants.DELETE_NOTIF_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -37,7 +39,10 @@ public class DeleteNotif extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();

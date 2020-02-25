@@ -1,4 +1,4 @@
-package bot.structure;
+package bot.structures;
 
 public class Server {
 

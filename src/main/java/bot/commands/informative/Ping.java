@@ -1,6 +1,8 @@
 package bot.commands.informative;
 
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -24,7 +26,7 @@ public class Ping extends Command {
     public Ping() {
         this.name = "Ping";
         this.aliases = new String[]{"Pong", "Pingpong", "Latency"};
-        this.help = "Shows the current latency of the bot.";
+        this.help = HelpConstants.PING_COMMAND_HELP;
         this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
@@ -37,7 +39,10 @@ public class Ping extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + "";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         commandEvent.reply("Ping: ...", (m) -> {

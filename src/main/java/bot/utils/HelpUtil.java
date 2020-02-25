@@ -20,7 +20,7 @@ public class HelpUtil {
         return helpUtil;
     }
 
-    public boolean sendCommandHelp(Command command, CommandEvent commandEvent) {
+    public boolean sendCommandHelp(Command command, CommandEvent commandEvent, String commandExample) {
         if (commandEvent.getArgs().equals("--help")) {
             EmbedBuilder embedBuilder = new MixerEmbedBuilder()
                     .setTitle(command.getName() + " command")

@@ -1,8 +1,8 @@
 package bot.services;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.commands.Commands;
-import bot.structure.enums.CommandCategory;
+import bot.structures.enums.CommandCategory;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -18,12 +18,12 @@ public class ClientService {
 
     private ClientService() {
         instance = new CommandClientBuilder()
-                .setPrefix(Constants.PREFIX)
+                .setPrefix(BasicConstants.PREFIX)
                 .setAlternativePrefix("@mention")
-                .setOwnerId(Constants.OWNER_ID)
-                .setCoOwnerIds(Constants.CO_OWNER_ID, Constants.CO_OWNER_ID2)
-                .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
-                .setServerInvite(Constants.DISCORD)
+                .setOwnerId(BasicConstants.OWNER_ID)
+                .setCoOwnerIds(BasicConstants.CO_OWNER_ID, BasicConstants.CO_OWNER_ID2)
+                .setEmojis(BasicConstants.SUCCESS, BasicConstants.WARNING, BasicConstants.ERROR)
+                .setServerInvite(BasicConstants.DISCORD)
                 .addCommands(Commands.getCommands())
                 .setHelpConsumer(ClientService::help)
                 .build();
@@ -84,7 +84,7 @@ public class ClientService {
                             "**#" +
                             owner.getDiscriminator() +
                             " or join " +
-                            Constants.DISCORD;
+                            BasicConstants.DISCORD;
                     event.reply(contact);
                 }
             }

@@ -1,4 +1,4 @@
-package bot.structure;
+package bot.structures;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;

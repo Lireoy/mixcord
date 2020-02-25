@@ -1,9 +1,9 @@
 package bot.utils;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
 import bot.services.ShardService;
-import bot.structure.Notification;
+import bot.structures.Notification;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,7 +24,7 @@ public class NotifSender {
      */
     public static void sendEmbed(Notification notif, JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
-        final String embLiveThumbnail = Constants.MIXER_THUMB_PRE + queryChId + Constants.MIXER_THUMB_POST;
+        final String embLiveThumbnail = BasicConstants.MIXER_THUMB_PRE + queryChId + BasicConstants.MIXER_THUMB_POST;
 
         final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
         final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());

@@ -1,6 +1,6 @@
-package bot;
+package bot.constants;
 
-public class Constants {
+public class BasicConstants {
 
     // DEV RELATED
     public static final String OWNER_ID = "331756964801544202"; // Lireoy

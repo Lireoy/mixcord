@@ -1,7 +1,8 @@
 package bot.commands.mixer;
 
-import bot.Constants;
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
@@ -21,7 +22,7 @@ public class MixerUser extends Command {
 
     public MixerUser() {
         this.name = "MixerUser";
-        this.help = "Displays a Mixer user's data.";
+        this.help = HelpConstants.MIXER_USER_HELP;
         this.category = new Category(CommandCategory.MIXER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -37,7 +38,10 @@ public class MixerUser extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String query = commandEvent.getArgs().trim();
@@ -52,23 +56,23 @@ public class MixerUser extends Command {
             if (channel == null) {
                 commandEvent.reactError();
                 commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                        "please contact the developer: <@" + Constants.OWNER_ID + ">");
+                        "please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
                 return;
             }
 
             final int id = channel.getInt("id");
-            final String liveThumbnail = Constants.MIXER_THUMB_PRE + id + Constants.MIXER_THUMB_POST;
+            final String liveThumbnail = BasicConstants.MIXER_THUMB_PRE + id + BasicConstants.MIXER_THUMB_POST;
             final String username = channel.getString("token");
 
             final JSONObject user = channel.getJSONObject("user");
             final Object avatarObject = user.get("avatarUrl");
-            final String avatarUrl = avatarObject == JSONObject.NULL ? Constants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
+            final String avatarUrl = avatarObject == JSONObject.NULL ? BasicConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
             final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
-            final String isVerified = user.getBoolean("verified") ? Constants.SUCCESS : Constants.ERROR;
-            final String isPartnered = channel.getBoolean("partnered") ? Constants.SUCCESS : Constants.ERROR;
+            final String isVerified = user.getBoolean("verified") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
+            final String isPartnered = channel.getBoolean("partnered") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
             final boolean streaming = channel.getBoolean("online");
-            final String isOnline = channel.getBoolean("online") ? Constants.SUCCESS : Constants.ERROR;
-            final String isFeatured = channel.getBoolean("featured") ? Constants.SUCCESS : Constants.ERROR;
+            final String isOnline = channel.getBoolean("online") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
+            final String isFeatured = channel.getBoolean("featured") ? BasicConstants.SUCCESS : BasicConstants.ERROR;
 
             final String trusted =
                     "Verified: " + isVerified + "\n" +
@@ -84,7 +88,7 @@ public class MixerUser extends Command {
             final String language = channel.getString("languageId").toUpperCase();
             final String targetAudience = channel.getString("audience").toUpperCase();
             final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
-            final String channelUrl = Constants.HTTPS_MIXER_COM + username;
+            final String channelUrl = BasicConstants.HTTPS_MIXER_COM + username;
             final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
 
 

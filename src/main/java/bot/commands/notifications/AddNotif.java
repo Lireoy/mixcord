@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Server;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Server;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerQuery;
 import com.google.gson.Gson;
@@ -27,7 +28,7 @@ public class AddNotif extends Command {
     public AddNotif() {
         this.name = "AddNotif";
         this.aliases = new String[]{"CreateNotif"};
-        this.help = "Creates a new notification for a Mixer streamer in the channel where the command is used.";
+        this.help = HelpConstants.ADD_NOTIF_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -43,7 +44,10 @@ public class AddNotif extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
@@ -63,7 +67,7 @@ public class AddNotif extends Command {
 
         Cursor cursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (!cursor.hasNext()) {
-            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@" + Constants.OWNER_ID + ">");
+            commandEvent.reply("This server does not exist in the database. Please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
             return;
         }
 
@@ -89,7 +93,7 @@ public class AddNotif extends Command {
         if (channel == JSONObject.NULL) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: <@" + Constants.OWNER_ID + ">");
+                    "please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
             return;
         }
 
@@ -103,7 +107,7 @@ public class AddNotif extends Command {
         final String streamerName = channel.getString("token");
 
         if (streamerName.isEmpty() || streamerId.isEmpty()) {
-            commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@" + Constants.OWNER_ID + ">");
+            commandEvent.reply("Streamer name or ID is empty. Please contact the developer: <@" + BasicConstants.OWNER_ID + ">");
             log.info("Streamer name or ID was empty.");
             return;
         }

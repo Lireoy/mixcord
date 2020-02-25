@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.MixerEmbedBuilder;
@@ -25,7 +26,7 @@ public class NotifDetails extends Command {
 
     public NotifDetails() {
         this.name = "NotifDetails";
-        this.help = "Lists all settings for a notifications.";
+        this.help = HelpConstants.NOTIF_DETAILS_HELP;
         this.category = new Command.Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -40,16 +41,19 @@ public class NotifDetails extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
 
 
-        if (commandAuthor.getId().equals(Constants.OWNER_ID) ||
-                commandAuthor.getId().equals(Constants.CO_OWNER_ID) ||
-                commandAuthor.getId().equals(Constants.CO_OWNER_ID2)) {
+        if (commandAuthor.getId().equals(BasicConstants.OWNER_ID) ||
+                commandAuthor.getId().equals(BasicConstants.CO_OWNER_ID) ||
+                commandAuthor.getId().equals(BasicConstants.CO_OWNER_ID2)) {
 
             final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
             final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));

@@ -1,8 +1,10 @@
 package bot.commands.owner;
 
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
 import bot.services.NotifService;
 import bot.services.ShardService;
-import bot.structure.enums.CommandCategory;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,7 +17,7 @@ public class Shutdown extends Command {
 
     public Shutdown() {
         this.name = "Shutdown";
-        this.help = "Kills the bot. You know what shutdown means, don't ya? Cool. Be aware.";
+        this.help = HelpConstants.SHUTDOWN_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<reason>";
         this.guildOnly = true;
@@ -33,9 +35,12 @@ public class Shutdown extends Command {
     @Override
     protected void execute(CommandEvent commandEvent) {
         final User commandAuthor = commandEvent.getAuthor();
+        log.info("Command ran by {}", commandAuthor);
         final String reason = commandEvent.getArgs();
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " This is an example reason.";
+
+        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         if (reason.isEmpty()) {

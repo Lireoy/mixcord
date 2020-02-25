@@ -1,8 +1,8 @@
 package bot.utils;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.services.NotifService;
-import bot.structure.Credentials;
+import bot.structures.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -31,7 +31,7 @@ public class MixerQuery {
      */
     public static JSONObject queryChannel(String queryParam) {
         final CloseableHttpClient httpClient = HttpClients.createDefault();
-        final String uri = Constants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
+        final String uri = BasicConstants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
 
         // Custom Timout values to avoid long stuck commands
         final RequestConfig requestConfig = RequestConfig.custom()

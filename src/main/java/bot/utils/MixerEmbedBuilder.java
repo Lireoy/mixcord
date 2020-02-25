@@ -1,8 +1,8 @@
 package bot.utils;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.services.ShardService;
-import bot.structure.Notification;
+import bot.structures.Notification;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONObject;
 
@@ -21,14 +21,14 @@ public class MixerEmbedBuilder extends EmbedBuilder {
      * Sets the embed time and footer.
      */
     public MixerEmbedBuilder() {
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(BasicConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
     public MixerEmbedBuilder(JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
         this.setCustomColor();
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(BasicConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -44,8 +44,8 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         this.mixerInfo = mixerInfo;
         this.notif = notif;
         this.setCustomColor();
-        this.setImage(Constants.MIXER_BANNER_DEFAULT);
-        this.setFooter(Constants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setImage(BasicConstants.MIXER_BANNER_DEFAULT);
+        this.setFooter(BasicConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -66,7 +66,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         }
         // Handles "null" as a profile picture exception
         if (authorImg == JSONObject.NULL || authorImg == null) {
-            authorImg = Constants.MIXER_PROFILE_PICTURE_DEFAULT;
+            authorImg = BasicConstants.MIXER_PROFILE_PICTURE_DEFAULT;
         }
         this.setAuthor(mixerInfo.getString("token"), getChannelLink(), authorImg.toString());
         return this;
@@ -86,12 +86,12 @@ public class MixerEmbedBuilder extends EmbedBuilder {
 
     public MixerEmbedBuilder setCustomImage() {
         if (mixerInfo == null) {
-            this.setImage(Constants.MIXER_BANNER_DEFAULT);
+            this.setImage(BasicConstants.MIXER_BANNER_DEFAULT);
             return this;
         }
 
         final Object bannerUrl = mixerInfo.get("bannerUrl");
-        final String image = bannerUrl == JSONObject.NULL ? Constants.MIXER_BANNER_DEFAULT : bannerUrl.toString();
+        final String image = bannerUrl == JSONObject.NULL ? BasicConstants.MIXER_BANNER_DEFAULT : bannerUrl.toString();
 
         this.setImage(image);
         return this;
@@ -99,12 +99,12 @@ public class MixerEmbedBuilder extends EmbedBuilder {
 
     public MixerEmbedBuilder setCustomThumbnail() {
         if (mixerInfo == null) {
-            this.setThumbnail(Constants.MIXER_BANNER_DEFAULT);
+            this.setThumbnail(BasicConstants.MIXER_BANNER_DEFAULT);
             return this;
         }
 
         final Object avatarObj = mixerInfo.getJSONObject("user").get("avatarUrl");
-        final String avatarUrl = avatarObj == JSONObject.NULL ? Constants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObj.toString();
+        final String avatarUrl = avatarObj == JSONObject.NULL ? BasicConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObj.toString();
 
         this.setThumbnail(avatarUrl);
         return this;
@@ -146,6 +146,6 @@ public class MixerEmbedBuilder extends EmbedBuilder {
      */
     private String getChannelLink() {
         String streamerName = notif == null ? mixerInfo.getString("token") : notif.getStreamerName();
-        return Constants.HTTPS_MIXER_COM + streamerName;
+        return BasicConstants.HTTPS_MIXER_COM + streamerName;
     }
 }

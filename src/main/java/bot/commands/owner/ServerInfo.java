@@ -1,7 +1,9 @@
 package bot.commands.owner;
 
-import bot.structure.enums.CommandCategory;
-import bot.structure.enums.ServerFeatures;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
+import bot.structures.enums.ServerFeatures;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
@@ -18,9 +20,10 @@ import java.util.Objects;
 
 @Slf4j
 public class ServerInfo extends Command {
+
     public ServerInfo() {
         this.name = "ServerInfo";
-        this.help = "Shows information about the server.";
+        this.help = HelpConstants.SERVER_INFO_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = true;
         this.ownerCommand = true;
@@ -32,14 +35,17 @@ public class ServerInfo extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        final User commandAuthor = commandEvent.getAuthor();
+        log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name;
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         //TODO: Request info about a specific server
         //TODO: Optional arg for server ID, and look it with JDA if the bot is in the server
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
 
         final Guild guild = commandEvent.getGuild();
         User user = Objects.requireNonNull(guild.getOwner()).getUser();

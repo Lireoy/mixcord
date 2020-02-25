@@ -1,6 +1,8 @@
 package bot.commands.mixer;
 
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
@@ -20,7 +22,7 @@ public class MixerUserSocials extends Command {
 
     public MixerUserSocials() {
         this.name = "MixerUserSocials";
-        this.help = "Displays a Mixer user's social profiles.";
+        this.help = HelpConstants.MIXER_USER_SOCIALS_HELP;
         this.category = new Category(CommandCategory.MIXER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;
@@ -36,7 +38,10 @@ public class MixerUserSocials extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String streamerName = commandEvent.getArgs().trim();

@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -22,7 +23,7 @@ public class NotifEmbedConfig extends Command {
 
     public NotifEmbedConfig() {
         this.name = "NotifEmbedConfig";
-        this.help = "Edits the notification format. Set it to true for embed, false for non-embed notification.";
+        this.help = HelpConstants.NOTIF_EMBED_CONFIG_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;
@@ -37,13 +38,16 @@ public class NotifEmbedConfig extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + " shroud, true";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, true`";
+        final String example = "\nExample: `" + BasicConstants.PREFIX + this.name + " shroud, true`";
 
         String streamerName = "";
         String sendAsEmbed = "";
@@ -97,8 +101,8 @@ public class NotifEmbedConfig extends Command {
         final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        final String MIXER_PATTERN = Constants.HTTPS_MIXER_COM + notif.getStreamerName();
-        final String MIXER_PATTERN2 = Constants.HTTP_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN = BasicConstants.HTTPS_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN2 = BasicConstants.HTTP_MIXER_COM + notif.getStreamerName();
         boolean containsLink = false;
 
         if (notif.getMessage().contains(MIXER_PATTERN)) containsLink = true;

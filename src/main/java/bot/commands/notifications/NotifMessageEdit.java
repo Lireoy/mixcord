@@ -1,9 +1,10 @@
 package bot.commands.notifications;
 
-import bot.Constants;
+import bot.constants.BasicConstants;
 import bot.DatabaseDriver;
-import bot.structure.Notification;
-import bot.structure.enums.CommandCategory;
+import bot.constants.HelpConstants;
+import bot.structures.Notification;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -23,7 +24,7 @@ public class NotifMessageEdit extends Command {
     public NotifMessageEdit() {
         this.name = "NotifMessageEdit";
         this.aliases = new String[]{"MessageEdit", "EditMessage"};
-        this.help = "Edits the notification's message.";
+        this.help = HelpConstants.NOTIF_MESSAGE_EDIT_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;
@@ -38,13 +39,17 @@ public class NotifMessageEdit extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name +
+                " shroud, Hey guys! shroud is streaming, and this is a new notification message!";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-        final String example = "\nExample: `" + Constants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
+        final String example = "\nExample: `" + BasicConstants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
 
         String streamerName = "";
         String newMessage = "";
@@ -91,10 +96,10 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        final String MIXER_PATTERN = Constants.HTTPS_MIXER_COM + notif.getStreamerName();
+        final String MIXER_PATTERN = BasicConstants.HTTPS_MIXER_COM + notif.getStreamerName();
 
         if (notif.isEmbed()) {
-            if (StringUtil.containsIgnoreCase(newMessage, Constants.HTTPS_MIXER_COM)) {
+            if (StringUtil.containsIgnoreCase(newMessage, BasicConstants.HTTPS_MIXER_COM)) {
                 if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
                     commandEvent.reply("Your notification message contains a link to a different streamer.");
                     return;
@@ -102,7 +107,7 @@ public class NotifMessageEdit extends Command {
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
         } else {
-            if (!StringUtil.containsIgnoreCase(newMessage, Constants.HTTPS_MIXER_COM)) {
+            if (!StringUtil.containsIgnoreCase(newMessage, BasicConstants.HTTPS_MIXER_COM)) {
                 commandEvent.reply("Your notification message does not contain a link to the streamer.");
                 return;
             }

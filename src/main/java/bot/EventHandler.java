@@ -1,7 +1,7 @@
 package bot;
 
 import bot.services.NotifService;
-import bot.structure.Notification;
+import bot.structures.Notification;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;

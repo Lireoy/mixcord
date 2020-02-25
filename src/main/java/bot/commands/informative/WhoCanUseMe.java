@@ -1,6 +1,8 @@
 package bot.commands.informative;
 
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,7 +19,7 @@ public class WhoCanUseMe extends Command {
 
     public WhoCanUseMe() {
         this.name = "WhoCanUseMe";
-        this.help = "Displays those roles which can use Mixcord.";
+        this.help = HelpConstants.WHO_CAN_USE_ME_COMMAND_HELP;
         this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
@@ -31,7 +33,10 @@ public class WhoCanUseMe extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + "";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         List<Role> roleWithManageServer = new ArrayList<>();

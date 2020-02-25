@@ -1,7 +1,7 @@
 package bot.services;
 
 import bot.EventHandler;
-import bot.structure.Credentials;
+import bot.structures.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;

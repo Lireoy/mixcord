@@ -1,6 +1,8 @@
 package bot.commands.informative;
 
-import bot.structure.enums.CommandCategory;
+import bot.constants.BasicConstants;
+import bot.constants.HelpConstants;
+import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -18,7 +20,7 @@ public class Invite extends Command {
     public Invite() {
         this.name = "Invite";
         this.aliases = new String[]{"Inv", "GetOverHere"};
-        this.help = "Provides an invite link so you can add this bot to your server.";
+        this.help = HelpConstants.INVITE_COMMAND_HELP;
         this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
         this.ownerCommand = true;
@@ -33,7 +35,10 @@ public class Invite extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        boolean helpResponse = HelpUtil.getInstance().sendCommandHelp(this, commandEvent);
+        final String commandExample = BasicConstants.PREFIX + this.name + "";
+
+        boolean helpResponse = HelpUtil.getInstance()
+                .sendCommandHelp(this, commandEvent, commandExample);
         if (helpResponse) return;
 
         final String clientId = commandEvent.getSelfUser().getId();
