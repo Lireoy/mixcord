@@ -6,7 +6,11 @@
       "script": "/usr/bin/java",
       "args": [
         "-jar",
-        "/home/lireoy/mixcord/Mixcord.jar"
+        "-Xmx2000m",
+        "-Xms2000m",
+        "-XX:+UseG1GC",
+        "-XX:MaxGCPauseMillis=200",
+        "/home/lireoy/mixcord.jar"
       ],
       "node_args": [],
       "exec_interpreter": "",
