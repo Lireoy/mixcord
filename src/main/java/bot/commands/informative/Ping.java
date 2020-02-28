@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Sends the bot's latency information to the user in a regular message.
@@ -45,18 +44,10 @@ public class Ping extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        commandEvent.reply("Ping: ...", (m) -> {
+        commandEvent.reply("Calculating...", (m) -> {
             final long ping = commandEvent.getMessage().getTimeCreated().until(m.getTimeCreated(),
                     ChronoUnit.MILLIS);
 
-            m.editMessage("Calculating...").queue();
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            m.editMessage("Websocket: " + commandEvent.getJDA().getGatewayPing() + "ms").queue();
             m.editMessage("Ping: " + ping + "ms | Websocket: " +
                     commandEvent.getJDA().getGatewayPing() + "ms").queue();
         });

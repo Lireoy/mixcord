@@ -42,7 +42,7 @@ public class Info extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -111,9 +111,5 @@ public class Info extends Command {
                 .addField("Developers", developers, false)
                 .addField("Infrastructure", infrastructure, false)
                 .build());
-    }
-
-    public String getExample() {
-        return "haha";
     }
 }

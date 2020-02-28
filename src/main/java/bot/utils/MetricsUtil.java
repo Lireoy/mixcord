@@ -102,13 +102,17 @@ public class MetricsUtil {
      *
      * @param channelId Discord channel ID
      */
-    public void postMetrics(String channelId) {
-        TextChannel channel = ShardService.getInstance().getTextChannelById(channelId);
+    public void postMetrics(final String channelId) {
+        final TextChannel channel = ShardService.getInstance().getTextChannelById(channelId);
 
-        String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
-        String description = String.format(line, streamersProcessed, notifsSent, getSecs());
+        final String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";
+        final String description = String.format(line, streamersProcessed, notifsSent, getSecs());
 
-        assert channel != null;
+        if (channel == null) {
+            log.info("Could not post metrics to {}", channelId);
+            return;
+        }
+
         channel.sendMessage(new MixerEmbedBuilder()
                 .setTitle("Metrics")
                 .setDescription(description)

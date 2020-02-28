@@ -26,10 +26,10 @@ public class EventHandler extends ListenerAdapter {
 
     @Override
     public void onReady(@Nonnull ReadyEvent event) {
-        int shardId = event.getJDA().getShardInfo().getShardId();
-        int total = event.getGuildTotalCount();
-        int available = event.getGuildAvailableCount();
-        int unAvailable = event.getGuildUnavailableCount();
+        final int shardId = event.getJDA().getShardInfo().getShardId();
+        final int total = event.getGuildTotalCount();
+        final int available = event.getGuildAvailableCount();
+        final int unAvailable = event.getGuildUnavailableCount();
         log.info("Ready event for shard {}. Total guilds {}, Available {}, Unavailable {}",
                 shardId, total, available, unAvailable);
     }
@@ -42,7 +42,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onResume(@Nonnull ResumedEvent event) {
         log.info("Resumed session...");
-        NotifService.getInstance();
+        NotifService.getInstance().start();
     }
 
     /**
@@ -53,7 +53,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onReconnect(@Nonnull ReconnectedEvent event) {
         log.info("Reconnected to session...");
-        NotifService.getInstance();
+        NotifService.getInstance().start();
     }
 
     /**
@@ -97,11 +97,11 @@ public class EventHandler extends ListenerAdapter {
         log.info("Deleting server configuration from database...");
 
         List<String> streamerIds = new ArrayList<>();
-        Cursor notifs = DatabaseDriver.getInstance().selectServerNotifs(event.getGuild().getId());
+        final Cursor notifs = DatabaseDriver.getInstance().selectServerNotifs(event.getGuild().getId());
 
         int deletedNotifs = 0;
         for (Object object : notifs) {
-            Notification notif = new Gson().fromJson(object.toString(), Notification.class);
+            final Notification notif = new Gson().fromJson(object.toString(), Notification.class);
             DatabaseDriver.getInstance().deleteNotif(notif.getId());
             deletedNotifs++;
 
@@ -113,7 +113,7 @@ public class EventHandler extends ListenerAdapter {
 
         int deletedStreamers = 0;
         for (String streamerId : streamerIds) {
-            Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(streamerId);
+            final Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(streamerId);
             if (!cursor.hasNext()) {
                 DatabaseDriver.getInstance().deleteStreamer(streamerId);
                 deletedStreamers++;

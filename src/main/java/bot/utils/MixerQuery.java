@@ -29,7 +29,7 @@ public class MixerQuery {
      * @param queryParam the parameter which the query should be executed with
      * @return the JSON response, or null if failed
      */
-    public static JSONObject queryChannel(String queryParam) {
+    public static JSONObject queryChannel(final String queryParam) {
         final CloseableHttpClient httpClient = HttpClients.createDefault();
         final String uri = MixerConstants.MIXER_API_CHANNELS_PATH + "/" + queryParam;
 
@@ -47,7 +47,7 @@ public class MixerQuery {
                 .build();
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            int status = response.getStatusLine().getStatusCode();
+            final int status = response.getStatusLine().getStatusCode();
             if (status >= 200 && status < 300) {
                 final HttpEntity entity = response.getEntity();
                 return new JSONObject(EntityUtils.toString(entity));

@@ -35,7 +35,7 @@ public class WhoCanUseMe extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -73,7 +73,6 @@ public class WhoCanUseMe extends Command {
                 description.append(">\n");
             }
         }
-
 
         commandEvent.reactSuccess();
         commandEvent.replyFormatted(description.toString());

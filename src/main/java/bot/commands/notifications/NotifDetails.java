@@ -19,9 +19,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 @Slf4j
 public class NotifDetails extends Command {
 
@@ -51,22 +48,20 @@ public class NotifDetails extends Command {
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
 
-
         if (commandAuthor.getId().equals(DeveloperConstants.OWNER_ID) ||
                 commandAuthor.getId().equals(DeveloperConstants.CO_OWNER_ID) ||
                 commandAuthor.getId().equals(DeveloperConstants.CO_OWNER_ID2)) {
 
             final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-            final ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
 
             String streamerName = "";
             String json = "";
 
-            if (argList.size() > 1) {
-                streamerName = argList.get(0).trim();
-                json = argList.get(1).trim();
+            if (args.length > 1) {
+                streamerName = args[0].trim();
+                json = args[1].trim();
             } else {
-                streamerName = argList.get(0).trim();
+                streamerName = args[0].trim();
             }
 
             if (streamerName.isEmpty()) {

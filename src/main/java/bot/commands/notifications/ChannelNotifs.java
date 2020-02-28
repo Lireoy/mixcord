@@ -41,13 +41,13 @@ public class ChannelNotifs extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(serverId, channelId);
+        final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(serverId, channelId);
 
         StringBuilder description = new StringBuilder();
         int notifCount = 0;

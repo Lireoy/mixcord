@@ -41,7 +41,7 @@ public class NotifEmbedConfig extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud, true"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -50,8 +50,6 @@ public class NotifEmbedConfig extends Command {
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, true`";
 
-        String streamerName = "";
-        String sendAsEmbed = "";
         boolean newEmbedValue = true;
         boolean booleanConvetSuccess = false;
 
@@ -60,8 +58,8 @@ public class NotifEmbedConfig extends Command {
             return;
         }
 
-        streamerName = args[0].trim();
-        sendAsEmbed = args[1].trim();
+        String streamerName = args[0].trim();
+        String sendAsEmbed = args[1].trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -93,7 +91,7 @@ public class NotifEmbedConfig extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;

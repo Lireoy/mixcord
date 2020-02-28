@@ -40,7 +40,7 @@ public class ServerInfo extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -48,8 +48,8 @@ public class ServerInfo extends Command {
         //TODO: Optional arg for server ID, and look it with JDA if the bot is in the server
 
         final Guild guild = commandEvent.getGuild();
-        User user = Objects.requireNonNull(guild.getOwner()).getUser();
-        String title = "Information about `" + guild.getName() + "`:";
+        final User user = Objects.requireNonNull(guild.getOwner()).getUser();
+        final String title = "Information about `" + guild.getName() + "`:";
 
         final String owner = user.getName() + "#" + user.getDiscriminator();
         final String id = guild.getId();
@@ -68,7 +68,7 @@ public class ServerInfo extends Command {
                 }
             }
         }
-        String features = StringUtil.replaceLastComma(stringBuilder.toString());
+        final String features = StringUtil.replaceLastComma(stringBuilder.toString());
 
         log.info("Features size {}", guild.getFeatures().size());
         for (String feature : guild.getFeatures()) {
@@ -87,7 +87,7 @@ public class ServerInfo extends Command {
         final long offlineCount = guild.getMembers().stream()
                 .filter((u) -> (u.getOnlineStatus() == OnlineStatus.OFFLINE)).count();
 
-        String line = "%d Online\n%d Idle\n%d Do not Disturb\n%d Offline\nAltogether %d users and %d bots.";
+        final String line = "%d Online\n%d Idle\n%d Do not Disturb\n%d Offline\nAltogether %d users and %d bots.";
         final String membersString = String.format(line, onlineCount, idleCount, dndCount, offlineCount, userCount, botCount);
 
         commandEvent.reply(new MixerEmbedBuilder()

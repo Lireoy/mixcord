@@ -22,7 +22,7 @@ public class NotifSender {
      * @param notif     {@link Notification} object which contains data for the notification from the database
      * @param queryJson {@link JSONObject} which contains data for the streamer from Mixer
      */
-    public static void sendEmbed(Notification notif, JSONObject queryJson) {
+    public static void sendEmbed(final Notification notif, final JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
         final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE + queryChId + MixerConstants.MIXER_THUMB_POST;
 
@@ -32,7 +32,12 @@ public class NotifSender {
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
 
-        Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
+        if (textChannel == null) {
+            log.info("Notification text channel was null: {}", notif.getChannelId());
+            return;
+        }
+
+        textChannel.sendMessage(notif.getMessage()).queue();
         textChannel.sendMessage(new MixerEmbedBuilder(notif, queryJson)
                 .setCustomAuthor()
                 .setCustomTitle()
@@ -55,7 +60,12 @@ public class NotifSender {
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
 
-        Objects.requireNonNull(textChannel).sendMessage(notif.getMessage()).queue();
+        if (textChannel == null) {
+            log.info("Notification text channel was null: {}", notif.getChannelId());
+            return;
+        }
+
+        textChannel.sendMessage(notif.getMessage()).queue();
         textChannel.sendMessage(notif.getMessage()).queue();
         log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
@@ -73,7 +83,12 @@ public class NotifSender {
         if (!isGuildReachable(notif, guild)) return;
         if (!isChannelReachable(notif, textChannel)) return;
 
-        Objects.requireNonNull(textChannel).sendMessage(notif.getStreamEndMessage()).queue();
+        if (textChannel == null) {
+            log.info("Notification text channel was null: {}", notif.getChannelId());
+            return;
+        }
+
+        textChannel.sendMessage(notif.getStreamEndMessage()).queue();
         log.info("Sent stream end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
 
@@ -86,9 +101,9 @@ public class NotifSender {
         return true;
     }
 
-    private static boolean isChannelReachable(Notification notif, TextChannel textChannel) {
+    private static boolean isChannelReachable(final Notification notif, final TextChannel txtChannel) {
         if (!Objects.requireNonNull(ShardService.getInstance().getGuildById(notif.getServerId()))
-                .getTextChannels().contains(textChannel)) {
+                .getTextChannels().contains(txtChannel)) {
             log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
             DatabaseDriver.getInstance().deleteNotif(notif.getId());
             log.info("Deleted the notification in G:{} C:{} for {} ({})",

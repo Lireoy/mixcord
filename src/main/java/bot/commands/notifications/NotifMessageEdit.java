@@ -43,7 +43,7 @@ public class NotifMessageEdit extends Command {
         final String[] commandExamples = {BotConstants.PREFIX + this.name +
                 " shroud, Hey guys! shroud is streaming, and this is a new notification message!"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -52,16 +52,13 @@ public class NotifMessageEdit extends Command {
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
 
-        String streamerName = "";
-        String newMessage = "";
-
         if (args.length < 2) {
             commandEvent.reply("Please provide a full configuration." + example);
             return;
         }
 
-        streamerName = args[0].trim();
-        newMessage = args[1].trim();
+        String streamerName = args[0].trim();
+        String newMessage = args[1].trim();
 
         if (streamerName.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
@@ -83,7 +80,7 @@ public class NotifMessageEdit extends Command {
             return;
         }
 
-        Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply("There is no such notification in this channel");
             return;

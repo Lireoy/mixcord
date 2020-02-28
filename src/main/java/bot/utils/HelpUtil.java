@@ -20,59 +20,59 @@ public class HelpUtil {
         return helpUtil;
     }
 
-    public boolean sendCommandHelp(Command command, CommandEvent commandEvent, String[] commandExamples) {
-        if (commandEvent.getArgs().equals("--help")) {
+    public boolean sendCommandHelp(final Command cmd, final CommandEvent cmdEvent, final String[] cmdExamples) {
+        if (cmdEvent.getArgs().equals("--help")) {
             EmbedBuilder embedBuilder = new MixerEmbedBuilder()
-                    .setTitle(command.getName() + " command")
-                    .addField("Category", command.getCategory().getName(), false)
-                    .addField("Name", command.getName(), false);
+                    .setTitle(cmd.getName() + " command")
+                    .addField("Category", cmd.getCategory().getName(), false)
+                    .addField("Name", cmd.getName(), false);
 
 
-            if (command.getArguments() != null)
-                embedBuilder.addField("Parameters", command.getArguments(), false);
+            if (cmd.getArguments() != null)
+                embedBuilder.addField("Parameters", cmd.getArguments(), false);
 
             StringBuilder example = new StringBuilder();
-            for (String commandExample : commandExamples) {
+            for (String commandExample : cmdExamples) {
                 example.append("`").append(commandExample).append("`\n");
             }
 
             embedBuilder.addField("Command usage example", example.toString(), false);
 
-            if (command.getAliases().length != 0) {
+            if (cmd.getAliases().length != 0) {
                 StringBuilder builder = new StringBuilder();
-                for (String alias : command.getAliases())
+                for (String alias : cmd.getAliases())
                     builder.append(alias).append(", ");
 
-                String aliases = StringUtil.replaceLastComma(builder.toString());
+                final String aliases = StringUtil.replaceLastComma(builder.toString());
                 embedBuilder.addField("Aliases", aliases, false);
             }
 
-            if (!command.getHelp().equals("no help available"))
-                embedBuilder.addField("What it does", command.getHelp(), false);
+            if (!cmd.getHelp().equals("no help available"))
+                embedBuilder.addField("What it does", cmd.getHelp(), false);
 
-            if (command.getBotPermissions().length != 0) {
-                Permission[] botPermissions = command.getBotPermissions();
+            if (cmd.getBotPermissions().length != 0) {
+                Permission[] botPermissions = cmd.getBotPermissions();
                 StringBuilder builder = new StringBuilder();
                 for (Permission permission : botPermissions) {
                     builder.append(permission.getName()).append(", ");
                 }
-                String botPermissionString = StringUtil.replaceLastComma(builder.toString());
+                final String botPermissionString = StringUtil.replaceLastComma(builder.toString());
                 embedBuilder.addField("Required bot permissions", botPermissionString, false);
             }
 
-            if (command.getUserPermissions().length != 0) {
-                Permission[] userPermissions = command.getUserPermissions();
+            if (cmd.getUserPermissions().length != 0) {
+                Permission[] userPermissions = cmd.getUserPermissions();
                 StringBuilder builder = new StringBuilder();
                 for (Permission permission : userPermissions) {
                     builder.append(permission.getName()).append(", ");
                 }
 
-                String userPermissionString = StringUtil.replaceLastComma(builder.toString());
+                final String userPermissionString = StringUtil.replaceLastComma(builder.toString());
                 embedBuilder.addField("Required user permissions", userPermissionString, false);
             }
 
 
-            commandEvent.reply(embedBuilder.build());
+            cmdEvent.reply(embedBuilder.build());
             return true;
         }
 

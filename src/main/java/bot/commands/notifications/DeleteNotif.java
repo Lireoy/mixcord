@@ -41,7 +41,7 @@ public class DeleteNotif extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -60,7 +60,8 @@ public class DeleteNotif extends Command {
             return;
         }
 
-        final Cursor notificationCursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, username);
+        final Cursor notificationCursor = DatabaseDriver.getInstance()
+                .selectOneNotification(serverId, channelId, username);
         if (!notificationCursor.hasNext()) {
             commandEvent.reply("There is no such notification...");
             return;
@@ -86,7 +87,7 @@ public class DeleteNotif extends Command {
         final String streamerName = channel.getString("token");
          */
 
-        Notification notif = new Gson().fromJson(notificationCursor.next().toString(), Notification.class);
+        final Notification notif = new Gson().fromJson(notificationCursor.next().toString(), Notification.class);
         notificationCursor.close();
 
         DatabaseDriver.getInstance().deleteNotif(notif.getId());
@@ -97,7 +98,7 @@ public class DeleteNotif extends Command {
 
         Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());
         if (!cursor.hasNext()) {
-            boolean streamerDeleteResponse = DatabaseDriver.getInstance().deleteStreamer(notif.getStreamerId());
+            final boolean streamerDeleteResponse = DatabaseDriver.getInstance().deleteStreamer(notif.getStreamerId());
 
             if (streamerDeleteResponse) {
                 log.info("There are no more notifications for {} - {}. Deleted from database.",

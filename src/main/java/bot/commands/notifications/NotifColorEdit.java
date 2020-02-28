@@ -42,7 +42,7 @@ public class NotifColorEdit extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud, f2ff00"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -51,16 +51,13 @@ public class NotifColorEdit extends Command {
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, 32a852`";
 
-        String streamerName = "";
-        String newColor = "";
-
         if (args.length < 2) {
             commandEvent.reply("Please provide a full configuration." + example);
             return;
         }
 
-        streamerName = args[0].trim();
-        newColor = args[1].trim();
+        String streamerName = args[0].trim();
+        String newColor = args[1].trim();
 
 
         if (streamerName.isEmpty()) {
@@ -89,7 +86,7 @@ public class NotifColorEdit extends Command {
             return;
         }
 
-        Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
+        final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
         newColor = HexUtil.getInstance().formatHex(newColor).trim();

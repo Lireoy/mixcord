@@ -43,7 +43,7 @@ public class Whitelist extends Command {
                 BotConstants.PREFIX + this.name + " all"
         };
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -71,12 +71,12 @@ public class Whitelist extends Command {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
                 final Guild guild = ShardService.getInstance().getGuildById(server.getServerId());
 
-                String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
-                String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
-                String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
+                final String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
+                final String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
+                final String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
 
-                String line = "· <@%s> - `%s` - `%s` - `%s members`\n";
-                String formattedLine = String.format(line,
+                final String line = "· <@%s> - `%s` - `%s` - `%s members`\n";
+                final String formattedLine = String.format(line,
                         guildOwnerId, guildName, server.getServerId(), guildMemberCount);
                 serversDetails.append(formattedLine);
             }

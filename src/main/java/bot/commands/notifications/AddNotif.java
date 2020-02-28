@@ -47,7 +47,7 @@ public class AddNotif extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -74,7 +74,7 @@ public class AddNotif extends Command {
         }
 
 
-        Server server = new Gson().fromJson(cursor.next().toString(), Server.class);
+        final Server server = new Gson().fromJson(cursor.next().toString(), Server.class);
         cursor.close();
         final ArrayList list = DatabaseDriver.getInstance().selectServerNotifsOrdered(serverId);
         if (server.isWhitelisted()) {

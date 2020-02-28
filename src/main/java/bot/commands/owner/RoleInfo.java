@@ -39,7 +39,7 @@ public class RoleInfo extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " testers"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
@@ -66,7 +66,7 @@ public class RoleInfo extends Command {
 
         final Role role = found.get(0);
 
-        String title = "Information about `" + role.getName() + "`:";
+        final String title = "Information about `" + role.getName() + "`:";
         StringBuilder permissions = new StringBuilder();
         final List<Member> list = role.isPublicRole() ? commandEvent.getGuild().getMembers() : commandEvent.getGuild().getMembersWithRoles(role);
 
