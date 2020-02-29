@@ -38,7 +38,6 @@ public class ClientService {
     }
 
     public static void help(CommandEvent event) {
-        // TODO: Write HelpUtil, and implement it in each command
         StringBuilder helpMessage = new StringBuilder();
         String botName = event.getSelfUser().getName();
 
@@ -98,7 +97,6 @@ public class ClientService {
 
     /*
     public static void help(CommandEvent event) {
-        //TODO: group commands by category, and not by order
         StringBuilder helpBuilder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
         Command.Category category = null;
         for (Command command : ClientService.instance.getCommands()) {
