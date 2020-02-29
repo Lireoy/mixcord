@@ -186,7 +186,6 @@ public class NotifService implements Runnable {
     public void stop() {
         try {
             WorkStatus.getInstance().markFinished();
-            worker = null;
             log.info("Stopping notifier service...");
         } catch (SecurityException ex) {
             log.info("Security exception.");

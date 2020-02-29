@@ -9,7 +9,7 @@ public class WorkStatus {
     private volatile boolean running;
 
     private WorkStatus() {
-        log.info("WorkStatus constructor called");
+        log.info("WorkStatus class - WorkStatus constructor called");
         this.running = false;
     }
 
@@ -25,12 +25,12 @@ public class WorkStatus {
     }
 
     public synchronized void markStarted() {
-        log.info("markStarted()");
+        log.info("WorkStatus class - markStarted()");
         this.running = true;
     }
 
     public synchronized void markFinished() {
-        log.info("markFinished()");
+        log.info("WorkStatus class - markFinished()");
         this.running = false;
     }
 }
