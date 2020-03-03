@@ -176,7 +176,6 @@ public class NotifService implements Runnable {
                 log.info(msg);
             } else {
                 WorkStatus.getInstance().markStarted();
-                worker.start();
                 msg = "Thread is alive but not running. Started it.";
                 log.info(msg);
             }
