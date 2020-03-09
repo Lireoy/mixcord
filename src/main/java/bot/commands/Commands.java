@@ -39,6 +39,7 @@ public class Commands {
 
                 // Owner
                 new Whitelist(),
+                new GetServerShard(),
                 new NotifServiceStatus(),
                 new StartNotifService(),
                 new StopNotifService(),
