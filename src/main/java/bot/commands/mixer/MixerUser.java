@@ -8,6 +8,7 @@ import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
+import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +64,8 @@ public class MixerUser extends Command {
             }
 
             final int id = channel.getInt("id");
-            final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id + MixerConstants.MIXER_THUMB_POST;
+            final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id +
+                    MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
             final String username = channel.getString("token");
 
             final JSONObject user = channel.getJSONObject("user");

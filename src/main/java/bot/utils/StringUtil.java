@@ -1,9 +1,14 @@
 package bot.utils;
 
+import bot.constants.BotConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * This class is a complementary class for the {@link String} class,
@@ -48,6 +53,22 @@ public class StringUtil {
 
     public static String replaceLastComma(final String text) {
         return text.replaceFirst("(?s)(.*)" + ", ", "$1" + "");
+    }
+
+    public static String generateRandomString(int minLength, int maxLength) {
+        List<Character> letters = new ArrayList<>();
+        for (char c : BotConstants.RANDOM_GEN_STRING.toCharArray())
+            letters.add(c);
+
+        Collections.shuffle(letters);
+        StringBuilder randomString = new StringBuilder();
+
+        Random random = new Random();
+        for (int i = random.nextInt(maxLength - minLength) + minLength; i > 0; --i) {
+            randomString.append(letters.get(random.nextInt(letters.size())));
+        }
+
+        return randomString.toString();
     }
 
     public static void displayAscii() {

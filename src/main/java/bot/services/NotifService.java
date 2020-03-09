@@ -50,7 +50,11 @@ public class NotifService implements Runnable {
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
 
-                    assert queryJson != null;
+                    if (queryJson == null) {
+                        log.info("queryJson was null.");
+                        return;
+                    }
+
                     boolean queryIsOnline = queryJson.getBoolean("online");
 
                     if (queryIsOnline && !streamer.isStreaming()) {

@@ -10,8 +10,5 @@
         <module name="Mixcord" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="mixcord" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

@@ -24,8 +24,8 @@ public class NotifSender {
      */
     public static void sendEmbed(final Notification notif, final JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
-        final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE +
-                queryChId + MixerConstants.MIXER_THUMB_POST ;
+        final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE + queryChId +
+                MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
 
         final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
         final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
