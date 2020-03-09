@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>bot</groupId>
-    <artifactId>Mixcord</artifactId>
-    <version>1.0-RELEASE</version>
+    <artifactId>mixcord</artifactId>
+    <version>1.0</version>
 
     <properties>
         <java.version>1.8</java.version>
@@ -96,6 +96,7 @@
 
     <build>
         <plugins>
+            <!-- compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -105,6 +106,7 @@
                     <source>${java.version}</source>
                 </configuration>
             </plugin>
+            <!-- jar package -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -116,6 +118,30 @@
                             <mainClass>bot.Mixcord</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+            <!-- build number -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>true</doCheck>
+                    <doUpdate>true</doUpdate>
+                    <format>{0,number}.{1,number}.{2,number}</format>
+                    <items>
+                        <item>buildNumber0</item>
+                        <item>buildNumber1</item>
+                        <item>buildNumber2</item>
+                    </items>
                 </configuration>
             </plugin>
         </plugins>
