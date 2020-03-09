@@ -1,7 +1,7 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.DeveloperConstants;
+import bot.constants.DevConstants;
 import bot.constants.HelpConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Server;
@@ -69,7 +69,7 @@ public class AddNotif extends Command {
         Cursor cursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (!cursor.hasNext()) {
             commandEvent.reply("This server does not exist in the database. " +
-                    "Please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
+                    "Please contact the developer: <@" + DevConstants.OWNER_ID + ">");
             return;
         }
 
@@ -95,7 +95,7 @@ public class AddNotif extends Command {
         if (channel == JSONObject.NULL) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
+                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
             return;
         }
 
@@ -110,7 +110,7 @@ public class AddNotif extends Command {
 
         if (streamerName.isEmpty() || streamerId.isEmpty()) {
             commandEvent.reply("Streamer name or ID is empty. " +
-                    "Please contact the developer: <@" + DeveloperConstants.OWNER_ID + ">");
+                    "Please contact the developer: <@" + DevConstants.OWNER_ID + ">");
             log.info("Streamer name or ID was empty.");
             return;
         }

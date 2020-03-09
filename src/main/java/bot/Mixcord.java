@@ -1,6 +1,6 @@
 package bot;
 
-import bot.constants.DeveloperConstants;
+import bot.constants.DevConstants;
 import bot.services.ClientService;
 import bot.services.NotifService;
 import bot.services.ShardService;
@@ -34,6 +34,6 @@ public class Mixcord {
         // the notifier service manually on every startup
         NotifService.getInstance();
         log.info("Notifier service was started.");
-        log.info("Posting metrics to G:{} - C:{}", DeveloperConstants.METRICS_GUILD, DeveloperConstants.METRICS_CHANNEL);
+        log.info("Posting metrics to G:{} - C:{}", DevConstants.METRICS_GUILD, DevConstants.METRICS_CHANNEL);
     }
 }

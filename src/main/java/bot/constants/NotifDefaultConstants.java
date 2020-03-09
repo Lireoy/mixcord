@@ -1,6 +1,6 @@
 package bot.constants;
 
-public class NotificationDefaultConstants {
+public class NotifDefaultConstants {
 
     public static final boolean NOTIF_EMBED_DEFAULT = true;
     public static final String NOTIF_EMBED_COLOR_DEFAULT = "ffffff";

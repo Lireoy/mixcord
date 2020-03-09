@@ -2,7 +2,7 @@ package bot.services;
 
 import bot.commands.Commands;
 import bot.constants.BotConstants;
-import bot.constants.DeveloperConstants;
+import bot.constants.DevConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -21,8 +21,8 @@ public class ClientService {
         instance = new CommandClientBuilder()
                 .setPrefix(BotConstants.PREFIX)
                 .setAlternativePrefix("@mention")
-                .setOwnerId(DeveloperConstants.OWNER_ID)
-                .setCoOwnerIds(DeveloperConstants.CO_OWNER_ID, DeveloperConstants.CO_OWNER_ID2)
+                .setOwnerId(DevConstants.OWNER_ID)
+                .setCoOwnerIds(DevConstants.CO_OWNER_ID, DevConstants.CO_OWNER_ID2)
                 .setEmojis(BotConstants.SUCCESS, BotConstants.WARNING, BotConstants.ERROR)
                 .setServerInvite(BotConstants.DISCORD)
                 .addCommands(Commands.getCommands())

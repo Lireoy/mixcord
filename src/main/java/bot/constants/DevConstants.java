@@ -1,6 +1,6 @@
 package bot.constants;
 
-public class DeveloperConstants {
+public class DevConstants {
 
     public static final String OWNER_ID = "331756964801544202"; // Lireoy
     public static final String CO_OWNER_ID = "236251438685093889"; // Akira
