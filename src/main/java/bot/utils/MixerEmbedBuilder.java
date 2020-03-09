@@ -121,8 +121,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         if (mixerInfo == null) return this;
 
         String gameName = mixerInfo.getJSONObject("type").getString("name");
-        String currentViewers = String.valueOf(mixerInfo.getJSONObject("type")
-                .getInt("viewersCurrent"));
+        String currentViewers = String.valueOf(mixerInfo.getInt("viewersCurrent"));
 
         String description = "Playing " + gameName + " for " + currentViewers + " viewers.\n"
                 + "[Click Here to Watch](" + getChannelLink() + ")";
