@@ -49,82 +49,93 @@ public class MixerUser extends Command {
 
         final String query = commandEvent.getArgs().trim();
 
-        // Empty args check
         if (query.isEmpty()) {
             commandEvent.reply("Please provide a streamer name!");
-        } else if (query.length() > 20) {
+            return;
+        }
+
+        if (query.length() > 20) {
             commandEvent.reply("This name is too long! Please provide a shorter one!");
+            return;
+        }
+
+        final JSONObject channel = MixerQuery.queryChannel(query);
+
+
+        // Non existent streamer queries return with null from Mixer API
+        if (channel == JSONObject.NULL) {
+            commandEvent.reply("There is no such streamer...");
+            return;
+        }
+
+        if (channel == null) {
+            commandEvent.reactError();
+            commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
+                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+            return;
+        }
+
+        final int id = channel.getInt("id");
+        final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id +
+                MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
+        final String username = channel.getString("token");
+
+        final JSONObject user = channel.getJSONObject("user");
+        final Object avatarObject = user.get("avatarUrl");
+        final String avatarUrl = avatarObject == JSONObject.NULL ? MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
+        final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
+        final String isVerified = user.getBoolean("verified") ? BotConstants.SUCCESS : BotConstants.ERROR;
+        final String isPartnered = channel.getBoolean("partnered") ? BotConstants.SUCCESS : BotConstants.ERROR;
+        final boolean streaming = channel.getBoolean("online");
+        final String isOnline = channel.getBoolean("online") ? BotConstants.SUCCESS : BotConstants.ERROR;
+        final String isFeatured = channel.getBoolean("featured") ? BotConstants.SUCCESS : BotConstants.ERROR;
+
+        final String trusted =
+                "Verified: " + isVerified + "\n" +
+                        "Partnered: " + isPartnered + "\n";
+
+        final String status =
+                "Online: " + isOnline + "\n" +
+                        "Featured: " + isFeatured;
+
+        final String followers = String.valueOf(channel.getInt("numFollowers"));
+        final String streamTitle = channel.getString("name");
+        final String currentGame = channel.getJSONObject("type").getString("name");
+        final String language = channel.getString("languageId").toUpperCase();
+        final String targetAudience = channel.getString("audience").toUpperCase();
+        final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
+        final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
+        final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
+
+
+        if (streaming) {
+            // Live
+            commandEvent.reply(new MixerEmbedBuilder(channel)
+                    .setCustomAuthor()
+                    .setThumbnail(avatarUrl)
+                    .addField("Bio", bio.toString(), false)
+                    .addField("Trusted", trusted, true)
+                    .addField("Status", status, true)
+                    .addField("Followers", followers, false)
+                    .addField("Currently live", streamTitle, false)
+                    .addField("Game", currentGame, true)
+                    .addField("Viewers", viewersCurrent, true)
+                    .addField("Language", language, true)
+                    .addField("Target audience", targetAudience, true)
+                    .addField("Link", liveStreamLink, false)
+                    .setImage(liveThumbnail)
+                    .build());
         } else {
-            final JSONObject channel = MixerQuery.queryChannel(query);
-            if (channel == null) {
-                commandEvent.reactError();
-                commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                        "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
-                return;
-            }
-
-            final int id = channel.getInt("id");
-            final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id +
-                    MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
-            final String username = channel.getString("token");
-
-            final JSONObject user = channel.getJSONObject("user");
-            final Object avatarObject = user.get("avatarUrl");
-            final String avatarUrl = avatarObject == JSONObject.NULL ? MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
-            final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
-            final String isVerified = user.getBoolean("verified") ? BotConstants.SUCCESS : BotConstants.ERROR;
-            final String isPartnered = channel.getBoolean("partnered") ? BotConstants.SUCCESS : BotConstants.ERROR;
-            final boolean streaming = channel.getBoolean("online");
-            final String isOnline = channel.getBoolean("online") ? BotConstants.SUCCESS : BotConstants.ERROR;
-            final String isFeatured = channel.getBoolean("featured") ? BotConstants.SUCCESS : BotConstants.ERROR;
-
-            final String trusted =
-                    "Verified: " + isVerified + "\n" +
-                            "Partnered: " + isPartnered + "\n";
-
-            final String status =
-                    "Online: " + isOnline + "\n" +
-                            "Featured: " + isFeatured;
-
-            final String followers = String.valueOf(channel.getInt("numFollowers"));
-            final String streamTitle = channel.getString("name");
-            final String currentGame = channel.getJSONObject("type").getString("name");
-            final String language = channel.getString("languageId").toUpperCase();
-            final String targetAudience = channel.getString("audience").toUpperCase();
-            final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
-            final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
-            final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
-
-
-            if (streaming) {
-                // Live
-                commandEvent.reply(new MixerEmbedBuilder(channel)
-                        .setCustomAuthor()
-                        .setThumbnail(avatarUrl)
-                        .addField("Bio", bio.toString(), false)
-                        .addField("Trusted", trusted, true)
-                        .addField("Status", status, true)
-                        .addField("Followers", followers, false)
-                        .addField("Currently live", streamTitle, false)
-                        .addField("Game", currentGame, true)
-                        .addField("Viewers", viewersCurrent, true)
-                        .addField("Language", language, true)
-                        .addField("Target audience", targetAudience, true)
-                        .addField("Link", liveStreamLink, false)
-                        .setImage(liveThumbnail)
-                        .build());
-            } else {
-                // Offline
-                commandEvent.reply(new MixerEmbedBuilder(channel)
-                        .setCustomAuthor()
-                        .setCustomImage()
-                        .setThumbnail(avatarUrl)
-                        .addField("Bio", bio.toString(), false)
-                        .addField("Trusted", trusted, true)
-                        .addField("Status", status, true)
-                        .addField("Followers", followers, true)
-                        .build());
-            }
+            // Offline
+            commandEvent.reply(new MixerEmbedBuilder(channel)
+                    .setCustomAuthor()
+                    .setCustomImage()
+                    .setThumbnail(avatarUrl)
+                    .addField("Bio", bio.toString(), false)
+                    .addField("Trusted", trusted, true)
+                    .addField("Status", status, true)
+                    .addField("Followers", followers, true)
+                    .build());
         }
     }
 }

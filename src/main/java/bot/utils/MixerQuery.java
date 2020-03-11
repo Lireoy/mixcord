@@ -51,13 +51,17 @@ public class MixerQuery {
             if (status >= 200 && status < 300) {
                 final HttpEntity entity = response.getEntity();
                 return new JSONObject(EntityUtils.toString(entity));
-            } else {
-                log.info("Request failed: {}", uri);
-                log.info("Unexpected response status: {}", status);
-                EntityUtils.consumeQuietly(response.getEntity());
-                //log.info("Full response: {}", response);
-                return null;
             }
+
+            if (status == 404) {
+                EntityUtils.consumeQuietly(response.getEntity());
+                return new JSONObject(JSONObject.NULL);
+            }
+
+            log.info("Request failed: {}", uri);
+            log.info("Unexpected response status: {}", status);
+            EntityUtils.consumeQuietly(response.getEntity());
+            return null;
         } catch (SocketTimeoutException | ClientProtocolException e) {
             log.info("Caught an exception: {}", e.getMessage());
             e.printStackTrace();

@@ -1,6 +1,7 @@
 package bot.commands.mixer;
 
 import bot.constants.BotConstants;
+import bot.constants.DevConstants;
 import bot.constants.HelpConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -58,9 +59,15 @@ public class MixerUserSocials extends Command {
         }
 
         final JSONObject channel = MixerQuery.queryChannel(streamerName);
-        if (channel == null) {
+        if (channel == JSONObject.NULL) {
             commandEvent.reply("There is no such streamer...");
+            return;
+        }
+
+        if (channel == null) {
             commandEvent.reactError();
+            commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
+                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
             return;
         }
 

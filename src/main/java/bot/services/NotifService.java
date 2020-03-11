@@ -44,18 +44,23 @@ public class NotifService implements Runnable {
         try {
             while (WorkStatus.getInstance().isRunning()) {
                 MetricsUtil.getInstance().startTimer();
-                Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
+                final Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
 
                 for (Object streamerObj : streamers) {
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
-                    JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
+                    final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
+
+                    if (queryJson == JSONObject.NULL) {
+                        log.info("Streamer not found.");
+                        return;
+                    }
 
                     if (queryJson == null) {
                         log.info("queryJson was null.");
                         return;
                     }
 
-                    boolean queryIsOnline = queryJson.getBoolean("online");
+                    final boolean queryIsOnline = queryJson.getBoolean("online");
 
                     if (queryIsOnline && !streamer.isStreaming()) {
                         // Was offline, is now online

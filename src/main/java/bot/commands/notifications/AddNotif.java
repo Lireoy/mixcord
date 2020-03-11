@@ -93,15 +93,16 @@ public class AddNotif extends Command {
         // Query Mixer to get case-correct streamer name, ID etc.
         final JSONObject channel = MixerQuery.queryChannel(query);
         if (channel == JSONObject.NULL) {
-            commandEvent.reactError();
-            commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+            commandEvent.reply("There is no such streamer...");
             return;
         }
 
         // Non existent streamer queries return with null from Mixer API
         if (channel == null) {
-            commandEvent.reply("There is no such streamer...");
+            commandEvent.reactError();
+            commandEvent.reply("Query response JSON was null, when adding a notification, " +
+                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+
             return;
         }
 
