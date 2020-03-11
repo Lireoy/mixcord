@@ -61,17 +61,15 @@ public class MixerUser extends Command {
 
         final JSONObject channel = MixerQuery.queryChannel(query);
 
-
-        // Non existent streamer queries return with null from Mixer API
-        if (channel == JSONObject.NULL) {
-            commandEvent.reply("There is no such streamer...");
-            return;
-        }
-
         if (channel == null) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
                     "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+            return;
+        }
+
+        if (channel.isEmpty()) {
+            commandEvent.reply("There is no such streamer...");
             return;
         }
 

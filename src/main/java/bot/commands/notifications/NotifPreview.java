@@ -76,16 +76,16 @@ public class NotifPreview extends Command {
         if (notif.isEmbed()) {
             final JSONObject queryJson = MixerQuery.queryChannel(notif.getStreamerName());
 
-            if (queryJson == JSONObject.NULL) {
-                commandEvent.reply("Streamer not found on Mixer.");
-                log.info("Streamer not found on Mixer.");
-                return;
-            }
-
             if (queryJson == null) {
                 commandEvent.reactError();
                 commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
                         "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+                return;
+            }
+
+            if (queryJson.isEmpty()) {
+                commandEvent.reply("Streamer not found on Mixer.");
+                log.info("Streamer not found on Mixer.");
                 return;
             }
 
