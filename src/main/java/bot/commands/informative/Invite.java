@@ -23,7 +23,6 @@ public class Invite extends Command {
         this.help = HelpConstants.INVITE_COMMAND_HELP;
         this.category = new Category(CommandCategory.INFORMATIVE.toString());
         this.guildOnly = true;
-        this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
