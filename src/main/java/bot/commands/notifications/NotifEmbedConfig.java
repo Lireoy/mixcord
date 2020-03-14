@@ -72,7 +72,6 @@ public class NotifEmbedConfig extends Command {
         }
 
         if (sendAsEmbed.isEmpty()) {
-
             commandEvent.reply("Please provide a full configuration." + example);
             return;
         }
@@ -104,8 +103,8 @@ public class NotifEmbedConfig extends Command {
         final String MIXER_PATTERN2 = MixerConstants.HTTP_MIXER_COM + notif.getStreamerName();
         boolean containsLink = false;
 
-        if (notif.getMessage().contains(MIXER_PATTERN)) containsLink = true;
-        if (notif.getMessage().contains(MIXER_PATTERN2)) containsLink = true;
+        if (StringUtil.containsIgnoreCase(notif.getMessage(), MIXER_PATTERN)) containsLink = true;
+        if (StringUtil.containsIgnoreCase(notif.getMessage(), MIXER_PATTERN2)) containsLink = true;
 
         if (!containsLink) {
             commandEvent.reply("Your notification message does not contain a link to the streamer. " +
