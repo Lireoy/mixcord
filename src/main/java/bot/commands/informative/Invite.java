@@ -41,11 +41,13 @@ public class Invite extends Command {
         if (helpResponse) return;
 
         final String clientId = commandEvent.getSelfUser().getId();
+        String description = "[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=%s&permissions=347200&scope=bot)";
+        String finalDescription = String.format(description, clientId);
 
         commandEvent.reactSuccess();
         commandEvent.reply(new MixerEmbedBuilder()
                 .setAuthor("Invite")
-                .setDescription("[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=" + clientId + "&permissions=347200&scope=bot)")
+                .setDescription(finalDescription)
                 .build());
     }
 }

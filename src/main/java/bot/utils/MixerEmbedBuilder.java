@@ -46,7 +46,8 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         this.notif = notif;
         this.setCustomColor();
         this.setImage(MixerConstants.MIXER_BANNER_DEFAULT);
-        this.setFooter(BotConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(BotConstants.MIXCORD_IO_EMBED_FOOTER,
+                ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -59,17 +60,12 @@ public class MixerEmbedBuilder extends EmbedBuilder {
     public MixerEmbedBuilder setCustomAuthor() {
         if (mixerInfo == null) return this;
 
-        Object authorImg = null;
-        try {
-            authorImg = mixerInfo.getJSONObject("user").get("avatarUrl");
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        // Handles "null" as a profile picture exception
-        if (authorImg == JSONObject.NULL || authorImg == null) {
-            authorImg = MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT;
-        }
-        this.setAuthor(mixerInfo.getString("token"), getChannelLink(), authorImg.toString());
+        String authorImg = MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT;
+        JSONObject user = mixerInfo.getJSONObject("user");
+        if (user.opt("avatarUrl") != JSONObject.NULL)
+            authorImg = String.valueOf(user.opt("avatarUrl"));
+
+        this.setAuthor(mixerInfo.getString("token"), getChannelLink(), authorImg);
         return this;
     }
 
@@ -81,31 +77,33 @@ public class MixerEmbedBuilder extends EmbedBuilder {
     public MixerEmbedBuilder setCustomTitle() {
         if (mixerInfo == null) return this;
 
-        this.setTitle(mixerInfo.getString("name"), getChannelLink());
+
+        String title = "No title available.";
+        if (mixerInfo.opt("name") != JSONObject.NULL)
+            title = mixerInfo.getString("name");
+
+        this.setTitle(title, getChannelLink());
         return this;
     }
 
     public MixerEmbedBuilder setCustomImage() {
-        if (mixerInfo == null) {
-            this.setImage(MixerConstants.MIXER_BANNER_DEFAULT);
-            return this;
+        String bannerUrl = MixerConstants.MIXER_BANNER_DEFAULT;
+        if (mixerInfo != null) {
+            if (mixerInfo.opt("bannerUrl") != JSONObject.NULL)
+                bannerUrl = mixerInfo.getString("bannerUrl");
         }
 
-        final Object bannerUrl = mixerInfo.get("bannerUrl");
-        final String image = bannerUrl == JSONObject.NULL ? MixerConstants.MIXER_BANNER_DEFAULT : bannerUrl.toString();
-
-        this.setImage(image);
+        this.setImage(bannerUrl);
         return this;
     }
 
     public MixerEmbedBuilder setCustomThumbnail() {
-        if (mixerInfo == null) {
-            this.setThumbnail(MixerConstants.MIXER_BANNER_DEFAULT);
-            return this;
+        String avatarUrl = MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT;
+        if (mixerInfo != null) {
+            JSONObject user = mixerInfo.getJSONObject("user");
+            if (user.opt("avatarUrl") != JSONObject.NULL)
+                avatarUrl = user.getString("avatarUrl");
         }
-
-        final Object avatarObj = mixerInfo.getJSONObject("user").get("avatarUrl");
-        final String avatarUrl = avatarObj == JSONObject.NULL ? MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObj.toString();
 
         this.setThumbnail(avatarUrl);
         return this;
@@ -120,12 +118,18 @@ public class MixerEmbedBuilder extends EmbedBuilder {
     public MixerEmbedBuilder setCustomDescription() {
         if (mixerInfo == null) return this;
 
-        String gameName = mixerInfo.getJSONObject("type").getString("name");
-        String currentViewers = String.valueOf(mixerInfo.getInt("viewersCurrent"));
+        String currentGame = "No game available.";
+        if (mixerInfo.opt("type") != JSONObject.NULL)
+            currentGame = mixerInfo.getJSONObject("type").getString("name");
 
-        String description = "Playing " + gameName + " for " + currentViewers + " viewers.\n"
-                + "[Click Here to Watch](" + getChannelLink() + ")";
-        this.setDescription(description);
+        String viewersCurrent = "No viewers.";
+        if (mixerInfo.optInt("viewersCurrent") != 0)
+            viewersCurrent = String.valueOf(mixerInfo.getInt("viewersCurrent"));
+
+        String description = "Playing %s for %s viewers.\n[Click Here to Watch](%s)";
+        String finalDescription = String.format(description, currentGame, viewersCurrent, getChannelLink());
+
+        this.setDescription(finalDescription);
         return this;
     }
 

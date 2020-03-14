@@ -134,6 +134,7 @@ public class NotifService implements Runnable {
                 MetricsUtil.getInstance().reset();
             }
         } catch (Exception ex) {
+            /*
             if (ex instanceof InterruptedException) {
                 //TODO: create a central class to support app-wide DM report sending to owners
                 this.stop();
@@ -145,7 +146,9 @@ public class NotifService implements Runnable {
                         BotConstants.WARNING + BotConstants.WARNING;
 
                 sendReportInDm(DevConstants.OWNER_ID, message);
-            } else if (ex instanceof ReqlOpFailedError) {
+            } else*/
+
+            if (ex instanceof ReqlOpFailedError) {
                 this.stop();
                 log.info("ReqlOpFailedError");
                 ex.printStackTrace();
@@ -155,6 +158,14 @@ public class NotifService implements Runnable {
                         BotConstants.WARNING + BotConstants.WARNING;
 
                 sendReportInDm(DevConstants.OWNER_ID, message);
+            } else if (ex instanceof NullPointerException) {
+                log.info("NullPointer in the loop, sleeping then continue.");
+                try {
+                    TimeUnit.SECONDS.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                this.start();
             } else {
                 this.stop();
                 log.info("General exception");

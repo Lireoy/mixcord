@@ -77,16 +77,33 @@ public class MixerUser extends Command {
         final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id +
                 MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
         final String username = channel.getString("token");
-
         final JSONObject user = channel.getJSONObject("user");
-        final Object avatarObject = user.get("avatarUrl");
-        final String avatarUrl = avatarObject == JSONObject.NULL ? MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT : avatarObject.toString();
-        final Object bio = user.get("bio") == JSONObject.NULL ? "No bio available." : user.get("bio");
-        final String isVerified = user.getBoolean("verified") ? BotConstants.SUCCESS : BotConstants.ERROR;
-        final String isPartnered = channel.getBoolean("partnered") ? BotConstants.SUCCESS : BotConstants.ERROR;
-        final boolean streaming = channel.getBoolean("online");
-        final String isOnline = channel.getBoolean("online") ? BotConstants.SUCCESS : BotConstants.ERROR;
-        final String isFeatured = channel.getBoolean("featured") ? BotConstants.SUCCESS : BotConstants.ERROR;
+
+        String avatarUrl = MixerConstants.MIXER_PROFILE_PICTURE_DEFAULT;
+        if (user.opt("avatarUrl") != JSONObject.NULL)
+            avatarUrl = user.getString("avatarUrl");
+
+        String bio = "No bio available.";
+        if (!user.optString("bio").isEmpty())
+            bio = user.getString("bio");
+
+        String isVerified = BotConstants.ERROR;
+        if (user.optBoolean("verified"))
+            isVerified = BotConstants.SUCCESS;
+
+        String isPartnered = BotConstants.ERROR;
+        if (user.optBoolean("partnered"))
+            isPartnered = BotConstants.SUCCESS;
+
+        final boolean streaming = channel.optBoolean("online");
+
+        String isOnline = BotConstants.ERROR;
+        if (channel.optBoolean("online"))
+            isOnline = BotConstants.SUCCESS;
+
+        String isFeatured = BotConstants.ERROR;
+        if (channel.optBoolean("featured"))
+            isFeatured = BotConstants.SUCCESS;
 
         final String trusted =
                 "Verified: " + isVerified + "\n" +
@@ -96,12 +113,30 @@ public class MixerUser extends Command {
                 "Online: " + isOnline + "\n" +
                         "Featured: " + isFeatured;
 
-        final String followers = String.valueOf(channel.getInt("numFollowers"));
-        final String streamTitle = channel.getString("name");
-        final String currentGame = channel.getJSONObject("type").getString("name");
-        final String language = channel.getString("languageId").toUpperCase();
-        final String targetAudience = channel.getString("audience").toUpperCase();
-        final String viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
+        String followers = "No followers.";
+        if (channel.optInt("numFollowers") != 0)
+            followers = String.valueOf(channel.optInt("numFollowers"));
+
+        String streamTitle = "No stream title available.";
+        if (!channel.optString("name").isEmpty())
+            streamTitle = channel.getString("name");
+
+        String currentGame = "No game available.";
+        if (channel.opt("type") != JSONObject.NULL)
+            currentGame = channel.getJSONObject("type").getString("name");
+
+        String language = "No language available.";
+        if (channel.opt("languageId") != JSONObject.NULL)
+            language = channel.getString("languageId").toUpperCase();
+
+        String targetAudience = "No audience available.";
+        if (!channel.optString("audience").isEmpty())
+            targetAudience = channel.getString("audience").toUpperCase();
+
+        String viewersCurrent = "No viewers.";
+        if (channel.optInt("viewersCurrent") != 0)
+            viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
+
         final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
         final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
 
@@ -111,7 +146,7 @@ public class MixerUser extends Command {
             commandEvent.reply(new MixerEmbedBuilder(channel)
                     .setCustomAuthor()
                     .setThumbnail(avatarUrl)
-                    .addField("Bio", bio.toString(), false)
+                    .addField("Bio", bio, false)
                     .addField("Trusted", trusted, true)
                     .addField("Status", status, true)
                     .addField("Followers", followers, false)
@@ -129,7 +164,7 @@ public class MixerUser extends Command {
                     .setCustomAuthor()
                     .setCustomImage()
                     .setThumbnail(avatarUrl)
-                    .addField("Bio", bio.toString(), false)
+                    .addField("Bio", bio, false)
                     .addField("Trusted", trusted, true)
                     .addField("Status", status, true)
                     .addField("Followers", followers, true)

@@ -73,46 +73,45 @@ public class MixerUserSocials extends Command {
         }
 
         final JSONObject user = channel.getJSONObject("user");
-        final JSONObject socials = user.getJSONObject("social");
-
+        final JSONObject socials = user.optJSONObject("social");
 
         StringBuilder description = new StringBuilder();
         boolean hasSocial = false;
 
         if (socials.has("facebook")) {
-            description.append("· [Facebook](").append(socials.getString("facebook")).append(")\n");
+            description.append("· [Facebook](").append(socials.optString("facebook")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("instagram")) {
-            description.append("· [Instagram](").append(socials.getString("instagram")).append(")\n");
+            description.append("· [Instagram](").append(socials.optString("instagram")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("twitter")) {
-            description.append("· [Twitter](").append(socials.getString("twitter")).append(")\n");
+            description.append("· [Twitter](").append(socials.optString("twitter")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("youtube")) {
-            description.append("· [Youtube](").append(socials.getString("youtube")).append(")\n");
+            description.append("· [Youtube](").append(socials.optString("youtube")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("discord")) {
-            description.append("· [Discord](").append(socials.getString("discord")).append(")\n");
+            description.append("· [Discord](").append(socials.optString("discord")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("patreon")) {
-            description.append("· [Patreon](").append(socials.getString("patreon")).append(")\n");
+            description.append("· [Patreon](").append(socials.optString("patreon")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("player")) {
-            description.append("· [Player](").append(socials.getString("player")).append(")\n");
+            description.append("· [Player](").append(socials.optString("player")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("soundcloud")) {
-            description.append("· [Soundcloud](").append(socials.getString("soundcloud")).append(")\n");
+            description.append("· [Soundcloud](").append(socials.optString("soundcloud")).append(")\n");
             hasSocial = true;
         }
         if (socials.has("steam")) {
-            description.append("· [Steam](").append(socials.getString("steam")).append(")\n");
+            description.append("· [Steam](").append(socials.optString("steam")).append(")\n");
             hasSocial = true;
         }
         // TODO: FIND A SPREADSHIRT LINKED ACCOUNT
