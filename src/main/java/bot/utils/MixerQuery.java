@@ -1,7 +1,6 @@
 package bot.utils;
 
 import bot.constants.MixerConstants;
-import bot.services.NotifService;
 import bot.structures.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -61,15 +60,12 @@ public class MixerQuery {
             log.info("Request failed: {}", uri);
             log.info("Unexpected response status: {}", status);
             EntityUtils.consumeQuietly(response.getEntity());
-            return null;
         } catch (SocketTimeoutException | ClientProtocolException e) {
             log.info("Caught an exception: {}", e.getMessage());
             e.printStackTrace();
-            NotifService.getInstance();
         } catch (IOException e) {
             log.info("Caught an IOException: {}", e.getMessage());
             e.printStackTrace();
-            NotifService.getInstance();
         }
 
         return null;

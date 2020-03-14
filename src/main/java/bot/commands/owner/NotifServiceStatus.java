@@ -3,6 +3,7 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.services.NotifService;
+import bot.services.NotifierThread;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -28,7 +29,7 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final String state = NotifService.getInstance().getState();
+        final String state = "I aight no fukcing body knows dude.... Maybe you should implement this shite matey.";
         String message = "Notifier service state: " + state;
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};

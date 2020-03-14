@@ -2,7 +2,7 @@ package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
-import bot.services.WorkStatus;
+import bot.services.NotifierThread;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -36,8 +36,8 @@ public class StopNotifService extends Command {
         final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
+        NotifierThread.getInstance().stop();
 
-        WorkStatus.getInstance().markFinished();
         commandEvent.reactSuccess();
     }
 }

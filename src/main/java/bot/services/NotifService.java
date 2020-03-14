@@ -15,19 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 public class NotifService implements Runnable {
 
     private static NotifService instance;
-    private Thread worker;
+    private volatile boolean isRunning;
 
     private NotifService() {
-        log.info("NotifService constructor called.");
-        worker = new Thread(this);
-        WorkStatus.getInstance().markStarted();
-        this.start();
     }
 
     public static NotifService getInstance() {
@@ -37,19 +31,20 @@ public class NotifService implements Runnable {
         return instance;
     }
 
+    @Override
     public void run() {
-        log.info("run()");
-
+        log.info("Notifier service was started.");
+        this.isRunning = true;
 
         try {
-            while (WorkStatus.getInstance().isRunning()) {
+            while (isRunning) {
                 MetricsUtil.getInstance().startTimer();
                 final Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
 
                 for (Object streamerObj : streamers) {
+                    if (!isRunning) break;
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
-
 
                     if (queryJson == null) {
                         log.info("queryJson was null.");
@@ -128,28 +123,22 @@ public class NotifService implements Runnable {
 
                 if (MetricsUtil.getInstance().getSecs() <= 40) {
                     log.info("Sleeping the notifier service...");
-                    TimeUnit.SECONDS.sleep(60);
+                    long waiterStart = System.currentTimeMillis();
+                    long desiredTime = waiterStart + 60000;
+
+                    boolean toCheck = true;
+                    while (toCheck) {
+                        if (desiredTime == System.currentTimeMillis() || !isRunning) {
+                            toCheck = false;
+                        }
+                    }
                 }
 
                 MetricsUtil.getInstance().reset();
             }
         } catch (Exception ex) {
-            /*
-            if (ex instanceof InterruptedException) {
-                //TODO: create a central class to support app-wide DM report sending to owners
-                this.stop();
-                log.info("InterruptedException");
-                ex.printStackTrace();
-
-                String message = BotConstants.WARNING + BotConstants.WARNING +
-                        "The notifier service was interrupted. Terminating the notifier service." +
-                        BotConstants.WARNING + BotConstants.WARNING;
-
-                sendReportInDm(DevConstants.OWNER_ID, message);
-            } else*/
-
             if (ex instanceof ReqlOpFailedError) {
-                this.stop();
+                this.isRunning = false;
                 log.info("ReqlOpFailedError");
                 ex.printStackTrace();
 
@@ -160,61 +149,22 @@ public class NotifService implements Runnable {
                 sendReportInDm(DevConstants.OWNER_ID, message);
             } else if (ex instanceof NullPointerException) {
                 log.info("NullPointer in the loop, sleeping then continue.");
-                try {
-                    TimeUnit.SECONDS.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                this.start();
+                NotifierThread.getInstance().start();
             } else {
-                this.stop();
                 log.info("General exception");
-                ex.printStackTrace();
+                log.info("Message: {}", ex.getMessage());
+                NotifierThread.getInstance().start();
             }
         }
     }
 
-    public void start() {
-        String msg;
-
-        if (worker.getState().equals(Thread.State.NEW)) {
-            worker.start();
-            worker.setName("NotifierService");
-            msg = "Started worker...";
-            log.info(msg);
-        }
-
-        if (worker.isInterrupted()) {
-            WorkStatus.getInstance().markStarted();
-            worker.start();
-            msg = "Thread is in interrupted state. Started worker...";
-            log.info(msg);
-        }
-
-        if (worker.isAlive()) {
-            if (WorkStatus.getInstance().isRunning()) {
-                msg = "Thread is alive and is running.";
-                log.info(msg);
-            } else {
-                WorkStatus.getInstance().markStarted();
-                msg = "Thread is alive but not running. Started it.";
-                log.info(msg);
-            }
-        }
+    public void terminate() {
+        this.isRunning = false;
+        log.info("Terminating...");
     }
 
-    public void stop() {
-        try {
-            WorkStatus.getInstance().markFinished();
-            log.info("Stopping notifier service...");
-        } catch (SecurityException ex) {
-            log.info("Security exception.");
-            ex.printStackTrace();
-        }
-    }
-
-    public String getState() {
-        return worker.getState().name();
+    public boolean isRunning() {
+        return isRunning;
     }
 
     private void sendReportInDm(String userId, String message) {

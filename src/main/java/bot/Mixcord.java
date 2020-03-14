@@ -1,8 +1,6 @@
 package bot;
 
-import bot.constants.DevConstants;
 import bot.services.ClientService;
-import bot.services.NotifService;
 import bot.services.ShardService;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -28,12 +26,5 @@ public class Mixcord {
             log.info("Added co-owner: {}", coOwnerId);
 
         ShardService.getInstance();
-
-        // Starts the automatic notification system
-        // If you delete this, then you have to start
-        // the notifier service manually on every startup
-        NotifService.getInstance();
-        log.info("Notifier service was started.");
-        log.info("Posting metrics to G:{} - C:{}", DevConstants.METRICS_GUILD, DevConstants.METRICS_CHANNEL);
     }
 }

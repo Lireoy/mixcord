@@ -1,7 +1,7 @@
 package bot;
 
 import bot.database.DatabaseDriver;
-import bot.services.NotifService;
+import bot.services.NotifierThread;
 import bot.structures.Notification;
 import com.google.gson.Gson;
 import com.rethinkdb.net.Cursor;
@@ -32,6 +32,7 @@ public class EventHandler extends ListenerAdapter {
         final int unAvailable = event.getGuildUnavailableCount();
         log.info("Ready event for shard {}. Total guilds {}, Available {}, Unavailable {}",
                 shardId, total, available, unAvailable);
+        NotifierThread.getInstance().start();
     }
 
     /**
@@ -42,7 +43,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onResume(@Nonnull ResumedEvent event) {
         log.info("Resumed event...");
-        NotifService.getInstance().start();
+        NotifierThread.getInstance().start();
     }
 
     /**
@@ -53,7 +54,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onReconnect(@Nonnull ReconnectedEvent event) {
         log.info("Reconnect event...");
-        NotifService.getInstance().start();
+        NotifierThread.getInstance().start();
     }
 
     /**
@@ -65,7 +66,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onDisconnect(@Nonnull DisconnectEvent event) {
         log.info("Disconnect event...");
-        NotifService.getInstance().stop();
+        NotifierThread.getInstance().stop();
         log.info("Stopping notifier service due to disconnect event...");
     }
 

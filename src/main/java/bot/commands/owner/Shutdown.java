@@ -2,7 +2,7 @@ package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
-import bot.services.NotifService;
+import bot.services.NotifierThread;
 import bot.services.ShardService;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -49,7 +49,7 @@ public class Shutdown extends Command {
             commandEvent.reply("You need to provide a reason.");
         } else {
             log.info("Command ran by {}. Reason: {}", commandAuthor, reason);
-            NotifService.getInstance().stop();
+            NotifierThread.getInstance().stop();
             log.info("Notifier service was shut down due to system shutdown request...");
 
             ShardService.getInstance().shutdown();
