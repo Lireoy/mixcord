@@ -53,24 +53,40 @@ public class WhoCanUseMe extends Command {
         }
 
         StringBuilder description = new StringBuilder();
-        description.append("Roles which can manage notifications:\n\n");
-        for (Role role : roleWithManageServer) {
-            description.append("· <@&").append(role.getId());
-            if (role.isManaged()) {
-                description.append("> (Managed by an integration)\n");
-            } else {
-                description.append(">\n");
+
+        if (roleWithManageServer.size() < 1 && roleToUse.size() < 1) {
+            commandEvent.reply("There are no roles which can use Mixcord.");
+            return;
+        }
+
+        if (roleWithManageServer.size() > 0) {
+            description.append("Roles which can manage notifications:\n\n");
+            for (Role role : roleWithManageServer) {
+                String simpleLine = "· <@&%s>\n";
+                String advancedLine = "· <@&%s> (Managed by an integration)\n";
+
+                if (role.isManaged()) {
+                    description.append(String.format(advancedLine, role.getId()));
+                } else {
+                    description.append(String.format(simpleLine, role.getId()));
+                }
             }
         }
-        description.append("\n").append("=================================\n\n");
-        description.append("Roles which can use basic commands:\n\n");
 
-        for (Role role : roleToUse) {
-            description.append("· <@&").append(role.getId());
-            if (role.isManaged()) {
-                description.append("> (Managed by an integration)\n");
-            } else {
-                description.append(">\n");
+        if (roleWithManageServer.size() > 0 && roleToUse.size() > 0)
+            description.append("\n").append("=================================\n\n");
+
+        if (roleToUse.size() > 0) {
+            description.append("Roles which can use basic commands:\n\n");
+            for (Role role : roleToUse) {
+                String simpleLine = "· <@&%s>\n";
+                String advancedLine = "· <@&%s> (Managed by an integration)\n";
+
+                if (role.isManaged()) {
+                    description.append(String.format(advancedLine, role.getId()));
+                } else {
+                    description.append(String.format(simpleLine, role.getId()));
+                }
             }
         }
 
