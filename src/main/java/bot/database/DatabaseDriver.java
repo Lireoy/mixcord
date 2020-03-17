@@ -469,4 +469,13 @@ public class DatabaseDriver {
         cursor.close();
         return null;
     }
+
+    public void cleanStreamerAndNotifications(String notifDocId, String streamerId) {
+        DatabaseDriver.getInstance().deleteNotif(notifDocId);
+        final Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(streamerId);
+        if (!cursor.hasNext()) {
+            DatabaseDriver.getInstance().deleteStreamer(streamerId);
+        }
+        cursor.close();
+    }
 }

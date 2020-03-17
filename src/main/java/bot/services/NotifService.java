@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 public class NotifService implements Runnable {
 
@@ -122,14 +124,9 @@ public class NotifService implements Runnable {
                         MetricsUtil.getInstance().getSecs());
 
                 if (MetricsUtil.getInstance().getSecs() <= 40) {
-                    log.info("Sleeping the notifier service...");
-                    long waiterStart = System.currentTimeMillis();
-                    long desiredTime = waiterStart + 60000;
-
-                    boolean toCheck = true;
-                    while (toCheck) {
-                        if (desiredTime == System.currentTimeMillis() || !isRunning) {
-                            toCheck = false;
+                    for (int i = 0; i < 9; i++) {
+                        if (isRunning) {
+                            TimeUnit.SECONDS.sleep(5);
                         }
                     }
                 }
@@ -153,6 +150,7 @@ public class NotifService implements Runnable {
             } else {
                 log.info("General exception");
                 log.info("Message: {}", ex.getMessage());
+                ex.printStackTrace();
                 NotifierThread.getInstance().start();
             }
         }

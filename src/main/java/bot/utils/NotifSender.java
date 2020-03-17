@@ -4,16 +4,16 @@ import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Notification;
-import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONObject;
 
-import java.util.Objects;
-
 @Slf4j
 public class NotifSender {
+
+    //TODO:UPDATE DOCS
 
     /**
      * Sends the specified message to the specified address in an embed when a streamer comes online.
@@ -27,17 +27,10 @@ public class NotifSender {
         final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE + queryChId +
                 MixerConstants.MIXER_THUMB_POST + "?" + StringUtil.generateRandomString(5, 6);
 
-        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
+        if (!isAvailable(notif)) return;
+        TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
-        if (!isGuildReachable(notif, guild)) return;
-        if (!isChannelReachable(notif, textChannel)) return;
-
-        if (textChannel == null) {
-            log.info("Notification text channel was null: {}", notif.getChannelId());
-            return;
-        }
-
+        assert textChannel != null;
         textChannel.sendMessage(notif.getMessage()).queue();
         textChannel.sendMessage(new MixerEmbedBuilder(notif, queryJson)
                 .setCustomAuthor()
@@ -54,19 +47,11 @@ public class NotifSender {
      *
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
-    public static void sendNonEmbed(Notification notif) {
-        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
+    public static void sendNonEmbed(final Notification notif) {
+        if (!isAvailable(notif)) return;
+        TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
-        if (!isGuildReachable(notif, guild)) return;
-        if (!isChannelReachable(notif, textChannel)) return;
-
-        if (textChannel == null) {
-            log.info("Notification text channel was null: {}", notif.getChannelId());
-            return;
-        }
-
-        textChannel.sendMessage(notif.getMessage()).queue();
+        assert textChannel != null;
         textChannel.sendMessage(notif.getMessage()).queue();
         log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
@@ -77,49 +62,48 @@ public class NotifSender {
      *
      * @param notif {@link Notification} object which contains data for the notification from the database
      */
-    public static void sendOfflineMsg(Notification notif) {
-        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
-        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
+    public static void sendOfflineMsg(final Notification notif) {
+        if (!isAvailable(notif)) return;
+        TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
-        if (!isGuildReachable(notif, guild)) return;
-        if (!isChannelReachable(notif, textChannel)) return;
-
-        if (textChannel == null) {
-            log.info("Notification text channel was null: {}", notif.getChannelId());
-            return;
-        }
-
+        assert textChannel != null;
         textChannel.sendMessage(notif.getStreamEndMessage()).queue();
         log.info("Sent stream end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
 
-    private static boolean isGuildReachable(Notification notif, Guild guild) {
-        if (!ShardService.getInstance().getGuilds().contains(guild)) {
-            log.info("Guild is not reachable. G:{}", notif.getServerId());
+    private static boolean isAvailable(final Notification notif) {
+        final Guild guild = ShardService.getInstance().getGuildById(notif.getServerId());
+        if (guild == null) {
+            log.info("Guild is not reachable: {}", notif.getServerId());
             return false;
         }
 
-        return true;
-    }
-
-    private static boolean isChannelReachable(final Notification notif, final TextChannel txtChannel) {
-        if (!Objects.requireNonNull(ShardService.getInstance().getGuildById(notif.getServerId()))
-                .getTextChannels().contains(txtChannel)) {
-            log.info("Channel does not exits. G:{} C:{}", notif.getServerId(), notif.getChannelId());
-            DatabaseDriver.getInstance().deleteNotif(notif.getId());
-            log.info("Deleted the notification in G:{} C:{} for {} ({})",
+        final TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
+        if (textChannel == null) {
+            DatabaseDriver.getInstance().cleanStreamerAndNotifications(notif.getId(), notif.getStreamerId());
+            log.info("Channel does not exist. Cleaned streamer and notifications in G:{} C:{} for {} ({})",
                     notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-
-            final Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());
-            if (!cursor.hasNext()) {
-                DatabaseDriver.getInstance().deleteStreamer(notif.getStreamerId());
-                log.info("There are no more notifications for {} - {}. Deleted from database.",
-                        notif.getStreamerName(), notif.getStreamerId());
-            }
-            cursor.close();
             return false;
         }
 
-        return true;
+        if (textChannel.canTalk()) {
+            return true;
+        } else {
+            final Member owner = textChannel.getGuild().getOwner();
+
+            if (owner != null) {
+                owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                    String template = "I don't have access to %s channel to send a notification for %s.\n" +
+                            "Please give me `READ MESSAGES` and `SEND MESSAGES` permission.";
+                    final String warningText = String.format(template, textChannel.getId(), notif.getStreamerName());
+                    privateChannel.sendMessage(warningText).queue();
+                });
+            } else {
+                DatabaseDriver.getInstance().cleanStreamerAndNotifications(notif.getId(), notif.getStreamerId());
+                log.info("No talk permissions. Cleaned streamer and notifications in G:{} C:{} for {} ({})",
+                        notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
+            }
+            return false;
+        }
     }
 }
