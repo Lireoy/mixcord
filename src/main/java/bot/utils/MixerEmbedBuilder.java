@@ -122,7 +122,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         if (mixerInfo.opt("type") != JSONObject.NULL)
             currentGame = mixerInfo.getJSONObject("type").getString("name");
 
-        String viewersCurrent = "No viewers.";
+        String viewersCurrent = "0";
         if (mixerInfo.optInt("viewersCurrent") != 0)
             viewersCurrent = String.valueOf(mixerInfo.getInt("viewersCurrent"));
 

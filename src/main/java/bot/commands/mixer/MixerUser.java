@@ -133,7 +133,7 @@ public class MixerUser extends Command {
         if (!channel.optString("audience").isEmpty())
             targetAudience = channel.getString("audience").toUpperCase();
 
-        String viewersCurrent = "No viewers.";
+        String viewersCurrent = "0";
         if (channel.optInt("viewersCurrent") != 0)
             viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
 

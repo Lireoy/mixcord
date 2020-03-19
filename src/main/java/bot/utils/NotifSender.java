@@ -92,15 +92,16 @@ public class NotifSender {
             final Member owner = textChannel.getGuild().getOwner();
 
             if (owner != null) {
+                log.info("No talk power, notified the server owner ({}).", owner.getUser().getId());
                 owner.getUser().openPrivateChannel().queue(privateChannel -> {
-                    String template = "I don't have access to %s channel to send a notification for %s.\n" +
-                            "Please give me `READ MESSAGES` and `SEND MESSAGES` permission.";
+                    String template = "I don't have access to <#%s> channel to send a notification for %s.\n" +
+                            "Please give me `READ MESSAGES` and `SEND MESSAGES` permission in that channel.";
                     final String warningText = String.format(template, textChannel.getId(), notif.getStreamerName());
                     privateChannel.sendMessage(warningText).queue();
                 });
             } else {
                 DatabaseDriver.getInstance().cleanStreamerAndNotifications(notif.getId(), notif.getStreamerId());
-                log.info("No talk permissions. Cleaned streamer and notifications in G:{} C:{} for {} ({})",
+                log.info("No talk power. Cleaned streamer and notifications in G:{} C:{} for {} ({})",
                         notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
             }
             return false;
