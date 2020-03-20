@@ -1,8 +1,7 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.services.NotifierThread;
+import bot.services.ClientService;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -12,11 +11,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class StartNotifService extends Command {
+public class Owners extends Command {
 
-    public StartNotifService() {
-        this.name = "StartNotifService";
-        this.help = HelpConstants.START_NOTIF_SERVICE_HELP;
+    public Owners() {
+        this.name = "Owners";
         this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = false;
         this.ownerCommand = true;
@@ -36,8 +34,14 @@ public class StartNotifService extends Command {
         final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
-        NotifierThread.getInstance().start();
 
-        commandEvent.reactSuccess();
+        String ownerOne = ClientService.getInstance().getOwnerId();
+        StringBuilder stringBuilder = new StringBuilder("Owners of this bot are:\n");
+        stringBuilder.append("· <@").append(ownerOne).append(">\n");
+        for (String owner : ClientService.getInstance().getCoOwnerIds()) {
+            stringBuilder.append("· <@").append(owner).append(">\n");
+        }
+
+        commandEvent.reply(stringBuilder.toString());
     }
 }

@@ -1,7 +1,9 @@
 package bot.database;
 
 import com.rethinkdb.RethinkDB;
+import com.rethinkdb.gen.exc.ReqlDriverError;
 import com.rethinkdb.net.Connection;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class helps build a connection for RethinkDB.
@@ -14,6 +16,7 @@ import com.rethinkdb.net.Connection;
  * you have to use {@link DatabaseConnectionBuilder#build()}
  * regardless of provided connection parameters.
  */
+@Slf4j
 public class DatabaseConnectionBuilder {
 
     private String databaseIp;
@@ -78,7 +81,16 @@ public class DatabaseConnectionBuilder {
      * @return a RethinkDB {@link Connection}
      */
     public Connection build() {
-        return RethinkDB.r.connection().hostname(databaseIp).port(databasePort)
-                .user(databaseUser, databasePassword).connect();
+        try {
+            return RethinkDB.r.connection().hostname(databaseIp).port(databasePort)
+                    .user(databaseUser, databasePassword).connect();
+        } catch (ReqlDriverError ex) {
+            log.info("ReqlDriverError: Could not connect to the database.");
+            log.info(ex.getCause().toString());
+            log.info(ex.getMessage());
+            //TODO: Report in DM to owner
+            System.exit(0);
+        }
+        return new Connection(new Connection.Builder());
     }
 }

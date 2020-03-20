@@ -1,7 +1,6 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.DevConstants;
 import bot.constants.HelpConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
@@ -79,7 +78,7 @@ public class NotifPreview extends Command {
             if (queryJson == null) {
                 commandEvent.reactError();
                 commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                        "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+                        "please contact the developer: **Lireoy#4444**");
                 return;
             }
 

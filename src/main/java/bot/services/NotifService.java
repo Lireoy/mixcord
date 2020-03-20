@@ -1,8 +1,8 @@
 package bot.services;
 
 import bot.constants.BotConstants;
-import bot.constants.DevConstants;
 import bot.database.DatabaseDriver;
+import bot.structures.Credentials;
 import bot.structures.Notification;
 import bot.structures.Streamer;
 import bot.utils.MetricsUtil;
@@ -47,11 +47,6 @@ public class NotifService implements Runnable {
                     if (!isRunning) break;
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
-
-                    if (queryJson == null) {
-                        log.info("queryJson was null.");
-                        return;
-                    }
 
                     if (queryJson.isEmpty()) {
                         log.info("Streamer not found.");
@@ -116,9 +111,9 @@ public class NotifService implements Runnable {
                 }
 
                 MetricsUtil.getInstance().stopTimer();
-                MetricsUtil.getInstance().postMetrics(DevConstants.METRICS_CHANNEL);
+                MetricsUtil.getInstance().postMetrics(Credentials.getInstance().getMetricsChannel());
                 log.info("Posting metrics to {} - {}",
-                        DevConstants.METRICS_GUILD, DevConstants.METRICS_CHANNEL);
+                        Credentials.getInstance().getMetricsGuild(), Credentials.getInstance().getMetricsChannel());
                 log.info("Checked {} streamers in {}s",
                         MetricsUtil.getInstance().getStreamersProcessed(),
                         MetricsUtil.getInstance().getSecs());
@@ -143,9 +138,14 @@ public class NotifService implements Runnable {
                         "There is a database issue. Stopping the notifier service." +
                         BotConstants.WARNING + BotConstants.WARNING;
 
-                sendReportInDm(DevConstants.OWNER_ID, message);
+                sendReportInDm(Credentials.getInstance().getOwnerOne(), message);
             } else if (ex instanceof NullPointerException) {
                 log.info("NullPointer in the loop, sleeping then continue.");
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 NotifierThread.getInstance().start();
             } else {
                 log.info("General exception");

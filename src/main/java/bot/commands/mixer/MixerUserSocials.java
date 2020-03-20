@@ -1,7 +1,6 @@
 package bot.commands.mixer;
 
 import bot.constants.BotConstants;
-import bot.constants.DevConstants;
 import bot.constants.HelpConstants;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
@@ -63,7 +62,7 @@ public class MixerUserSocials extends Command {
         if (channel == null) {
             commandEvent.reactError();
             commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                    "please contact the developer: <@" + DevConstants.OWNER_ID + ">");
+                    "please contact the developer: **Lireoy#4444**");
             return;
         }
 

@@ -24,6 +24,11 @@ public class Credentials {
     private String databaseUser;
     private String databasePassword;
     private int numberOfShards;
+    private String ownerOne;
+    private String ownerTwo;
+    private String ownerThree;
+    private String metricsGuild;
+    private String metricsChannel;
 
     public Credentials() {
     }
@@ -49,84 +54,68 @@ public class Credentials {
         return instance;
     }
 
-    public boolean isProductionBuild() {
-        return isProductionBuild;
+    public static String getCredentialsFileName() {
+        return credentialsFileName;
     }
 
-    public void setProductionBuild(boolean productionBuild) {
-        isProductionBuild = productionBuild;
+    public boolean isProductionBuild() {
+        return isProductionBuild;
     }
 
     public String getDiscordBotToken() {
         return discordBotToken;
     }
 
-    public void setDiscordBotToken(String discordBotToken) {
-        this.discordBotToken = discordBotToken;
-    }
-
     public String getDiscordBotTokenCanary() {
         return discordBotTokenCanary;
-    }
-
-    public void setDiscordBotTokenCanary(String discordBotTokenCanary) {
-        this.discordBotTokenCanary = discordBotTokenCanary;
     }
 
     public String getMixerApiClientId() {
         return mixerApiClientId;
     }
 
-    public void setMixerApiClientId(String mixerApiClientId) {
-        this.mixerApiClientId = mixerApiClientId;
-    }
-
     public String getMixerApiClientSecret() {
         return mixerApiClientSecret;
-    }
-
-    public void setMixerApiClientSecret(String mixerApiClientSecret) {
-        this.mixerApiClientSecret = mixerApiClientSecret;
     }
 
     public String getDatabaseIp() {
         return databaseIp;
     }
 
-    public void setDatabaseIp(String databaseIp) {
-        this.databaseIp = databaseIp;
-    }
-
     public int getDatabasePort() {
         return databasePort;
-    }
-
-    public void setDatabasePort(int databasePort) {
-        this.databasePort = databasePort;
     }
 
     public String getDatabaseUser() {
         return databaseUser;
     }
 
-    public void setDatabaseUser(String databaseUser) {
-        this.databaseUser = databaseUser;
-    }
-
     public String getDatabasePassword() {
         return databasePassword;
-    }
-
-    public void setDatabasePassword(String databasePassword) {
-        this.databasePassword = databasePassword;
     }
 
     public int getNumberOfShards() {
         return numberOfShards;
     }
 
-    public void setNumberOfShards(int numberOfShards) {
-        this.numberOfShards = numberOfShards;
+    public String getOwnerOne() {
+        return ownerOne;
+    }
+
+    public String getOwnerTwo() {
+        return ownerTwo;
+    }
+
+    public String getOwnerThree() {
+        return ownerThree;
+    }
+
+    public String getMetricsGuild() {
+        return metricsGuild;
+    }
+
+    public String getMetricsChannel() {
+        return metricsChannel;
     }
 
     @Override

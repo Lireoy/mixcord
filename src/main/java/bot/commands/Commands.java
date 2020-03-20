@@ -41,6 +41,7 @@ public class Commands {
                 new Whitelist(),
                 new GetServerShard(),
                 new NotifServiceStatus(),
+                new Owners(),
                 new StartNotifService(),
                 new StopNotifService(),
                 new RoleInfo(),

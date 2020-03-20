@@ -19,7 +19,7 @@ public class NotifServiceStatus extends Command {
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
         this.help = HelpConstants.NOTIF_SERVICE_STATUS_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
-        this.guildOnly = true;
+        this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,

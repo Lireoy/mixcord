@@ -20,7 +20,7 @@ public class Shutdown extends Command {
         this.help = HelpConstants.SHUTDOWN_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<reason>";
-        this.guildOnly = true;
+        this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,

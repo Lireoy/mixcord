@@ -16,7 +16,7 @@ public class GetServerShard extends Command {
     public GetServerShard() {
         this.name = "GetServerShard";
         this.category = new Category(CommandCategory.OWNER.toString());
-        this.guildOnly = true;
+        this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,

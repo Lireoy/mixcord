@@ -25,7 +25,7 @@ public class Whitelist extends Command {
         this.help = HelpConstants.WHITELIST_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<server ID>, <true | false> || 'all'";
-        this.guildOnly = true;
+        this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
