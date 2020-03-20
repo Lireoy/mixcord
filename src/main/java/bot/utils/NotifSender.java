@@ -94,9 +94,10 @@ public class NotifSender {
             if (owner != null) {
                 log.info("No talk power, notified the server owner ({}).", owner.getUser().getId());
                 owner.getUser().openPrivateChannel().queue(privateChannel -> {
-                    String template = "I don't have access to <#%s> channel to send a notification for %s.\n" +
+                    String template = "I don't have access to <#%s> channel in %s server, to send a notification for %s.\n" +
                             "Please give me `READ MESSAGES` and `SEND MESSAGES` permission in that channel.";
-                    final String warningText = String.format(template, textChannel.getId(), notif.getStreamerName());
+                    final String warningText = String.format(
+                            template, textChannel.getId(), notif.getServerId(), notif.getStreamerName());
                     privateChannel.sendMessage(warningText).queue();
                 });
             } else {
