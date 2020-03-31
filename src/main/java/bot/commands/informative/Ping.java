@@ -8,6 +8,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 import java.time.temporal.ChronoUnit;
@@ -45,8 +46,11 @@ public class Ping extends Command {
         if (helpResponse) return;
 
         commandEvent.reply("Calculating...", (m) -> {
-            final long ping = commandEvent.getMessage().getTimeCreated().until(m.getTimeCreated(),
-                    ChronoUnit.MILLIS);
+            final long ping =
+                    commandEvent.getMessage()
+                            .getTimeCreated()
+                            .until(m.getTimeCreated(),
+                                    ChronoUnit.MILLIS);
 
             m.editMessage("Ping: " + ping + "ms | Websocket: " +
                     commandEvent.getJDA().getGatewayPing() + "ms").queue();

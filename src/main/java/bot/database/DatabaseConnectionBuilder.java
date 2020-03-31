@@ -82,8 +82,11 @@ public class DatabaseConnectionBuilder {
      */
     public Connection build() {
         try {
-            return RethinkDB.r.connection().hostname(databaseIp).port(databasePort)
-                    .user(databaseUser, databasePassword).connect();
+            return RethinkDB.r.connection()
+                    .hostname(databaseIp)
+                    .port(databasePort)
+                    .user(databaseUser, databasePassword)
+                    .connect();
         } catch (ReqlDriverError ex) {
             log.info("ReqlDriverError: Could not connect to the database.");
             log.info(ex.getCause().toString());
