@@ -47,47 +47,6 @@ public class NotifDetails extends Command {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-
-        if (commandAuthor.getId().equals(Credentials.getInstance().getOwnerOne()) ||
-                commandAuthor.getId().equals(Credentials.getInstance().getOwnerTwo()) ||
-                commandAuthor.getId().equals(Credentials.getInstance().getOwnerThree())) {
-
-            final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-
-            String streamerName = "";
-            String json = "";
-
-            if (args.length > 1) {
-                streamerName = args[0].trim();
-                json = args[1].trim();
-            } else {
-                streamerName = args[0].trim();
-            }
-
-            if (streamerName.isEmpty()) {
-                commandEvent.reply("Please provide a streamer name!");
-                return;
-            }
-
-            if (streamerName.length() > 20) {
-                commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
-                return;
-            }
-
-            final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
-            if (!cursor.hasNext()) {
-                commandEvent.reply("There is no such notification...");
-                return;
-            }
-
-            if (json.equalsIgnoreCase("json")) {
-                String reply = "```json\n" + new JSONObject(cursor.next().toString()).toString(2) + "```";
-                commandEvent.reply(reply);
-                cursor.close();
-                return;
-            }
-        }
-
         final String username = commandEvent.getArgs();
 
         // Empty args check

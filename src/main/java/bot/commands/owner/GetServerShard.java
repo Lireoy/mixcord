@@ -35,7 +35,7 @@ public class GetServerShard extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
 
         if (args.length < 2) {
             commandEvent.reply("Please provide a full configuration.");

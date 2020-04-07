@@ -52,7 +52,7 @@ public class Whitelist extends Command {
             return;
         }
 
-        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
 
         if (args.length == 1) {
             if (!args[0].trim().equalsIgnoreCase("all")) {

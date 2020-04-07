@@ -38,6 +38,7 @@ public class Commands {
                 new MixerUserSocials(),
 
                 // Owner
+                new Debug(),
                 new Whitelist(),
                 new GetServerShard(),
                 new GetDbStats(),

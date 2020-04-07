@@ -10,6 +10,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
 public class NotifServiceStatus extends Command {
@@ -29,9 +30,12 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        final User commandAuthor = commandEvent.getAuthor();
+        log.info("Command ran by {}", commandAuthor);
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
+
+        boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

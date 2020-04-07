@@ -52,7 +52,7 @@ public class ServerNotifs extends Command {
         String prevChannel = "";
         if (list.isEmpty()) {
             commandEvent.reactError();
-            commandEvent.reply("There are no notifications in this channel");
+            commandEvent.reply("There are no notifications in this server.");
             return;
         }
 

@@ -49,7 +49,7 @@ public class NotifMessageEdit extends Command {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
 
         if (args.length < 2) {
