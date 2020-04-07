@@ -22,7 +22,7 @@ public class RoleInfo extends Command {
 
     public RoleInfo() {
         this.name = "RoleInfo";
-        this.help = HelpConstants.ROLE_INFO_HELP;
+        this.help = HelpConstants.ROLE_INFO_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<role>";
         this.guildOnly = true;

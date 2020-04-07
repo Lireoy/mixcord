@@ -27,7 +27,7 @@ public class NotifPreview extends Command {
     public NotifPreview() {
         this.name = "NotifPreview";
         this.aliases = new String[]{"Preview", "NotificationPreview"};
-        this.help = HelpConstants.NOTIF_PREVIEW_HELP;
+        this.help = HelpConstants.NOTIF_PREVIEW_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

@@ -26,7 +26,7 @@ public class ServerNotifs extends Command {
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};
-        this.help = HelpConstants.SERVER_NOTIFS_HELP;
+        this.help = HelpConstants.SERVER_NOTIFS_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

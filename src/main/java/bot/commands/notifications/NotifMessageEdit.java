@@ -25,7 +25,7 @@ public class NotifMessageEdit extends Command {
     public NotifMessageEdit() {
         this.name = "NotifMessageEdit";
         this.aliases = new String[]{"MessageEdit", "EditMessage"};
-        this.help = HelpConstants.NOTIF_MESSAGE_EDIT_HELP;
+        this.help = HelpConstants.NOTIF_MESSAGE_EDIT_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;

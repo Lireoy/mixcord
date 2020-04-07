@@ -24,7 +24,7 @@ public class NotifEmbedConfig extends Command {
 
     public NotifEmbedConfig() {
         this.name = "NotifEmbedConfig";
-        this.help = HelpConstants.NOTIF_EMBED_CONFIG_HELP;
+        this.help = HelpConstants.NOTIF_EMBED_CONFIG_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;

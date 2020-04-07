@@ -3,13 +3,11 @@ package bot.commands.notifications;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.database.DatabaseDriver;
-import bot.structures.Credentials;
 import bot.structures.Notification;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.MixerEmbedBuilder;
-import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,14 +15,13 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 @Slf4j
 public class NotifDetails extends Command {
 
     public NotifDetails() {
         this.name = "NotifDetails";
-        this.help = HelpConstants.NOTIF_DETAILS_HELP;
+        this.help = HelpConstants.NOTIF_DETAILS_COMMAND_HELP;
         this.category = new Command.Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

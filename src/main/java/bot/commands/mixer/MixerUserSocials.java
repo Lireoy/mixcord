@@ -22,7 +22,7 @@ public class MixerUserSocials extends Command {
 
     public MixerUserSocials() {
         this.name = "MixerUserSocials";
-        this.help = HelpConstants.MIXER_USER_SOCIALS_HELP;
+        this.help = HelpConstants.MIXER_USER_SOCIALS_COMMAND_HELP;
         this.category = new Category(CommandCategory.MIXER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

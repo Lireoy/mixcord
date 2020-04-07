@@ -25,7 +25,7 @@ public class NotifColorEdit extends Command {
     public NotifColorEdit() {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
-        this.help = HelpConstants.NOTIF_COLOR_EDIT_HELP;
+        this.help = HelpConstants.NOTIF_COLOR_EDIT_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;

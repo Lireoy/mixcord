@@ -23,7 +23,7 @@ public class DeleteNotif extends Command {
     public DeleteNotif() {
         this.name = "DeleteNotif";
         this.aliases = new String[]{"DeleteNotif", "DelNotif", "RemoveNotif"};
-        this.help = HelpConstants.DELETE_NOTIF_HELP;
+        this.help = HelpConstants.DELETE_NOTIF_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

@@ -22,7 +22,7 @@ public class Whitelist extends Command {
 
     public Whitelist() {
         this.name = "Whitelist";
-        this.help = HelpConstants.WHITELIST_HELP;
+        this.help = HelpConstants.WHITELIST_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = false;

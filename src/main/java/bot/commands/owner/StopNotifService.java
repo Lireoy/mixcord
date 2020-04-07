@@ -16,7 +16,7 @@ public class StopNotifService extends Command {
 
     public StopNotifService() {
         this.name = "StopNotifService";
-        this.help = HelpConstants.STOP_NOTIF_SERVICE_HELP;
+        this.help = HelpConstants.STOP_NOTIF_SERVICE_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = false;
         this.ownerCommand = true;

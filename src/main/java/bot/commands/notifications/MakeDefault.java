@@ -22,7 +22,7 @@ public class MakeDefault extends Command {
 
     public MakeDefault() {
         this.name = "MakeDefault";
-        this.help = HelpConstants.MAKE_DEFAULT_HELP;
+        this.help = HelpConstants.MAKE_DEFAULT_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

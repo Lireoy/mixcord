@@ -28,7 +28,7 @@ public class AddNotif extends Command {
     public AddNotif() {
         this.name = "AddNotif";
         this.aliases = new String[]{"CreateNotif"};
-        this.help = HelpConstants.ADD_NOTIF_HELP;
+        this.help = HelpConstants.ADD_NOTIF_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

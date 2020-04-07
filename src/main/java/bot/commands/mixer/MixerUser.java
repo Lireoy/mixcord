@@ -24,7 +24,7 @@ public class MixerUser extends Command {
 
     public MixerUser() {
         this.name = "MixerUser";
-        this.help = HelpConstants.MIXER_USER_HELP;
+        this.help = HelpConstants.MIXER_USER_COMMAND_HELP;
         this.category = new Category(CommandCategory.MIXER.toString());
         this.arguments = "<streamer name>";
         this.guildOnly = true;

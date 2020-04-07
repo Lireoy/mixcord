@@ -3,7 +3,6 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
 import bot.services.NotifService;
-import bot.services.NotifierThread;
 import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -18,7 +17,7 @@ public class NotifServiceStatus extends Command {
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
-        this.help = HelpConstants.NOTIF_SERVICE_STATUS_HELP;
+        this.help = HelpConstants.NOTIF_SERVICE_STATUS_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = false;
         this.ownerCommand = true;

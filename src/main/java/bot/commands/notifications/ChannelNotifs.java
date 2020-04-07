@@ -25,7 +25,7 @@ public class ChannelNotifs extends Command {
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};
-        this.help = HelpConstants.CHANNEL_NOTIFS_HELP;
+        this.help = HelpConstants.CHANNEL_NOTIFS_COMMAND_HELP;
         this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};

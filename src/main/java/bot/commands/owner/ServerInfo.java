@@ -2,6 +2,7 @@ package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.HelpConstants;
+import bot.services.ShardService;
 import bot.structures.enums.CommandCategory;
 import bot.structures.enums.ServerFeatures;
 import bot.utils.HelpUtil;
@@ -13,17 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 @Slf4j
 public class ServerInfo extends Command {
 
     public ServerInfo() {
         this.name = "ServerInfo";
-        this.help = HelpConstants.SERVER_INFO_HELP;
+        this.help = HelpConstants.SERVER_INFO_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.guildOnly = true;
         this.ownerCommand = true;
@@ -38,20 +39,32 @@ public class ServerInfo extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        final String[] commandExamples = {
+                BotConstants.PREFIX + this.name,
+                BotConstants.PREFIX + this.name + " 348110542667251712"};
 
         final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        //TODO: Request info about a specific server
-        //TODO: Optional arg for server ID, and look it with JDA if the bot is in the server
+        Guild guild = commandEvent.getGuild();
+        if (!commandEvent.getArgs().trim().isEmpty()) {
+            guild = ShardService.getInstance().getGuildById(commandEvent.getArgs().trim());
+        }
 
-        final Guild guild = commandEvent.getGuild();
-        final User user = Objects.requireNonNull(guild.getOwner()).getUser();
+        if (guild == null) {
+            commandEvent.reply("Guild was null.");
+            return;
+        }
+
+        final Member member = guild.getOwner();
+        if (member == null) {
+            commandEvent.reply("Owner was null.");
+            return;
+        }
+
         final String title = "Information about `" + guild.getName() + "`:";
-
-        final String owner = user.getName() + "#" + user.getDiscriminator();
+        final String owner = member.getUser().getName() + "#" + member.getUser().getDiscriminator();
         final String id = guild.getId();
         final String location = guild.getRegion().getEmoji() + " " + guild.getRegion().getName();
         final String creation = guild.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME);

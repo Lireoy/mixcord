@@ -17,7 +17,7 @@ public class Shutdown extends Command {
 
     public Shutdown() {
         this.name = "Shutdown";
-        this.help = HelpConstants.SHUTDOWN_HELP;
+        this.help = HelpConstants.SHUTDOWN_COMMAND_HELP;
         this.category = new Category(CommandCategory.OWNER.toString());
         this.arguments = "<reason>";
         this.guildOnly = false;
