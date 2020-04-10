@@ -1,9 +1,8 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.services.NotifierThread;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -16,8 +15,8 @@ public class StartNotifService extends Command {
 
     public StartNotifService() {
         this.name = "StartNotifService";
-        this.help = HelpConstants.START_NOTIF_SERVICE_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.START_NOTIF_SERVICE_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{

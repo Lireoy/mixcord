@@ -1,9 +1,8 @@
 package bot.commands.mixer;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
@@ -24,8 +23,8 @@ public class MixerUser extends Command {
 
     public MixerUser() {
         this.name = "MixerUser";
-        this.help = HelpConstants.MIXER_USER_COMMAND_HELP;
-        this.category = new Category(CommandCategory.MIXER.toString());
+        this.help = Locale.MIXER_USER_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("MIXER"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
@@ -49,12 +48,12 @@ public class MixerUser extends Command {
         final String query = commandEvent.getArgs().trim();
 
         if (query.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (query.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one!");
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_TOO_LONG_NAME);
             return;
         }
 
@@ -62,13 +61,12 @@ public class MixerUser extends Command {
 
         if (channel == null) {
             commandEvent.reactError();
-            commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                    "please contact the developer: **Lireoy#4444**");
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_JSON_WAS_NULL);
             return;
         }
 
         if (channel.isEmpty()) {
-            commandEvent.reply("There is no such streamer...");
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_SUCH_STREAMER);
             return;
         }
 
@@ -104,31 +102,34 @@ public class MixerUser extends Command {
         if (channel.optBoolean("featured"))
             isFeatured = BotConstants.SUCCESS;
 
-        final String trusted =
-                "Verified: " + isVerified + "\n" +
-                        "Partnered: " + isPartnered + "\n";
+        final String trusted = String.format(
+                Locale.MIXER_USER_COMMAND_TRUSTED,
+                isVerified,
+                isPartnered);
 
-        final String status =
-                "Online: " + isOnline + "\n" +
-                        "Featured: " + isFeatured;
+        final String status = String.format(
+                Locale.MIXER_USER_COMMAND_STATUS,
+                isOnline,
+                isFeatured);
 
-        String followers = "No followers.";
+
+        String followers = Locale.MIXER_USER_COMMAND_NO_FOLLOWERS;
         if (channel.optInt("numFollowers") != 0)
             followers = String.valueOf(channel.optInt("numFollowers"));
 
-        String streamTitle = "No stream title available.";
+        String streamTitle = Locale.MIXER_USER_COMMAND_NO_STREAM_TITLE;
         if (!channel.optString("name").isEmpty())
             streamTitle = channel.getString("name");
 
-        String currentGame = "No game available.";
+        String currentGame = Locale.MIXER_USER_COMMAND_NO_GAME;
         if (channel.opt("type") != JSONObject.NULL)
             currentGame = channel.getJSONObject("type").getString("name");
 
-        String language = "No language available.";
+        String language = Locale.MIXER_USER_COMMAND_NO_LANGUAGE;
         if (channel.opt("languageId") != JSONObject.NULL)
             language = channel.getString("languageId").toUpperCase();
 
-        String targetAudience = "No audience available.";
+        String targetAudience = Locale.MIXER_USER_COMMAND_NO_AUIDIENCE;
         if (!channel.optString("audience").isEmpty())
             targetAudience = channel.getString("audience").toUpperCase();
 
@@ -137,7 +138,9 @@ public class MixerUser extends Command {
             viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
 
         final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
-        final String liveStreamLink = "[Click here to watch on Mixer](" + channelUrl + ")";
+        final String liveStreamLink = String.format(
+                Locale.MIXER_USER_COMMAND_LIVE_STREAM_LINK,
+                channelUrl);
 
 
         if (streaming) {
@@ -145,16 +148,37 @@ public class MixerUser extends Command {
             commandEvent.reply(new MixerEmbedBuilder(channel)
                     .setCustomAuthor()
                     .setThumbnail(avatarUrl)
-                    .addField("Bio", bio, false)
-                    .addField("Trusted", trusted, true)
-                    .addField("Status", status, true)
-                    .addField("Followers", followers, false)
-                    .addField("Currently live", streamTitle, false)
-                    .addField("Game", currentGame, true)
-                    .addField("Viewers", viewersCurrent, true)
-                    .addField("Language", language, true)
-                    .addField("Target audience", targetAudience, true)
-                    .addField("Link", liveStreamLink, false)
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_BIO_TITLE,
+                            bio,
+                            false)
+                    .addField(Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
+                            trusted,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_STATUS_TITLE,
+                            status,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
+                            followers,
+                            false)
+                    .addField(Locale.MIXER_USER_COMMAND_CURRENTLY_LIVE_TITLE,
+                            streamTitle,
+                            false)
+                    .addField(Locale.MIXER_USER_COMMAND_GAME_TITLE,
+                            currentGame,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_VIEWERS_TITLE,
+                            viewersCurrent,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_LANGUAGE_TITLE,
+                            language,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_TARGET_AUDIENCE_TITLE,
+                            targetAudience,
+                            true)
+                    .addField(Locale.MIXER_USER_COMMAND_LINK_TITLE,
+                            liveStreamLink,
+                            false)
                     .setImage(liveThumbnail)
                     .build());
         } else {
@@ -163,10 +187,22 @@ public class MixerUser extends Command {
                     .setCustomAuthor()
                     .setCustomImage()
                     .setThumbnail(avatarUrl)
-                    .addField("Bio", bio, false)
-                    .addField("Trusted", trusted, true)
-                    .addField("Status", status, true)
-                    .addField("Followers", followers, true)
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_BIO_TITLE,
+                            bio,
+                            false)
+                    .addField(
+                            Locale.INFO_COMMAND_INFRASTRUCTURE_TITLE,
+                            trusted,
+                            true)
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_STATUS_TITLE,
+                            status,
+                            true)
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
+                            followers,
+                            true)
                     .build());
         }
     }

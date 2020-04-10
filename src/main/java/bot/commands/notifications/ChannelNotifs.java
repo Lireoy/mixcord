@@ -1,11 +1,10 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Streamer;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -25,8 +24,8 @@ public class ChannelNotifs extends Command {
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
         this.aliases = new String[]{"ListNotifs", "ListNotifications"};
-        this.help = HelpConstants.CHANNEL_NOTIFS_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.CHANNEL_NOTIFS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
@@ -54,14 +53,18 @@ public class ChannelNotifs extends Command {
 
         if (!cursor.hasNext()) {
             commandEvent.reactError();
-            commandEvent.reply("There are no notifications in this channel");
+            commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_NO_NOTIFICATIONS);
             return;
         }
 
         for (Object doc : cursor) {
             Streamer streamer = new Gson().fromJson(doc.toString(), Streamer.class);
-            String line = "· [%s](" + MixerConstants.HTTPS_MIXER_COM + "%s)\n";
-            description.append(String.format(line, streamer.getStreamerName(), streamer.getStreamerName()));
+            description.append(
+                    String.format(
+                            Locale.CHANNEL_NOTIFS_COMMAND_LINE,
+                            streamer.getStreamerName(),
+                            MixerConstants.HTTPS_MIXER_COM,
+                            streamer.getStreamerName()));
             notifCount++;
             if (notifCount % 5 == 0) {
                 description.append("\n");
@@ -70,17 +73,20 @@ public class ChannelNotifs extends Command {
         cursor.close();
 
         if (notifCount == 1) {
-            commandEvent.reply("There's only 1 notification in this channel.");
+            commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_ONLY_ONE);
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle("Channel Notifications")
+                    .setTitle(Locale.CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE)
                     .setDescription(description)
                     .build());
         }
 
         if (notifCount > 1) {
-            commandEvent.reply("There's a total of " + notifCount + " notifications in this channel.");
+            commandEvent.reply(
+                    String.format(
+                            Locale.CHANNEL_NOTIFS_COMMAND_N_AMOUNT,
+                            notifCount));
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle("Channel Notifications")
+                    .setTitle(Locale.CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE)
                     .setDescription(description)
                     .build());
         }

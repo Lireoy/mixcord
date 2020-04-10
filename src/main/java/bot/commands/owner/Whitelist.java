@@ -1,11 +1,10 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Server;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -22,8 +21,8 @@ public class Whitelist extends Command {
 
     public Whitelist() {
         this.name = "Whitelist";
-        this.help = HelpConstants.WHITELIST_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.WHITELIST_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = false;
         this.ownerCommand = true;
@@ -40,7 +39,7 @@ public class Whitelist extends Command {
 
         final String[] commandExamples = {
                 BotConstants.PREFIX + this.name + " 637724317672669184, true",
-                BotConstants.PREFIX + this.name + " all"
+                BotConstants.PREFIX + this.name + " --all"
         };
 
         final boolean helpResponse = HelpUtil.getInstance()
@@ -48,20 +47,21 @@ public class Whitelist extends Command {
         if (helpResponse) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
-            commandEvent.reply("Please provide the required parameters.");
+            commandEvent.reply(Locale.WHITELIST_COMMAND_NO_ARGUMENTS);
             return;
         }
 
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
 
-        if (args.length == 1) {
-            if (!args[0].trim().equalsIgnoreCase("all")) {
-                StringBuilder builder = new StringBuilder();
-                for (String example : commandExamples) {
-                    builder.append("`").append(example).append("`\n");
-                }
+        if (args.length == 0) {
+            commandEvent.reply(Locale.WHITELIST_COMMAND_NO_ARGUMENTS);
+            return;
+        }
 
-                commandEvent.reply("Please provide a full configuration.\n" + builder.toString());
+        // List all whitelisted server
+        if (args.length == 1) {
+            if (!args[0].trim().equalsIgnoreCase("--all")) {
+                commandEvent.reply(Locale.WHITELIST_COMMAND_NO_FULL_CONFIG);
                 return;
             }
 
@@ -71,12 +71,12 @@ public class Whitelist extends Command {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
                 final Guild guild = ShardService.getInstance().getGuildById(server.getServerId());
 
-                final String guildOwnerId = guild != null ? guild.getOwnerId() : "(Could not retrieve owner ID)";
-                final String guildName = guild != null ? guild.getName() : "(Could not retrieve name)";
+                final String guildOwnerId = guild != null ? guild.getOwnerId() : Locale.WHITELIST_COMMAND_OWNER_NOT_AVAILABLE;
+                final String guildName = guild != null ? guild.getName() : Locale.WHITELIST_COMMAND_NAME_NOT_AVAILABLE;
                 final String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
 
-                final String line = "· <@%s> - `%s` - `%s` - `%s members`\n";
-                final String formattedLine = String.format(line,
+                final String formattedLine = String.format(
+                        Locale.WHITELIST_COMMAND_LINE,
                         guildOwnerId, guildName, server.getServerId(), guildMemberCount);
                 serversDetails.append(formattedLine);
             }
@@ -86,35 +86,56 @@ public class Whitelist extends Command {
             return;
         }
 
+        // Whitelist configurer
         if (args.length == 2) {
             if (args[0].trim().isEmpty()) {
-                commandEvent.reply("First parameter was empty.\n`" + commandExamples[1] + "`");
+                commandEvent.reply(
+                        String.format(
+                                Locale.WHITELIST_COMMAND_NO_FIRST_ARG,
+                                commandExamples[1]));
                 return;
             }
 
             if (args[1].trim().isEmpty()) {
-                commandEvent.reply("Second parameter was empty.\n" + commandExamples[0] + "`");
+                commandEvent.reply(
+                        String.format(
+                                Locale.WHITELIST_COMMAND_NO_SECOND_ARG,
+                                commandExamples[0]));
                 return;
             }
         }
 
         final String serverId = args[0].trim();
         boolean newWhitelistVal = false;
+        boolean successfulConvert = false;
         if (args[1].trim().equalsIgnoreCase("true")) {
             newWhitelistVal = true;
+            successfulConvert = true;
+        }
+
+        if (args[1].trim().equalsIgnoreCase("false")) {
+            successfulConvert = true;
+        }
+
+        if (!successfulConvert) {
+            commandEvent.reply(Locale.WHITELIST_COMMAND_INVALID_SECOND_ARG);
+            return;
         }
 
         final Guild guild = ShardService.getInstance().getGuildById(serverId);
 
         if (!ShardService.getInstance().getGuilds().contains(guild)) {
-            commandEvent.reply("The bot is not in that server.");
+            commandEvent.reply(Locale.WHITELIST_COMMAND_NOT_IN_SERVER);
             commandEvent.reactError();
 
             String docId = DatabaseDriver.getInstance().getGuildDocId(serverId);
             DatabaseDriver.getInstance().deleteGuild(docId);
 
             log.info("Guild is not reachable. G:{}. Deleted from database.", serverId);
-            commandEvent.reply("Deleted G:`" + serverId + "` from database.");
+            commandEvent.reply(
+                    String.format(
+                            Locale.WHITELIST_COMMAND_DELETED,
+                            serverId));
             return;
         }
 
@@ -126,21 +147,32 @@ public class Whitelist extends Command {
             DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
 
             if (oldWhitelistVal == newWhitelistVal) {
-                commandEvent.reply("`" + serverId + "` is already set to `" + newWhitelistVal + "`");
+                commandEvent.reply(
+                        String.format(
+                                Locale.WHITELIST_COMMAND_ALREADY_SET,
+                                serverId,
+                                newWhitelistVal));
                 commandEvent.reactError();
                 return;
             }
 
             DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
-            commandEvent.reply("Successfully updated `" + serverId + "` to `" + newWhitelistVal + "`.");
+            commandEvent.reply(
+                    String.format(
+                            Locale.WHITELIST_COMMAND_UPDATED,
+                            serverId,
+                            newWhitelistVal));
             commandEvent.reactSuccess();
         } else {
             DatabaseDriver.getInstance().addServer(serverId);
             final Server server = new Gson().fromJson(
-                    DatabaseDriver.getInstance().selectOneServer(serverId).next().toString(), Server.class);
+                    DatabaseDriver.getInstance()
+                            .selectOneServer(serverId).next().toString(), Server.class);
 
             DatabaseDriver.getInstance().updateWhitelist(server.getId(), newWhitelistVal);
-            commandEvent.reply("Successfully whitelisted `" + serverId + "`.");
+            commandEvent.reply(String.format(
+                    Locale.WHITELIST_COMMAND_ADDED,
+                    serverId));
             commandEvent.reactSuccess();
         }
     }

@@ -1,10 +1,9 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -22,8 +21,8 @@ public class MakeDefault extends Command {
 
     public MakeDefault() {
         this.name = "MakeDefault";
-        this.help = HelpConstants.MAKE_DEFAULT_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.MAKE_DEFAULT_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -49,18 +48,18 @@ public class MakeDefault extends Command {
         final String streamerName = commandEvent.getArgs().trim();
 
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There is no such notification in this channel.");
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
 
@@ -68,8 +67,10 @@ public class MakeDefault extends Command {
         DatabaseDriver.getInstance().resetNotification(notif.getId(), notif.getStreamerName());
         cursor.close();
 
-
-        commandEvent.reply("Notification configuration was reset for `" + notif.getStreamerName() + "`.");
+        commandEvent.reply(
+                String.format(
+                        Locale.MAKE_DEFAULT_COMMAND_SUCCESSFUL,
+                        notif.getStreamerName()));
     }
 }
 

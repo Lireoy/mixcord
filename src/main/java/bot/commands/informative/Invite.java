@@ -1,8 +1,7 @@
 package bot.commands.informative;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -20,8 +19,8 @@ public class Invite extends Command {
     public Invite() {
         this.name = "Invite";
         this.aliases = new String[]{"Inv", "GetOverHere"};
-        this.help = HelpConstants.INVITE_COMMAND_HELP;
-        this.category = new Category(CommandCategory.INFORMATIVE.toString());
+        this.help = Locale.INVITE_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -41,12 +40,11 @@ public class Invite extends Command {
         if (helpResponse) return;
 
         final String clientId = commandEvent.getSelfUser().getId();
-        String description = "[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=%s&permissions=347200&scope=bot)";
-        String finalDescription = String.format(description, clientId);
+        String finalDescription = String.format(Locale.INVITE_COMMAND_INVITE_LINK, clientId);
 
         commandEvent.reactSuccess();
         commandEvent.reply(new MixerEmbedBuilder()
-                .setAuthor("Invite")
+                .setAuthor(Locale.INVITE_COMMAND_INVITE_TITLE)
                 .setDescription(finalDescription)
                 .build());
     }

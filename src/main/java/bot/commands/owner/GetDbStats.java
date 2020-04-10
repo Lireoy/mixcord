@@ -1,8 +1,8 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -16,7 +16,8 @@ public class GetDbStats extends Command {
 
     public GetDbStats() {
         this.name = "GetDbStats";
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.GET_DB_STATS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -36,14 +37,14 @@ public class GetDbStats extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        String message = "· Guilds: %s\n· Streamers: %s\n· Notifications: %s";
-        message = String.format(message,
+        String message = String.format(
+                Locale.GET_DB_STATS_COMMAND_STATISTICS,
                 DatabaseDriver.getInstance().countAllGuilds(),
                 DatabaseDriver.getInstance().countAllStreamers(),
                 DatabaseDriver.getInstance().countAllNotifs());
 
         commandEvent.reply(new MixerEmbedBuilder()
-                .setTitle("Database statistics")
+                .setTitle(Locale.GET_DB_STATS_COMMAND_STATISTICS_TITLE)
                 .setDescription(message)
                 .build());
     }

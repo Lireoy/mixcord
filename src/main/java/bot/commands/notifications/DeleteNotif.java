@@ -1,10 +1,9 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -23,8 +22,8 @@ public class DeleteNotif extends Command {
     public DeleteNotif() {
         this.name = "DeleteNotif";
         this.aliases = new String[]{"DeleteNotif", "DelNotif", "RemoveNotif"};
-        this.help = HelpConstants.DELETE_NOTIF_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.DELETE_NOTIF_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -51,41 +50,21 @@ public class DeleteNotif extends Command {
 
         // Empty args check
         if (username.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (username.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one!");
+            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         final Cursor notificationCursor = DatabaseDriver.getInstance()
                 .selectOneNotification(serverId, channelId, username);
         if (!notificationCursor.hasNext()) {
-            commandEvent.reply("There is no such notification...");
+            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
-
-        /*
-        // Query Mixer to get case-correct streamer name, ID etc.
-        final JSONObject channel = MixerQuery.queryChannel(username);
-        if (channel == JSONObject.NULL) {
-            commandEvent.reactError();
-            commandEvent.reply("Query response JSON was null, when deleting a notification, " +
-                    "please contact the developer: <@" + Constants.OWNER_ID + ">");
-            return;
-        }
-
-        // Non existent streamer queries return with null from Mixer API
-        if (channel == null) {
-            commandEvent.reply("There is no such streamer...");
-            return;
-        }
-
-        final String streamerId = String.valueOf(channel.getInt("userId"));
-        final String streamerName = channel.getString("token");
-         */
 
         final Notification notif = new Gson().fromJson(notificationCursor.next().toString(), Notification.class);
         notificationCursor.close();
@@ -93,7 +72,7 @@ public class DeleteNotif extends Command {
         DatabaseDriver.getInstance().deleteNotif(notif.getId());
         log.info("Deleted the notification in G:{} C:{} for {} ({})",
                 notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-        commandEvent.reply("Notification was deleted.");
+        commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_SUCCESSFUL);
         commandEvent.reactSuccess();
 
         Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());

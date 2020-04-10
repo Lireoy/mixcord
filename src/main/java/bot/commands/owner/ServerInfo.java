@@ -1,9 +1,8 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.services.ShardService;
-import bot.structures.enums.CommandCategory;
 import bot.structures.enums.ServerFeatures;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
@@ -24,8 +23,8 @@ public class ServerInfo extends Command {
 
     public ServerInfo() {
         this.name = "ServerInfo";
-        this.help = HelpConstants.SERVER_INFO_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.SERVER_INFO_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = true;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -53,30 +52,41 @@ public class ServerInfo extends Command {
         }
 
         if (guild == null) {
-            commandEvent.reply("Guild was null.");
+            commandEvent.reply(Locale.SERVER_INFO_COMMAND_GUILD_NULL);
             return;
         }
 
         final Member member = guild.getOwner();
         if (member == null) {
-            commandEvent.reply("Owner was null.");
+            commandEvent.reply(Locale.SERVER_INFO_COMMAND_OWNER_NULL);
             return;
         }
 
-        final String title = "Information about `" + guild.getName() + "`:";
-        final String owner = member.getUser().getName() + "#" + member.getUser().getDiscriminator();
+        final String title = String.format(
+                Locale.SERVER_INFO_COMMAND_TITLE,
+                guild.getName());
+        final String owner = String.format(
+                Locale.SERVER_INFO_COMMAND_OWNER_LINE,
+                member.getUser().getName(),
+                member.getUser().getDiscriminator());
         final String id = guild.getId();
-        final String location = guild.getRegion().getEmoji() + " " + guild.getRegion().getName();
+        final String location = String.format(
+                Locale.SERVER_INFO_COMMAND_LOCATION,
+                guild.getRegion().getEmoji(),
+                guild.getRegion().getName());
         final String creation = guild.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
         StringBuilder stringBuilder = new StringBuilder();
         if (guild.getFeatures().size() < 1) {
-            stringBuilder.append("None");
+            stringBuilder.append(Locale.SERVER_INFO_COMMAND_FEATURES_NONE);
         } else {
             for (String feature : guild.getFeatures()) {
                 for (ServerFeatures serverFeature : ServerFeatures.values()) {
                     if (feature.equalsIgnoreCase(serverFeature.name())) {
-                        stringBuilder.append(serverFeature.getText()).append(", ");
+                        stringBuilder.append(
+                                String.format(
+                                        Locale.SERVER_INFO_COMMAND_FEATURE_LINE,
+                                        serverFeature.getText()));
                     }
                 }
             }
@@ -100,18 +110,42 @@ public class ServerInfo extends Command {
         final long offlineCount = guild.getMembers().stream()
                 .filter((u) -> (u.getOnlineStatus() == OnlineStatus.OFFLINE)).count();
 
-        final String line = "%d Online\n%d Idle\n%d Do not Disturb\n%d Offline\nAltogether %d users and %d bots.";
-        final String membersString = String.format(line, onlineCount, idleCount, dndCount, offlineCount, userCount, botCount);
+        final String membersString = String.format(
+                Locale.SERVER_INFO_COMMAND_SUMMARY,
+                onlineCount,
+                idleCount,
+                dndCount,
+                offlineCount,
+                userCount,
+                botCount);
 
         commandEvent.reply(new MixerEmbedBuilder()
                 .setColor(guild.getOwner().getColor())
                 .setTitle(title)
-                .addField("ID", id, false)
-                .addField("Owner", owner, false)
-                .addField("Location", location, false)
-                .addField("Creation", creation, false)
-                .addField("Features", features, false)
-                .addField("Members", membersString, false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_ID_TITLE,
+                        id,
+                        false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_OWNER_TITLE,
+                        owner,
+                        false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_LOCATION_TITLE,
+                        location,
+                        false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_CREATION_TITLE,
+                        creation,
+                        false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_FEATURES_TITLE,
+                        features,
+                        false)
+                .addField(
+                        Locale.SERVER_INFO_COMMAND_MEMBERS_TITLE,
+                        membersString,
+                        false)
                 .build());
     }
 }

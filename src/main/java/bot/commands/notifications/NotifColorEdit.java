@@ -1,10 +1,9 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.StringUtil;
@@ -25,8 +24,8 @@ public class NotifColorEdit extends Command {
     public NotifColorEdit() {
         this.name = "NotifColorEdit";
         this.aliases = new String[]{"ColorEdit", "EditColor", "Color"};
-        this.help = HelpConstants.NOTIF_COLOR_EDIT_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.NOTIF_COLOR_EDIT_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>, <new hex color code>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -52,37 +51,39 @@ public class NotifColorEdit extends Command {
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, 32a852`";
 
         if (args.length < 2) {
-            commandEvent.reply("Please provide a full configuration." + example);
+            commandEvent.reply(
+                    String.format(
+                            Locale.NOTIF_COLOR_EDIT_COMMAND_NO_FULL_CONFIG,
+                            example));
             return;
         }
 
         String streamerName = args[0].trim();
         String newColor = args[1].trim();
 
-
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         if (newColor.isEmpty()) {
-            commandEvent.reply("Please provide a valid hex color.");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_INVALID_HEX);
             return;
         }
 
         if (!HexUtil.getInstance().validateHex(newColor.trim())) {
-            commandEvent.reply("Please provide a valid hex color.");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_INVALID_HEX);
             return;
         }
 
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There are no notifications in this channel");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_NO_NOTIFICATIONS);
             return;
         }
 
@@ -91,16 +92,23 @@ public class NotifColorEdit extends Command {
 
         newColor = HexUtil.getInstance().formatHex(newColor).trim();
         if (notif.getEmbedColor().equals(newColor)) {
-            commandEvent.reply("Your new color is same as the old one!");
+            commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_SAME_COLOR);
             return;
         }
 
         DatabaseDriver.getInstance().updateColor(notif.getId(), newColor);
 
         String response = "";
-        response += "Notification color was changed for the following notification: `" + notif.getStreamerName() + "`";
-        response += "\nOld color:\n```" + notif.getEmbedColor() + "```\n\n";
-        response += "New color:\n```" + newColor + "```";
+        response += String.format(
+                Locale.NOTIF_COLOR_EDIT_COMMAND_SUCCESSFUL,
+                notif.getStreamerName());
+        response += String.format(
+                Locale.NOTIF_COLOR_EDIT_COMMAND_OLD_COLOR,
+                notif.getEmbedColor());
+        response += String.format(
+                Locale.NOTIF_COLOR_EDIT_COMMAND_NEW_COLOR,
+                newColor);
+
         commandEvent.reply(response);
     }
 }

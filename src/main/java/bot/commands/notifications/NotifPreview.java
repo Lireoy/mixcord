@@ -1,10 +1,9 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
@@ -27,8 +26,8 @@ public class NotifPreview extends Command {
     public NotifPreview() {
         this.name = "NotifPreview";
         this.aliases = new String[]{"Preview", "NotificationPreview"};
-        this.help = HelpConstants.NOTIF_PREVIEW_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.NOTIF_PREVIEW_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -54,18 +53,18 @@ public class NotifPreview extends Command {
         final String streamerName = commandEvent.getArgs().trim();
 
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.NOTIF_PREVIEW_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            commandEvent.reply(Locale.NOTIF_PREVIEW_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There is no such notification in this channel.");
+            commandEvent.reply(Locale.NOTIF_PREVIEW_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
 
@@ -77,14 +76,13 @@ public class NotifPreview extends Command {
 
             if (queryJson == null) {
                 commandEvent.reactError();
-                commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                        "please contact the developer: **Lireoy#4444**");
+                commandEvent.reply(Locale.NOTIF_PREVIEW_COMMAND_JSON_WAS_NULL);
                 return;
             }
 
             if (queryJson.isEmpty()) {
-                commandEvent.reply("Streamer not found on Mixer.");
-                log.info("Streamer not found on Mixer.");
+                commandEvent.reply(Locale.NOTIF_PREVIEW_COMMAND_WAS_NOT_FOUND_ON_MIXER);
+                log.info(Locale.NOTIF_PREVIEW_COMMAND_WAS_NOT_FOUND_ON_MIXER);
                 return;
             }
 

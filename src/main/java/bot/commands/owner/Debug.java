@@ -1,12 +1,12 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Notification;
 import bot.structures.Streamer;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
@@ -28,7 +28,8 @@ public class Debug extends Command {
 
     public Debug() {
         this.name = "Debug";
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.DEBUG_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -56,7 +57,7 @@ public class Debug extends Command {
         if (helpResponse) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
-            commandEvent.reply("Please provide some arguments.");
+            commandEvent.reply(Locale.DEBUG_COMMAND_NO_ARGUMENTS);
             return;
         }
 
@@ -64,7 +65,7 @@ public class Debug extends Command {
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 3);
 
         if (args.length == 0) {
-            commandEvent.reply("Please provide some arguments.");
+            commandEvent.reply(Locale.DEBUG_COMMAND_NO_ARGUMENTS);
             return;
         }
 
@@ -73,12 +74,12 @@ public class Debug extends Command {
             final String serverId = args[0].trim();
 
             if (serverId.isEmpty()) {
-                commandEvent.reply("Empty serverId argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SERVER_ID);
                 return;
             }
 
             if (!DatabaseDriver.getInstance().selectOneServer(serverId).hasNext()) {
-                commandEvent.reply("I'm not in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NOT_IN_SERVER);
                 return;
             }
 
@@ -86,7 +87,7 @@ public class Debug extends Command {
 
             if (list.isEmpty()) {
                 commandEvent.reactError();
-                commandEvent.reply("There are no notifications in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_NOTIFS_IN_SERVER);
                 return;
             }
 
@@ -95,13 +96,10 @@ public class Debug extends Command {
             for (Object doc : list) {
                 Notification notif = new Gson().fromJson(doc.toString(), Notification.class);
 
-                String channelTemplate = "\n%s - <#%s>\n";
-                String streamerTemplate = "· [%s](%s%s)\n";
-
                 if (!prevChannel.equals(notif.getChannelId())) {
                     description.append(
                             String.format(
-                                    channelTemplate,
+                                    Locale.DEBUG_COMMAND_CHANNEL_LINE,
                                     notif.getChannelId(),
                                     notif.getChannelId()));
                 }
@@ -109,15 +107,14 @@ public class Debug extends Command {
                 prevChannel = notif.getChannelId();
                 description.append(
                         String.format(
-                                streamerTemplate,
+                                Locale.DEBUG_COMMAND_STREAMER_LINE,
                                 notif.getStreamerName(),
                                 MixerConstants.HTTPS_MIXER_COM,
                                 notif.getStreamerName()));
             }
 
-            String titleTemplate = "Notifications in G:%s";
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle(String.format(titleTemplate, serverId))
+                    .setTitle(String.format(Locale.DEBUG_COMMAND_SERVER_NOTIFS_TITLE, serverId))
                     .setDescription(description.toString())
                     .build());
             return;
@@ -130,17 +127,17 @@ public class Debug extends Command {
 
 
             if (serverId.isEmpty()) {
-                commandEvent.reply("Empty serverId argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SERVER_ID);
                 return;
             }
 
             if (channelId.isEmpty()) {
-                commandEvent.reply("Empty channelId argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_CHANNEL_ID);
                 return;
             }
 
             if (!DatabaseDriver.getInstance().selectOneServer(serverId).hasNext()) {
-                commandEvent.reply("I'm not in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NOT_IN_SERVER);
                 return;
             }
 
@@ -148,7 +145,7 @@ public class Debug extends Command {
 
             if (list.isEmpty()) {
                 commandEvent.reactError();
-                commandEvent.reply("There are no notifications in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_NOTIFS_IN_SERVER);
                 return;
             }
 
@@ -156,13 +153,13 @@ public class Debug extends Command {
 
             if (textChannel == null) {
                 commandEvent.reactError();
-                commandEvent.reply("There is no such channel.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SUCH_CHANNEL);
                 return;
             }
 
             if (!textChannel.canTalk()) {
                 commandEvent.reactError();
-                commandEvent.reply("No talk power in that channel.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_TALK_POWER);
                 return;
             }
 
@@ -171,27 +168,25 @@ public class Debug extends Command {
 
             if (!cursor.hasNext()) {
                 commandEvent.reactError();
-                commandEvent.reply("There are no notifications in this channel.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_NOTIFS_IN_CHANNEL);
                 return;
             }
 
             for (Object doc : cursor) {
                 Streamer streamer = new Gson().fromJson(doc.toString(), Streamer.class);
 
-                String streamerTemplate = "· [%s](%s%s)\n";
-
                 description.append(
                         String.format(
-                                streamerTemplate,
+                                Locale.DEBUG_COMMAND_STREAMER_LINE,
                                 streamer.getStreamerName(),
                                 MixerConstants.HTTPS_MIXER_COM,
                                 streamer.getStreamerName()));
             }
             cursor.close();
 
-            String titleTemplate = "Notifications in G:%s C:%s";
+
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle(String.format(titleTemplate, serverId, channelId))
+                    .setTitle(String.format(Locale.DEBUG_COMMAND_CHANNEL_NOTIFS_TITLE, serverId, channelId))
                     .setDescription(description)
                     .build());
             return;
@@ -204,22 +199,22 @@ public class Debug extends Command {
             final String streamerName = args[2].trim();
 
             if (serverId.isEmpty()) {
-                commandEvent.reply("Empty serverId argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SERVER_ID);
                 return;
             }
 
             if (channelId.isEmpty()) {
-                commandEvent.reply("Empty channelId argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_CHANNEL_ID);
                 return;
             }
 
             if (streamerName.isEmpty()) {
-                commandEvent.reply("Empty streamerName argument.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_STREAMER_NAME);
                 return;
             }
 
             if (!DatabaseDriver.getInstance().selectOneServer(serverId).hasNext()) {
-                commandEvent.reply("I'm not in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NOT_IN_SERVER);
                 return;
             }
 
@@ -227,7 +222,7 @@ public class Debug extends Command {
 
             if (list.isEmpty()) {
                 commandEvent.reactError();
-                commandEvent.reply("There are no notifications in this server.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_NOTIFS_IN_SERVER);
                 return;
             }
 
@@ -235,28 +230,27 @@ public class Debug extends Command {
 
             if (textChannel == null) {
                 commandEvent.reactError();
-                commandEvent.reply("There is no such channel.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SUCH_CHANNEL);
                 return;
             }
 
             if (!textChannel.canTalk()) {
                 commandEvent.reactError();
-                commandEvent.reply("No talk power in that channel.");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_TALK_POWER);
                 return;
             }
 
             final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
             if (!cursor.hasNext()) {
-                commandEvent.reply("There is no such notification in this channel");
+                commandEvent.reply(Locale.DEBUG_COMMAND_NO_SUCH_STREAMER);
                 return;
             }
 
             String jsonReplyTemplate = "```json\n%s```";
             String reply = String.format(
                     jsonReplyTemplate,
-                    new JSONObject(
-                            cursor.next().toString()
-                    ).toString(2));
+                    new JSONObject(cursor.next().toString())
+                            .toString(2));
             cursor.close();
             commandEvent.reply(reply);
 

@@ -1,8 +1,7 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -22,8 +21,8 @@ public class RoleInfo extends Command {
 
     public RoleInfo() {
         this.name = "RoleInfo";
-        this.help = HelpConstants.ROLE_INFO_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.ROLE_INFO_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.arguments = "<role>";
         this.guildOnly = true;
         this.ownerCommand = true;
@@ -44,50 +43,101 @@ public class RoleInfo extends Command {
         if (helpResponse) return;
 
         if (commandEvent.getArgs().isEmpty()) {
-            commandEvent.replyError("Please provide the name of a role!");
+            commandEvent.replyError(Locale.ROLE_INFO_COMMAND_NO_ROLE);
             return;
         }
 
         final List<Role> found = FinderUtil.findRoles(commandEvent.getArgs(), commandEvent.getGuild());
         if (found.isEmpty()) {
-            commandEvent.replyError("I couldn't find the role you were looking for!");
+            commandEvent.replyError(Locale.ROLE_INFO_COMMAND_NO_SUCH_ROLE);
             return;
         }
 
         if (found.size() > 1) {
             StringBuilder reply = new StringBuilder();
-            reply.append("Multiple roles found matching `").append(commandEvent.getArgs()).append("`:\n");
+            reply.append(
+                    String.format(
+                            Locale.ROLE_INFO_COMMAND_MULTIPLE_ROLES_FOUND,
+                            commandEvent.getArgs()));
+
             for (Role item : found) {
-                reply.append(" - ").append(item.getName()).append(" (ID: `").append(item.getId()).append("`)\n");
+                reply.append(
+                        String.format(
+                                Locale.ROLE_INFO_COMMAND_ROLE_LINE,
+                                item.getName(),
+                                item.getId()));
             }
             commandEvent.replyWarning(reply.toString());
             return;
         }
 
         final Role role = found.get(0);
-
-        final String title = "Information about `" + role.getName() + "`:";
+        final String title = String.format(Locale.ROLE_INFO_COMMAND_REPLy_TITLE, role.getName());
         StringBuilder permissions = new StringBuilder();
-        final List<Member> list = role.isPublicRole() ? commandEvent.getGuild().getMembers() : commandEvent.getGuild().getMembersWithRoles(role);
+        final List<Member> list;
+
+        if (role.isPublicRole()) {
+            list = commandEvent.getGuild().getMembers();
+        } else {
+            list = commandEvent.getGuild().getMembersWithRoles(role);
+        }
 
         if (role.getPermissions().isEmpty()) {
-            permissions.append("None");
+            permissions.append(Locale.ROLE_INFO_COMMAND_NONE);
         } else {
-            permissions.append(role.getPermissions().stream().map(p -> "`, `" + p.getName()).reduce("", String::concat).substring(3)).append("`");
+            StringBuilder acc = new StringBuilder();
+            for (Permission permission : role.getPermissions()) {
+                acc.append(String.format(
+                        Locale.ROLE_INFO_COMMAND_PERMISSION_LINE,
+                        permission.getName()));
+            }
+            permissions.append(acc
+                    .substring(3)).append("`");
+
+            /* Old version
+            permissions.append(role.getPermissions().stream().map(
+                    p -> "`, `" + p.getName())
+                    .reduce("", String::concat)
+                    .substring(3)).append("`");
+             */
         }
 
         commandEvent.reply(new MixerEmbedBuilder()
                 .setColor(role.getColor())
                 .setTitle(title)
-                .addField("ID", role.getId(), false)
-                .addField("Creation", role.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME), false)
-                .addField("Color", (role.getColor() == null ? "000000" : Integer.toHexString(role.getColor().getRGB()).toUpperCase().substring(2)), false)
-                .addField("Postion", String.valueOf(role.getPosition()), false)
-                .addField("Mentionable", String.valueOf(role.isMentionable()), false)
-                .addField("Hoisted", String.valueOf(role.isHoisted()), false)
-                .addField("Members", String.valueOf(list.size()), false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_ID_TITLE,
+                        role.getId(),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_CREATION_TITLE,
+                        role.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_COLOR_TITLE,
+                        (role.getColor() == null ? "000000" : Integer.toHexString(role.getColor().getRGB()).toUpperCase().substring(2)),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_POSITION_TITLE,
+                        String.valueOf(role.getPosition()),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_MENTIONABLE_TITLE,
+                        String.valueOf(role.isMentionable()),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_HOISTED_TITLE,
+                        String.valueOf(role.isHoisted()),
+                        false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_MEMBERS_TITLE,
+                        String.valueOf(list.size()),
+                        false)
                 .addBlankField(false)
-                .addField("Permissions", permissions.toString(), false)
+                .addField(
+                        Locale.ROLE_INFO_COMMAND_PERMISSIONS_TITLE,
+                        permissions.toString(),
+                        false)
                 .build());
     }
 }

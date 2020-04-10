@@ -1,11 +1,10 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -25,8 +24,8 @@ public class NotifMessageEdit extends Command {
     public NotifMessageEdit() {
         this.name = "NotifMessageEdit";
         this.aliases = new String[]{"MessageEdit", "EditMessage"};
-        this.help = HelpConstants.NOTIF_MESSAGE_EDIT_COMMAND_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.NOTIF_MESSAGE_EDIT_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -53,7 +52,10 @@ public class NotifMessageEdit extends Command {
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, Shroud went live again lolzz`";
 
         if (args.length < 2) {
-            commandEvent.reply("Please provide a full configuration." + example);
+            commandEvent.reply(
+                    String.format(
+                            Locale.NOTIF_MESSAGE_EDIT_COMMAND_NO_FULL_CONFIG,
+                            example));
             return;
         }
 
@@ -61,28 +63,28 @@ public class NotifMessageEdit extends Command {
         String newMessage = args[1].trim();
 
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         if (newMessage.isEmpty()) {
-            commandEvent.reply("Please provide a new notification message!");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_NO_NEW_MESSAGE);
             return;
         }
 
         if (newMessage.length() > 300) {
-            commandEvent.reply("Your new notification message is too long! (max 300 chars)");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_NEW_MESSAGE_TOO_LONG);
             return;
         }
 
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There is no such notification in this channel");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
 
@@ -90,7 +92,7 @@ public class NotifMessageEdit extends Command {
         cursor.close();
 
         if (notif.getMessage().equals(newMessage)) {
-            commandEvent.reply("Your new message is same as the old one!");
+            commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_SAME_MESSAGE);
             return;
         }
 
@@ -99,18 +101,18 @@ public class NotifMessageEdit extends Command {
         if (notif.isEmbed()) {
             if (StringUtil.containsIgnoreCase(newMessage, MixerConstants.HTTPS_MIXER_COM)) {
                 if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                    commandEvent.reply("Your notification message contains a link to a different streamer.");
+                    commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_WRONG_LINK);
                     return;
                 }
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
         } else {
             if (!StringUtil.containsIgnoreCase(newMessage, MixerConstants.HTTPS_MIXER_COM)) {
-                commandEvent.reply("Your notification message does not contain a link to the streamer.");
+                commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_NO_LINK);
                 return;
             }
             if (!StringUtil.containsIgnoreCase(newMessage, MIXER_PATTERN)) {
-                commandEvent.reply("Your notification message contains a link to a different streamer.");
+                commandEvent.reply(Locale.NOTIF_MESSAGE_EDIT_COMMAND_WRONG_LINK);
                 return;
             }
             updateMsgAndRespond(commandEvent, newMessage, notif.getId(), notif.getStreamerName(), notif.getMessage());
@@ -120,12 +122,17 @@ public class NotifMessageEdit extends Command {
     private void updateMsgAndRespond(CommandEvent event, String newMessage, String docId, String streamerName, String oldMessage) {
         DatabaseDriver.getInstance().updateMessage(docId, newMessage);
 
-        StringBuilder response = new StringBuilder();
+        String response = "";
+        response += String.format(
+                Locale.NOTIF_MESSAGE_EDIT_COMMAND_SUCCESSFUL,
+                streamerName);
+        response += String.format(
+                Locale.NOTIF_MESSAGE_EDIT_COMMAND_OLD_MESSAGE,
+                oldMessage);
+        response += String.format(
+                Locale.NOTIF_MESSAGE_EDIT_COMMAND_NEW_MESSAGE,
+                newMessage);
 
-        response.append("Notification message was changed for the following notification: `").append(streamerName).append("`");
-        response.append("\nOld message:\n```").append(oldMessage).append("```\n\n");
-        response.append("New message:\n```").append(newMessage).append("```");
-
-        event.reply(response.toString());
+        event.reply(response);
     }
 }

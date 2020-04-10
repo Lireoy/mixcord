@@ -1,10 +1,9 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.services.NotifierThread;
 import bot.services.ShardService;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,8 +16,8 @@ public class Shutdown extends Command {
 
     public Shutdown() {
         this.name = "Shutdown";
-        this.help = HelpConstants.SHUTDOWN_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.SHUTDOWN_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.arguments = "<reason>";
         this.guildOnly = false;
         this.ownerCommand = true;
@@ -46,7 +45,7 @@ public class Shutdown extends Command {
 
         if (reason.isEmpty()) {
             log.info("{} attempted to shutdown the bot, but failed because there was no reason provided.", commandAuthor);
-            commandEvent.reply("You need to provide a reason.");
+            commandEvent.reply(Locale.SHUTDOWN_COMMAND_NO_REASON);
         } else {
             log.info("Command ran by {}. Reason: {}", commandAuthor, reason);
             NotifierThread.getInstance().stop();

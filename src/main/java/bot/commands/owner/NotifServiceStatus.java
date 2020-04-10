@@ -1,9 +1,8 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.services.NotifService;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,8 +16,8 @@ public class NotifServiceStatus extends Command {
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
-        this.help = HelpConstants.NOTIF_SERVICE_STATUS_COMMAND_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.NOTIF_SERVICE_STATUS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -38,14 +37,12 @@ public class NotifServiceStatus extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        String message;
-        if(NotifService.getInstance().isRunning()) {
-            message = "Notifier service state: RUNNING";
+        if (NotifService.getInstance().isRunning()) {
+            commandEvent.reply(Locale.NOTIF_SERVICE_STATUS_COMMAND_RUNNING);
+            log.info(Locale.NOTIF_SERVICE_STATUS_COMMAND_RUNNING);
         } else {
-            message = "Notifier service state: NOT RUNNING";
+            commandEvent.reply(Locale.NOTIF_SERVICE_STATUS_COMMAND_NOT_RUNNING);
+            log.info(Locale.NOTIF_SERVICE_STATUS_COMMAND_NOT_RUNNING);
         }
-
-        commandEvent.reply(message);
-        log.info(message);
     }
 }
