@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -48,9 +49,23 @@ public class NotifService implements Runnable {
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
 
+
                     if (queryJson == null) {
+                        // Check if it's null or not. Idk what this would do if it's null
                         log.info("Query JSON was null.");
+                    } else if (queryJson.isEmpty()) {
+                        // If the JSON is empty then the streamer was deleted on Mixer or changed name
+                        // We delete all the correlating data to the streamer
+                        Cursor notifications = DatabaseDriver.getInstance().selectStreamerNotifs(streamer.getStreamerId());
+                        for (Object notificationObj : notifications) {
+                            Notification notif = new Gson().fromJson(
+                                    notificationObj.toString(), Notification.class);
+                            DatabaseDriver.getInstance().deleteNotif(notif.getId());
+                        }
+
+                        DatabaseDriver.getInstance().deleteStreamer(streamer.getStreamerId());
                     } else {
+                        // Do the status check, and notify if necessary
                         final boolean queryIsOnline = queryJson.getBoolean("online");
 
                         if (queryIsOnline && !streamer.isStreaming()) {
@@ -132,6 +147,7 @@ public class NotifService implements Runnable {
             if (ex instanceof ReqlOpFailedError) {
                 this.isRunning = false;
                 log.info("ReqlOpFailedError");
+                log.info("Message: {}", ex.getMessage());
                 ex.printStackTrace();
 
                 String message = BotConstants.WARNING + BotConstants.WARNING +
@@ -140,14 +156,18 @@ public class NotifService implements Runnable {
 
                 User owner = ShardService.getInstance().getUserById(Credentials.getInstance().getOwnerOne());
                 EventEmitter.emitInDm(owner, message);
+                EventEmitter.emitInDm(owner, ex.getMessage());
+                EventEmitter.emitInDm(owner, Arrays.toString(ex.getCause().getStackTrace()));
             } else {
                 log.info("General exception");
                 log.info("Message: {}", ex.getMessage());
                 ex.printStackTrace();
 
-                String message = String.format("General exception in NotifService. Content: %s", ex.getMessage());
+                String message = "General exception in NotifService.";
                 User owner = ShardService.getInstance().getUserById(Credentials.getInstance().getOwnerOne());
                 EventEmitter.emitInDm(owner, message);
+                EventEmitter.emitInDm(owner, ex.getMessage());
+                EventEmitter.emitInDm(owner, Arrays.toString(ex.getCause().getStackTrace()));
 
                 NotifierThread.getInstance().start();
             }
