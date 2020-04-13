@@ -16,7 +16,7 @@ public class Locale {
     // INFO COMMAND
     public static final String INFO_COMMAND_HELP = "Shows information about the bot.";
     public static final String INFO_COMMAND_UPTIME_TITLE = "Uptime";
-    public static final String INFO_COMMAND_UPTIME = "%s months, %s days, %s hours, %s minutes, %s seconds";
+    public static final String INFO_COMMAND_UPTIME = "%s days, %s hours, %s minutes, %s seconds";
     public static final String INFO_COMMAND_USAGE_TITLE = "Usage";
     public static final String INFO_COMMAND_USAGE = "· %s servers\n· %s members";
     public static final String INFO_COMMAND_JAVA_VERSION_TITLE = "Version";

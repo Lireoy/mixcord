@@ -47,8 +47,8 @@ public class Info extends Command {
         // Calculate uptime
         final long duration = ManagementFactory.getRuntimeMXBean().getUptime();
 
-        final long years = duration / 31104000000L;
-        final long months = duration / 2592000000L % 12;
+        //final long years = duration / 31104000000L;
+        //final long months = duration / 2592000000L % 12;
         final long days = duration / 86400000L % 30;
         final long hours = duration / 3600000L % 24;
         final long minutes = duration / 60000L % 60;
@@ -65,7 +65,7 @@ public class Info extends Command {
         uptime = StringUtil.replaceLastComma(uptime);*/
         String upTime = String.format(
                 Locale.INFO_COMMAND_UPTIME,
-                months, days, hours, minutes, seconds);
+                days, hours, minutes, seconds);
 
 
         // Usage segment
