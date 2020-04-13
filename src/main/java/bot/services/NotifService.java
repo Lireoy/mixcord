@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -48,66 +49,79 @@ public class NotifService implements Runnable {
                     Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
                     final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
 
-                    if (queryJson.isEmpty()) {
-                        log.info("Streamer not found.");
-                        return;
-                    }
 
-                    final boolean queryIsOnline = queryJson.getBoolean("online");
-
-                    if (queryIsOnline && !streamer.isStreaming()) {
-                        // Was offline, is now online
-
-                        log.info("{} ({}) is streaming. Processing...",
-                                streamer.getStreamerName(), streamer.getStreamerId());
-                        DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), true);
-
-                        log.info("Updated streaming to TRUE for {} ({})",
-                                streamer.getStreamerName(), streamer.getStreamerId());
-                        log.info("Queueing notifications...");
-
-                        // Select all notifications for this streamer from database
-                        Cursor notifications = DatabaseDriver.getInstance()
-                                .selectStreamerNotifs(streamer.getStreamerId());
-
+                    if (queryJson == null) {
+                        // Check if it's null or not. Idk what this would do if it's null
+                        log.info("Query JSON was null.");
+                    } else if (queryJson.isEmpty()) {
+                        // If the JSON is empty then the streamer was deleted on Mixer or changed name
+                        // We delete all the correlating data to the streamer
+                        Cursor notifications = DatabaseDriver.getInstance().selectStreamerNotifs(streamer.getStreamerId());
                         for (Object notificationObj : notifications) {
                             Notification notif = new Gson().fromJson(
                                     notificationObj.toString(), Notification.class);
-
-                            boolean dbEmbed = notif.isEmbed();
-                            if (dbEmbed) NotifSender.sendEmbed(notif, queryJson);
-                            else NotifSender.sendNonEmbed(notif);
-                            MetricsUtil.getInstance().incrementNotifsSent();
+                            DatabaseDriver.getInstance().deleteNotif(notif.getId());
                         }
-                        notifications.close();
-                    }
 
-                    if (!queryIsOnline && streamer.isStreaming()) {
-                        // Was online, is now offline
+                        DatabaseDriver.getInstance().deleteStreamer(streamer.getStreamerId());
+                    } else {
+                        // Do the status check, and notify if necessary
+                        final boolean queryIsOnline = queryJson.getBoolean("online");
 
-                        log.info("{} ({}) is not streaming. Processing...",
-                                streamer.getStreamerName(), streamer.getStreamerId());
+                        if (queryIsOnline && !streamer.isStreaming()) {
+                            // Was offline, is now online
 
-                        DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), false);
+                            log.info("{} ({}) is streaming. Processing...",
+                                    streamer.getStreamerName(), streamer.getStreamerId());
+                            DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), true);
 
-                        log.info("Updated streaming to FALSE for {} ({})",
-                                streamer.getStreamerName(), streamer.getStreamerId());
-                        log.info("Queueing event end message...");
+                            log.info("Updated streaming to TRUE for {} ({})",
+                                    streamer.getStreamerName(), streamer.getStreamerId());
+                            log.info("Queueing notifications...");
 
-                        // Select all notifications for this streamer from database
-                        Cursor notifications = DatabaseDriver.getInstance()
-                                .selectStreamerNotifs(streamer.getStreamerId());
+                            // Select all notifications for this streamer from database
+                            Cursor notifications = DatabaseDriver.getInstance()
+                                    .selectStreamerNotifs(streamer.getStreamerId());
 
-                        for (Object notificationObj : notifications) {
-                            Notification notif = new Gson().fromJson(
-                                    notificationObj.toString(), Notification.class);
-                            NotifSender.sendOfflineMsg(notif);
-                            MetricsUtil.getInstance().incrementNotifsSent();
+                            for (Object notificationObj : notifications) {
+                                Notification notif = new Gson().fromJson(
+                                        notificationObj.toString(), Notification.class);
+
+                                boolean dbEmbed = notif.isEmbed();
+                                if (dbEmbed) NotifSender.sendEmbed(notif, queryJson);
+                                else NotifSender.sendNonEmbed(notif);
+                                MetricsUtil.getInstance().incrementNotifsSent();
+                            }
+                            notifications.close();
                         }
-                        notifications.close();
+
+                        if (!queryIsOnline && streamer.isStreaming()) {
+                            // Was online, is now offline
+
+                            log.info("{} ({}) is not streaming. Processing...",
+                                    streamer.getStreamerName(), streamer.getStreamerId());
+
+                            DatabaseDriver.getInstance().updateIsStreaming(streamer.getId(), false);
+
+                            log.info("Updated streaming to FALSE for {} ({})",
+                                    streamer.getStreamerName(), streamer.getStreamerId());
+                            log.info("Queueing event end message...");
+
+                            // Select all notifications for this streamer from database
+                            Cursor notifications = DatabaseDriver.getInstance()
+                                    .selectStreamerNotifs(streamer.getStreamerId());
+
+                            for (Object notificationObj : notifications) {
+                                Notification notif = new Gson().fromJson(
+                                        notificationObj.toString(), Notification.class);
+                                NotifSender.sendOfflineMsg(notif);
+                                MetricsUtil.getInstance().incrementNotifsSent();
+                            }
+                            notifications.close();
+                        }
+                        MetricsUtil.getInstance().incrementStreamersProcessed();
+                        streamers.close();
                     }
-                    MetricsUtil.getInstance().incrementStreamersProcessed();
-                    streamers.close();
                 }
 
                 MetricsUtil.getInstance().stopTimer();
@@ -128,29 +142,33 @@ public class NotifService implements Runnable {
 
                 MetricsUtil.getInstance().reset();
             }
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             if (ex instanceof ReqlOpFailedError) {
                 this.isRunning = false;
                 log.info("ReqlOpFailedError");
+                log.info("Message: {}", ex.getMessage());
                 ex.printStackTrace();
 
                 String message = BotConstants.WARNING + BotConstants.WARNING +
                         "There is a database issue. Stopping the notifier service." +
                         BotConstants.WARNING + BotConstants.WARNING;
 
-                sendReportInDm(Credentials.getInstance().getOwnerOne(), message);
-            } else if (ex instanceof NullPointerException) {
-                log.info("NullPointer in the loop, sleeping then continue.");
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                NotifierThread.getInstance().start();
+                User owner = ShardService.getInstance().getUserById(Credentials.getInstance().getOwnerOne());
+                EventEmitter.emitInDm(owner, message);
+                EventEmitter.emitInDm(owner, ex.getMessage());
+                EventEmitter.emitInDm(owner, Arrays.toString(ex.getCause().getStackTrace()));
             } else {
                 log.info("General exception");
                 log.info("Message: {}", ex.getMessage());
                 ex.printStackTrace();
+
+                String message = "General exception in NotifService.";
+                User owner = ShardService.getInstance().getUserById(Credentials.getInstance().getOwnerOne());
+                EventEmitter.emitInDm(owner, message);
+                EventEmitter.emitInDm(owner, ex.getMessage());
+                EventEmitter.emitInDm(owner, Arrays.toString(ex.getCause().getStackTrace()));
+
                 NotifierThread.getInstance().start();
             }
         }
@@ -163,12 +181,5 @@ public class NotifService implements Runnable {
 
     public boolean isRunning() {
         return isRunning;
-    }
-
-    private void sendReportInDm(String userId, String message) {
-        User owner = ShardService.getInstance().getUserById(userId);
-        assert owner != null;
-        owner.openPrivateChannel().queue(
-                channel -> channel.sendMessage(message).queue());
     }
 }

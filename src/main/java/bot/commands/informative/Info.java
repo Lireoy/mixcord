@@ -1,11 +1,9 @@
 package bot.commands.informative;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
-import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +25,8 @@ public class Info extends Command {
 
     public Info() {
         this.name = "Info";
-        this.help = HelpConstants.INFO_COMMAND_HELP;
-        this.category = new Category(CommandCategory.INFORMATIVE.toString());
+        this.help = Locale.INFO_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -49,22 +47,26 @@ public class Info extends Command {
         // Calculate uptime
         final long duration = ManagementFactory.getRuntimeMXBean().getUptime();
 
-        final long years = duration / 31104000000L;
-        final long months = duration / 2592000000L % 12;
+        //final long years = duration / 31104000000L;
+        //final long months = duration / 2592000000L % 12;
         final long days = duration / 86400000L % 30;
         final long hours = duration / 3600000L % 24;
         final long minutes = duration / 60000L % 60;
         final long seconds = duration / 1000L % 60;
 
-        String uptime =
+
+        /*String uptime =
                 (years == 0 ? "" : years + " years, ") +
                         (months == 0 ? "" : months + " months, ") +
                         (days == 0 ? "" : days + " days, ") +
                         (hours == 0 ? "" : hours + " hours, ") +
                         (minutes == 0 ? "" : minutes + " minutes, ") +
                         (seconds == 0 ? "" : seconds + " seconds, ");
+        uptime = StringUtil.replaceLastComma(uptime);*/
+        String upTime = String.format(
+                Locale.INFO_COMMAND_UPTIME,
+                days, hours, minutes, seconds);
 
-        uptime = StringUtil.replaceLastComma(uptime);
 
         // Usage segment
         final int guildCount = commandEvent.getJDA().getGuilds().size();
@@ -74,42 +76,73 @@ public class Info extends Command {
         for (int i = 0; i < guildCount; i++) {
             memberCount += commandEvent.getJDA().getGuilds().get(i).getMembers().size();
         }
-        String usage = "· " + guildCount + " servers\n· " + memberCount + " members";
+
+        String usage = String.format(
+                Locale.INFO_COMMAND_USAGE,
+                guildCount, memberCount);
 
         // Get Java version
-        String version = "· Java " + System.getProperty("java.version");
+        String version = String.format(
+                Locale.INFO_COMMAND_JAVA_VERSION,
+                System.getProperty("java.version"));
 
         // Shards
         final long ping = commandEvent.getJDA().getGatewayPing();
         final int shardId = commandEvent.getJDA().getShardInfo().getShardId();
         final int totalShards = commandEvent.getJDA().getShardInfo().getShardTotal();
-        String shards = "· Current shard: " + shardId + "\n· Shard latency: "
-                + ping + "ms\n· Total shards: " + totalShards;
+        String shards = String.format(
+                Locale.INFO_COMMAND_SHARDS,
+                shardId, ping, totalShards);
 
         // System
         Runtime rt = Runtime.getRuntime();
-        final String systemInfo = rt.freeMemory() / 1024 / 1024 + "MB / " + rt.maxMemory() / 1024 / 1024 + "MB";
+        final String systemInfo = String.format(
+                Locale.INFO_COMMAND_RAM_USAGE,
+                rt.freeMemory() / 1024 / 1024,
+                rt.maxMemory() / 1024 / 1024
+        );
 
         // Links
-        final String links = "· Website: " + BotConstants.MIXCORD_IO + " \n" +
-                "· Discord: " + BotConstants.DISCORD;
-
-        // Developers
-        final String developers = "Lead Dev: Lireoy#4444\nConsultant: Akira#8185";
-
-        // Infrastructure
-        final String infrastructure = "Provided by Akira#8185";
+        final String links = String.format(
+                Locale.INFO_COMMAND_LINKS,
+                BotConstants.MIXCORD_IO,
+                BotConstants.DISCORD
+        );
 
         commandEvent.reply(new MixerEmbedBuilder()
-                .setTitle("Mixcord")
-                .addField("Uptime", uptime, false)
-                .addField("Usage", usage, true)
-                .addField("Version", version, true)
-                .addField("Shards", shards, true)
-                .addField("System", systemInfo, false)
-                .addField("Links", links, false)
-                .addField("Developers", developers, false)
-                .addField("Infrastructure", infrastructure, false)
+                .setTitle(commandEvent.getJDA().getSelfUser().getName())
+                .addField(
+                        Locale.INFO_COMMAND_UPTIME_TITLE,
+                        upTime,
+                        false)
+                .addField(
+                        Locale.INFO_COMMAND_USAGE_TITLE,
+                        usage,
+                        true)
+                .addField(
+                        Locale.INFO_COMMAND_JAVA_VERSION_TITLE,
+                        version,
+                        true)
+                .addField(
+                        Locale.INFO_COMMAND_SHARDS_TITLE,
+                        shards,
+                        true)
+                .addField(
+                        Locale.INFO_COMMAND_RAM_USAGE_TITLE,
+                        systemInfo,
+                        false)
+                .addField(
+                        Locale.INFO_COMMAND_LINKS_TITLE,
+                        links,
+                        false)
+                .addField(
+                        Locale.INFO_COMMAND_DEVELOPER_TITLE,
+                        Locale.INFO_COMMAND_DEVELOPER,
+                        false)
+                .addField(
+                        Locale.INFO_COMMAND_INFRASTRUCTURE_TITLE,
+                        Locale.INFO_COMMAND_INFRASTRUCTURE,
+                        false)
                 .build());
     }
 }

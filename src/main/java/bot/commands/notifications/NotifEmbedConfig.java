@@ -1,11 +1,10 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -24,8 +23,8 @@ public class NotifEmbedConfig extends Command {
 
     public NotifEmbedConfig() {
         this.name = "NotifEmbedConfig";
-        this.help = HelpConstants.NOTIF_EMBED_CONFIG_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.NOTIF_EMBED_CONFIG_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>, <true | false>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -47,14 +46,17 @@ public class NotifEmbedConfig extends Command {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
+        final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
         final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, true`";
 
         boolean newEmbedValue = true;
         boolean booleanConvetSuccess = false;
 
         if (args.length < 2) {
-            commandEvent.reply("Please provide a full configuration." + example);
+            commandEvent.reply(
+                    String.format(
+                            Locale.NOTIF_EMBED_CONFIG_COMMAND_NO_FULL_CONFIG,
+                            example));
             return;
         }
 
@@ -62,17 +64,20 @@ public class NotifEmbedConfig extends Command {
         String sendAsEmbed = args[1].trim();
 
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         if (sendAsEmbed.isEmpty()) {
-            commandEvent.reply("Please provide a full configuration." + example);
+            commandEvent.reply(
+                    String.format(
+                            Locale.NOTIF_EMBED_CONFIG_COMMAND_NO_FULL_CONFIG,
+                            example));
             return;
         }
 
@@ -86,13 +91,13 @@ public class NotifEmbedConfig extends Command {
         }
 
         if (!booleanConvetSuccess) {
-            commandEvent.reply("Please provide a valid embed value." + example);
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_INVALID_EMBED_VALUE);
             return;
         }
 
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There is no such notification in this channel");
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
 
@@ -107,27 +112,28 @@ public class NotifEmbedConfig extends Command {
         if (StringUtil.containsIgnoreCase(notif.getMessage(), MIXER_PATTERN2)) containsLink = true;
 
         if (!containsLink) {
-            commandEvent.reply("Your notification message does not contain a link to the streamer. " +
-                    "Please include one, and try again.");
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_NO_LINK);
             return;
         }
 
         if (notif.isEmbed() == newEmbedValue) {
-            commandEvent.reply("This embed configuration is already set.");
+            commandEvent.reply(Locale.NOTIF_EMBED_CONFIG_COMMAND_ALREADY_SET);
             return;
         }
 
         DatabaseDriver.getInstance().updateEmbed(notif.getId(), newEmbedValue);
 
-        StringBuilder response = new StringBuilder();
-        response.append("Notification format was changed for the following notification: `")
-                .append(notif.getStreamerName()).append("`");
+        String response = "";
+        response += String.format(
+                Locale.NOTIF_EMBED_CONFIG_COMMAND_SUCCESSFUL,
+                notif.getStreamerName());
+
         if (newEmbedValue) {
-            response.append("\nThis notification will be sent as an embed in the future.");
+            response += Locale.NOTIF_EMBED_CONFIG_COMMAND_SEND_AS_EMBED;
         } else {
-            response.append("\nThis notification will be sent without an embed in the future.");
+            response += Locale.NOTIF_EMBED_CONFIG_COMMAND_SEND_AS_NON_EMBED;
         }
 
-        commandEvent.reply(response.toString());
+        commandEvent.reply(response);
     }
 }

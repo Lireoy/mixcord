@@ -1,8 +1,9 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
+import bot.constants.Locale;
 import bot.services.ClientService;
-import bot.structures.enums.CommandCategory;
+import bot.services.ShardService;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,7 +16,8 @@ public class Owners extends Command {
 
     public Owners() {
         this.name = "Owners";
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.OWNERS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -35,13 +37,35 @@ public class Owners extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        String ownerOne = ClientService.getInstance().getOwnerId();
-        StringBuilder stringBuilder = new StringBuilder("Owners of this bot are:\n");
-        stringBuilder.append("· <@").append(ownerOne).append(">\n");
-        for (String owner : ClientService.getInstance().getCoOwnerIds()) {
-            stringBuilder.append("· <@").append(owner).append(">\n");
+        StringBuilder response = new StringBuilder(Locale.OWNERS_COMMAND_TITLE);
+
+        User ownerOne = ShardService.getInstance().getUserById(
+                ClientService.getInstance().getOwnerId());
+
+        if (ownerOne == null) {
+            commandEvent.reply(Locale.OWNERS_COMMAND_NO_OWNER);
+            return;
         }
 
-        commandEvent.reply(stringBuilder.toString());
+        response.append(
+                String.format(
+                        Locale.OWNERS_COMMAND_OWNER_LINE,
+                        ownerOne.getName(),
+                        ownerOne.getDiscriminator()));
+
+        for (String ownerId : ClientService.getInstance().getCoOwnerIds()) {
+            User ownerN = ShardService.getInstance().getUserById(ownerId);
+            if (ownerN == null) {
+                return;
+            }
+
+            response.append(
+                    String.format(
+                            Locale.OWNERS_COMMAND_OWNER_LINE,
+                            ownerN.getName(),
+                            ownerN.getDiscriminator()));
+        }
+
+        commandEvent.reply(response.toString());
     }
 }

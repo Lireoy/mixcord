@@ -89,6 +89,10 @@ public class DatabaseDriver {
         return streamers.map(ReqlExpr::toJson).run(connection);
     }
 
+    public long countAllStreamers() {
+        return streamers.count().run(connection);
+    }
+
     /**
      * Selects all notifications from the notifications table
      * for the specified streamer mapped to JSON.
@@ -211,6 +215,10 @@ public class DatabaseDriver {
      */
     public Cursor selectAllNotifs() {
         return notifications.map(ReqlExpr::toJson).run(connection);
+    }
+
+    public long countAllNotifs() {
+        return notifications.count().run(connection);
     }
 
     /**
@@ -430,6 +438,10 @@ public class DatabaseDriver {
      */
     public Cursor selectAllGuilds() {
         return guilds.map(ReqlExpr::toJson).run(connection);
+    }
+
+    public long countAllGuilds() {
+        return guilds.count().run(connection);
     }
 
     /**

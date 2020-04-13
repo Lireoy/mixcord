@@ -1,8 +1,7 @@
 package bot.commands.informative;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,8 +24,8 @@ public class Ping extends Command {
     public Ping() {
         this.name = "Ping";
         this.aliases = new String[]{"Pong", "Pingpong", "Latency"};
-        this.help = HelpConstants.PING_COMMAND_HELP;
-        this.category = new Category(CommandCategory.INFORMATIVE.toString());
+        this.help = Locale.PING_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -44,12 +43,18 @@ public class Ping extends Command {
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        commandEvent.reply("Calculating...", (m) -> {
-            final long ping = commandEvent.getMessage().getTimeCreated().until(m.getTimeCreated(),
-                    ChronoUnit.MILLIS);
+        commandEvent.reply(Locale.PING_COMMAND_CALCULATING, (m) -> {
+            final long ping =
+                    commandEvent.getMessage()
+                            .getTimeCreated()
+                            .until(m.getTimeCreated(),
+                                    ChronoUnit.MILLIS);
+            final long gatewayPing = commandEvent.getJDA().getGatewayPing();
 
-            m.editMessage("Ping: " + ping + "ms | Websocket: " +
-                    commandEvent.getJDA().getGatewayPing() + "ms").queue();
+            m.editMessage(String.format(
+                    Locale.PING_COMMAND_REPLY,
+                    ping, gatewayPing)
+            ).queue();
         });
     }
 }

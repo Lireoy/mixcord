@@ -1,15 +1,12 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
-import bot.structures.Credentials;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.HexUtil;
 import bot.utils.MixerEmbedBuilder;
-import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,15 +14,14 @@ import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
-import org.json.JSONObject;
 
 @Slf4j
 public class NotifDetails extends Command {
 
     public NotifDetails() {
         this.name = "NotifDetails";
-        this.help = HelpConstants.NOTIF_DETAILS_HELP;
-        this.category = new Command.Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.NOTIF_DETAILS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -47,62 +43,21 @@ public class NotifDetails extends Command {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-
-        if (commandAuthor.getId().equals(Credentials.getInstance().getOwnerOne()) ||
-                commandAuthor.getId().equals(Credentials.getInstance().getOwnerTwo()) ||
-                commandAuthor.getId().equals(Credentials.getInstance().getOwnerThree())) {
-
-            final String[] args = StringUtil.separateArgs(commandEvent.getArgs());
-
-            String streamerName = "";
-            String json = "";
-
-            if (args.length > 1) {
-                streamerName = args[0].trim();
-                json = args[1].trim();
-            } else {
-                streamerName = args[0].trim();
-            }
-
-            if (streamerName.isEmpty()) {
-                commandEvent.reply("Please provide a streamer name!");
-                return;
-            }
-
-            if (streamerName.length() > 20) {
-                commandEvent.reply("This name is too long! Please provide a shorter one! (max 20 chars)");
-                return;
-            }
-
-            final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
-            if (!cursor.hasNext()) {
-                commandEvent.reply("There is no such notification...");
-                return;
-            }
-
-            if (json.equalsIgnoreCase("json")) {
-                String reply = "```json\n" + new JSONObject(cursor.next().toString()).toString(2) + "```";
-                commandEvent.reply(reply);
-                cursor.close();
-                return;
-            }
-        }
-
         final String username = commandEvent.getArgs();
 
         // Empty args check
         if (username.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_NO_STREAMER_NAME);
         }
 
         if (username.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one!");
+            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, username);
         if (!cursor.hasNext()) {
-            commandEvent.reply("There is no such notification...");
+            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_NO_SUCH_NOTIFICATION);
             return;
         }
 
@@ -110,13 +65,30 @@ public class NotifDetails extends Command {
         cursor.close();
 
         commandEvent.reply(new MixerEmbedBuilder()
-                .setTitle("Notification details")
+                .setTitle(Locale.NOTIF_DETAILS_COMMAND_NOTIFICATION_DETAILS_TITLE)
                 .setColor(HexUtil.getInstance().formatForEmbed(notif.getEmbedColor()))
-                .addField("Name", notif.getStreamerName(), false)
-                .addField("Send in embed", String.valueOf(notif.isEmbed()), false)
-                .addField("Embed color", "#" + notif.getEmbedColor(), false)
-                .addField("Stream start message", notif.getMessage(), false)
-                .addField("Stream end message", notif.getStreamEndMessage(), false)
+                .addField(
+                        Locale.NOTIF_DETAILS_COMMAND_NAME_TITLE,
+                        notif.getStreamerName(),
+                        false)
+                .addField(
+                        Locale.NOTIF_DETAILS_COMMAND_SEND_EMBED_TITLE,
+                        String.valueOf(notif.isEmbed()),
+                        false)
+                .addField(
+                        Locale.NOTIF_DETAILS_COMMAND_EMBED_COLOR_TITLE,
+                        String.format(
+                                Locale.NOTIF_DETAILS_COMMAND_EMBED_COLOR,
+                                notif.getEmbedColor()),
+                        false)
+                .addField(
+                        Locale.NOTIF_DETAILS_COMMAND_START_MESSAGE_TITLE,
+                        notif.getMessage(),
+                        false)
+                .addField(
+                        Locale.NOTIF_DETAILS_COMMAND_END_MESSAGE_TITLE,
+                        notif.getStreamEndMessage(),
+                        false)
                 .build());
     }
 }

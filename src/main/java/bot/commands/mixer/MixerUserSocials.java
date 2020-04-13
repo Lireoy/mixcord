@@ -1,8 +1,7 @@
 package bot.commands.mixer;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
@@ -22,8 +21,8 @@ public class MixerUserSocials extends Command {
 
     public MixerUserSocials() {
         this.name = "MixerUserSocials";
-        this.help = HelpConstants.MIXER_USER_SOCIALS_HELP;
-        this.category = new Category(CommandCategory.MIXER.toString());
+        this.help = Locale.MIXER_USER_SOCIALS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("MIXER"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
@@ -48,12 +47,12 @@ public class MixerUserSocials extends Command {
 
 
         if (streamerName.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (streamerName.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one!");
+            commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_TOO_LONG_NAME);
             return;
         }
 
@@ -61,13 +60,12 @@ public class MixerUserSocials extends Command {
 
         if (channel == null) {
             commandEvent.reactError();
-            commandEvent.reply("Query response JSON was null, when requesting data for a user, " +
-                    "please contact the developer: **Lireoy#4444**");
+            commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_JSON_WAS_NULL);
             return;
         }
 
         if (channel.isEmpty()) {
-            commandEvent.reply("There is no such streamer...");
+            commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_NO_SUCH_STREAMER);
             return;
         }
 
@@ -75,56 +73,81 @@ public class MixerUserSocials extends Command {
         final JSONObject socials = user.optJSONObject("social");
 
         StringBuilder description = new StringBuilder();
-        boolean hasSocial = false;
 
         if (socials.has("facebook")) {
-            description.append("· [Facebook](").append(socials.optString("facebook")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_FACEBOOK,
+                            socials.optString("facebook")));
+
         }
         if (socials.has("instagram")) {
-            description.append("· [Instagram](").append(socials.optString("instagram")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_INSTAGRAM,
+                            socials.optString("instagram")));
         }
+
         if (socials.has("twitter")) {
-            description.append("· [Twitter](").append(socials.optString("twitter")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_TWITTER,
+                            socials.optString("twitter")));
         }
+
         if (socials.has("youtube")) {
-            description.append("· [Youtube](").append(socials.optString("youtube")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_YOUTUBE,
+                            socials.optString("youtube")));
         }
+
         if (socials.has("discord")) {
-            description.append("· [Discord](").append(socials.optString("discord")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_DISCORD,
+                            socials.optString("discord")));
         }
+
         if (socials.has("patreon")) {
-            description.append("· [Patreon](").append(socials.optString("patreon")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_PATREON,
+                            socials.optString("patreon")));
         }
+
         if (socials.has("player")) {
-            description.append("· [Player](").append(socials.optString("player")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_PLAYER,
+                            socials.optString("player")));
         }
+
         if (socials.has("soundcloud")) {
-            description.append("· [Soundcloud](").append(socials.optString("soundcloud")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_SOUNDCLOUD,
+                            socials.optString("soundcloud")));
         }
+
         if (socials.has("steam")) {
-            description.append("· [Steam](").append(socials.optString("steam")).append(")\n");
-            hasSocial = true;
+            description.append(
+                    String.format(
+                            Locale.MIXER_USER_SOCIALS_COMMAND_STEAM,
+                            socials.optString("steam")));
         }
         // TODO: FIND A SPREADSHIRT LINKED ACCOUNT
 
-        if (hasSocial) {
+        if (description.toString().isEmpty()) {
+            description.append(Locale.MIXER_USER_SOCIALS_COMMAND_NO_SOCIALS);
             commandEvent.reply(new MixerEmbedBuilder(channel)
                     .setCustomAuthor()
-                    .setCustomThumbnail()
                     .setDescription(description)
                     .build());
         } else {
-            description = new StringBuilder("No socials are available.");
             commandEvent.reply(new MixerEmbedBuilder(channel)
                     .setCustomAuthor()
+                    .setCustomThumbnail()
                     .setDescription(description)
                     .build());
         }

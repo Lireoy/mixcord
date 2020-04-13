@@ -1,8 +1,7 @@
 package bot.commands.informative;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
-import bot.structures.enums.CommandCategory;
+import bot.constants.Locale;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,8 +18,8 @@ public class WhoCanUseMe extends Command {
 
     public WhoCanUseMe() {
         this.name = "WhoCanUseMe";
-        this.help = HelpConstants.WHO_CAN_USE_ME_COMMAND_HELP;
-        this.category = new Category(CommandCategory.INFORMATIVE.toString());
+        this.help = Locale.WHO_CAN_USE_ME_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -55,20 +54,23 @@ public class WhoCanUseMe extends Command {
         StringBuilder description = new StringBuilder();
 
         if (roleWithManageServer.size() < 1 && roleToUse.size() < 1) {
-            commandEvent.reply("There are no roles which can use Mixcord.");
+            commandEvent.reply(Locale.WHO_CAN_USE_ME_COMMAND_NO_ROLES);
             return;
         }
 
         if (roleWithManageServer.size() > 0) {
-            description.append("Roles which can manage notifications:\n\n");
+            description.append(Locale.WHO_CAN_USE_ME_COMMAND_MANAGE_NOTIFS);
             for (Role role : roleWithManageServer) {
-                String simpleLine = "· <@&%s>\n";
-                String advancedLine = "· <@&%s> (Managed by an integration)\n";
-
                 if (role.isManaged()) {
-                    description.append(String.format(advancedLine, role.getId()));
+                    description.append(
+                            String.format(
+                                    Locale.WHO_CAN_USE_ME_COMMAND_ADVANCED_LINE,
+                                    role.getId()));
                 } else {
-                    description.append(String.format(simpleLine, role.getId()));
+                    description.append(
+                            String.format(
+                                    Locale.WHO_CAN_USE_ME_COMMAND_SIMPLE_LINE,
+                                    role.getId()));
                 }
             }
         }
@@ -77,15 +79,18 @@ public class WhoCanUseMe extends Command {
             description.append("\n").append("=================================\n\n");
 
         if (roleToUse.size() > 0) {
-            description.append("Roles which can use basic commands:\n\n");
+            description.append(Locale.WHO_CAN_USE_ME_COMMAND_BASIC_COMMANDS);
             for (Role role : roleToUse) {
-                String simpleLine = "· <@&%s>\n";
-                String advancedLine = "· <@&%s> (Managed by an integration)\n";
-
                 if (role.isManaged()) {
-                    description.append(String.format(advancedLine, role.getId()));
+                    description.append(
+                            String.format(
+                                    Locale.WHO_CAN_USE_ME_COMMAND_ADVANCED_LINE,
+                                    role.getId()));
                 } else {
-                    description.append(String.format(simpleLine, role.getId()));
+                    description.append(
+                            String.format(
+                                    Locale.WHO_CAN_USE_ME_COMMAND_SIMPLE_LINE,
+                                    role.getId()));
                 }
             }
         }

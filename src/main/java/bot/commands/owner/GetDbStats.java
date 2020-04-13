@@ -1,7 +1,8 @@
-package bot.commands.informative;
+package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
+import bot.database.DatabaseDriver;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
@@ -10,18 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 
-/**
- * Sends the bot's invite link to the user in a formatted embed.
- */
 @Slf4j
-public class Invite extends Command {
+public class GetDbStats extends Command {
 
-    public Invite() {
-        this.name = "Invite";
-        this.aliases = new String[]{"Inv", "GetOverHere"};
-        this.help = Locale.INVITE_COMMAND_HELP;
-        this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
-        this.guildOnly = true;
+    public GetDbStats() {
+        this.name = "GetDbStats";
+        this.help = Locale.GET_DB_STATS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
+        this.guildOnly = false;
+        this.ownerCommand = true;
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -35,17 +33,19 @@ public class Invite extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        final String clientId = commandEvent.getSelfUser().getId();
-        String finalDescription = String.format(Locale.INVITE_COMMAND_INVITE_LINK, clientId);
+        String message = String.format(
+                Locale.GET_DB_STATS_COMMAND_STATISTICS,
+                DatabaseDriver.getInstance().countAllGuilds(),
+                DatabaseDriver.getInstance().countAllStreamers(),
+                DatabaseDriver.getInstance().countAllNotifs());
 
-        commandEvent.reactSuccess();
         commandEvent.reply(new MixerEmbedBuilder()
-                .setAuthor(Locale.INVITE_COMMAND_INVITE_TITLE)
-                .setDescription(finalDescription)
+                .setTitle(Locale.GET_DB_STATS_COMMAND_STATISTICS_TITLE)
+                .setDescription(message)
                 .build());
     }
 }
