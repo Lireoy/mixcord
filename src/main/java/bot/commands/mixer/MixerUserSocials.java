@@ -139,7 +139,7 @@ public class MixerUserSocials extends Command {
         // TODO: FIND A SPREADSHIRT LINKED ACCOUNT
 
         if (description.toString().isEmpty()) {
-            description = new StringBuilder(Locale.MIXER_USER_SOCIALS_COMMAND_NO_SOCIALS);
+            description.append(Locale.MIXER_USER_SOCIALS_COMMAND_NO_SOCIALS);
             commandEvent.reply(new MixerEmbedBuilder(channel)
                     .setCustomAuthor()
                     .setDescription(description)
