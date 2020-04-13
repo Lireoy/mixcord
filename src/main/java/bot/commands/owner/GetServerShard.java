@@ -16,6 +16,7 @@ public class GetServerShard extends Command {
     public GetServerShard() {
         this.name = "GetServerShard";
         this.category = new Category(Locale.CATEGORIES.get("OWNER"));
+        this.arguments = "<server ID>, <total number of shards>";
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -29,7 +30,7 @@ public class GetServerShard extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " 348110542667251712"};
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " 348110542667251712, 12"};
 
         final boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);

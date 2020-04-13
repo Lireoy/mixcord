@@ -289,7 +289,7 @@ public class Locale {
     public static final String WHITELIST_COMMAND_NO_FIRST_ARG = "First parameter was empty.\n`%s`";
     public static final String WHITELIST_COMMAND_NO_SECOND_ARG = "Second parameter was empty.\n%s`";
     public static final String WHITELIST_COMMAND_INVALID_SECOND_ARG = "Please provide a valid second arguments. `true` or `false`";
-    public static final String WHITELIST_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration. %s%s";
+    public static final String WHITELIST_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration.";
     public static final String WHITELIST_COMMAND_OWNER_NOT_AVAILABLE = "(Could not retrieve owner ID)";
     public static final String WHITELIST_COMMAND_NAME_NOT_AVAILABLE = "(Could not retrieve name)";
     public static final String WHITELIST_COMMAND_LINE = "· <@%s> - `%s` - `%s` - `%s members`\n";

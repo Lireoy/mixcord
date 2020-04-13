@@ -69,16 +69,18 @@ public class Whitelist extends Command {
             StringBuilder serversDetails = new StringBuilder();
             for (Object o : cursor) {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
-                final Guild guild = ShardService.getInstance().getGuildById(server.getServerId());
 
-                final String guildOwnerId = guild != null ? guild.getOwnerId() : Locale.WHITELIST_COMMAND_OWNER_NOT_AVAILABLE;
-                final String guildName = guild != null ? guild.getName() : Locale.WHITELIST_COMMAND_NAME_NOT_AVAILABLE;
-                final String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
+                if (server.isWhitelisted()) {
+                    final Guild guild = ShardService.getInstance().getGuildById(server.getServerId());
+                    final String guildOwnerId = guild != null ? guild.getOwnerId() : Locale.WHITELIST_COMMAND_OWNER_NOT_AVAILABLE;
+                    final String guildName = guild != null ? guild.getName() : Locale.WHITELIST_COMMAND_NAME_NOT_AVAILABLE;
+                    final String guildMemberCount = guild != null ? String.valueOf(guild.getMembers().size()) : "-1";
 
-                final String formattedLine = String.format(
-                        Locale.WHITELIST_COMMAND_LINE,
-                        guildOwnerId, guildName, server.getServerId(), guildMemberCount);
-                serversDetails.append(formattedLine);
+                    final String formattedLine = String.format(
+                            Locale.WHITELIST_COMMAND_LINE,
+                            guildOwnerId, guildName, server.getServerId(), guildMemberCount);
+                    serversDetails.append(formattedLine);
+                }
             }
 
             cursor.close();
