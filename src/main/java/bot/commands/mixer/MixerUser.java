@@ -152,31 +152,40 @@ public class MixerUser extends Command {
                             Locale.MIXER_USER_COMMAND_BIO_TITLE,
                             bio,
                             false)
-                    .addField(Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
                             trusted,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_STATUS_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_STATUS_TITLE,
                             status,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
                             followers,
                             false)
-                    .addField(Locale.MIXER_USER_COMMAND_CURRENTLY_LIVE_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_CURRENTLY_LIVE_TITLE,
                             streamTitle,
                             false)
-                    .addField(Locale.MIXER_USER_COMMAND_GAME_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_GAME_TITLE,
                             currentGame,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_VIEWERS_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_VIEWERS_TITLE,
                             viewersCurrent,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_LANGUAGE_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_LANGUAGE_TITLE,
                             language,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_TARGET_AUDIENCE_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_TARGET_AUDIENCE_TITLE,
                             targetAudience,
                             true)
-                    .addField(Locale.MIXER_USER_COMMAND_LINK_TITLE,
+                    .addField(
+                            Locale.MIXER_USER_COMMAND_LINK_TITLE,
                             liveStreamLink,
                             false)
                     .setImage(liveThumbnail)
