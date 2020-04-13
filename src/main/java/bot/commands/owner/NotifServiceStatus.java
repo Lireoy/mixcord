@@ -1,15 +1,14 @@
 package bot.commands.owner;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.services.NotifService;
-import bot.services.NotifierThread;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
 public class NotifServiceStatus extends Command {
@@ -17,8 +16,8 @@ public class NotifServiceStatus extends Command {
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
         this.aliases = new String[]{"Status", "NotifierServiceStatus"};
-        this.help = HelpConstants.NOTIF_SERVICE_STATUS_HELP;
-        this.category = new Category(CommandCategory.OWNER.toString());
+        this.help = Locale.NOTIF_SERVICE_STATUS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
         this.botPermissions = new Permission[]{
@@ -29,16 +28,21 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final String state = "I aight no fukcing body knows dude.... Maybe you should implement this shite matey.";
-        String message = "Notifier service state: " + state;
+        final User commandAuthor = commandEvent.getAuthor();
+        log.info("Command ran by {}", commandAuthor);
 
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        boolean helpResponse = HelpUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
-        commandEvent.reply(message);
-        log.info(message);
+        if (NotifService.getInstance().isRunning()) {
+            commandEvent.reply(Locale.NOTIF_SERVICE_STATUS_COMMAND_RUNNING);
+            log.info(Locale.NOTIF_SERVICE_STATUS_COMMAND_RUNNING);
+        } else {
+            commandEvent.reply(Locale.NOTIF_SERVICE_STATUS_COMMAND_NOT_RUNNING);
+            log.info(Locale.NOTIF_SERVICE_STATUS_COMMAND_NOT_RUNNING);
+        }
     }
 }

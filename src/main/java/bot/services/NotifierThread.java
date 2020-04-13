@@ -21,6 +21,7 @@ public class NotifierThread {
     public void start() {
         if (thread == null) {
             thread = new Thread(NotifService.getInstance());
+            thread.setName("NotifService");
             thread.start();
             log.info("Notifier thread was started.");
         }

@@ -1,11 +1,10 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -26,8 +25,8 @@ public class ServerNotifs extends Command {
     public ServerNotifs() {
         this.name = "ServerNotifs";
         this.aliases = new String[]{"ListAllNotifs", "ListAllNotifications"};
-        this.help = HelpConstants.SERVER_NOTIFS_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.SERVER_NOTIFS_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
@@ -52,36 +51,44 @@ public class ServerNotifs extends Command {
         String prevChannel = "";
         if (list.isEmpty()) {
             commandEvent.reactError();
-            commandEvent.reply("There are no notifications in this channel");
+            commandEvent.reply(Locale.SERVER_NOTIFS_COMMAND_NO_NOTIFICATIONS);
             return;
         }
 
         StringBuilder description = new StringBuilder();
         for (Object doc : list) {
             Notification notif = new Gson().fromJson(doc.toString(), Notification.class);
-            String channelLine = "\n<#%s>\n";
-            String streamerLine = "· [%s](" + MixerConstants.HTTPS_MIXER_COM + "%s)\n";
 
             if (!prevChannel.equals(notif.getChannelId())) {
-                description.append(String.format(channelLine, notif.getChannelId()));
+                description.append(
+                        String.format(
+                                Locale.SERVER_NOTIFS_COMMAND_CHANNEL_LINE,
+                                notif.getChannelId()));
             }
             prevChannel = notif.getChannelId();
-            description.append(String.format(streamerLine, notif.getStreamerName(), notif.getStreamerName()));
+            description.append(
+                    String.format(
+                            Locale.SERVER_NOTIFS_COMMAND_STREAMER_LINE,
+                            notif.getStreamerName(),
+                            MixerConstants.HTTPS_MIXER_COM,
+                            notif.getStreamerName()));
         }
 
         if (list.size() == 1) {
-            commandEvent.reply("There's only 1 notification in this server.");
+            commandEvent.reply(Locale.SERVER_NOTIFS_COMMAND_ONLY_ONE);
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle("Channel Notifications")
+                    .setTitle(Locale.SERVER_NOTIFS_COMMAND_SERVER_NOTIFS_TITLE)
                     .setDescription(description)
                     .build());
         }
 
         if (list.size() > 1) {
-            String message = "There's a total of " + list.size() + " notifications in this server.";
-            commandEvent.reply(message);
+            commandEvent.reply(
+                    String.format(
+                            Locale.SERVER_NOTIFS_COMMAND_N_AMOUNT,
+                            list.size()));
             commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle("Server Notifications")
+                    .setTitle(Locale.SERVER_NOTIFS_COMMAND_SERVER_NOTIFS_TITLE)
                     .setDescription(description.toString())
                     .build());
         }

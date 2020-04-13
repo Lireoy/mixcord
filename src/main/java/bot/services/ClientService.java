@@ -2,8 +2,8 @@ package bot.services;
 
 import bot.commands.Commands;
 import bot.constants.BotConstants;
+import bot.constants.Locale;
 import bot.structures.Credentials;
-import bot.structures.enums.CommandCategory;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -50,14 +50,14 @@ public class ClientService {
         helpMessage.append("Here's an example for requesting command help:");
         helpMessage.append("`").append(instance.getPrefix()).append("Info --help`\n");
 
-        for (CommandCategory category : CommandCategory.values()) {
-            if (!category.getText().equalsIgnoreCase("Owner") || event.isOwner())
-                helpMessage.append("\n  **").append(category.getText()).append("**\n");
+        for (String category : Locale.CATEGORIES.values()) {
+            if (!category.equalsIgnoreCase("Owner") || event.isOwner())
+                helpMessage.append("\n  **").append(category).append("**\n");
 
             StringBuilder builder = new StringBuilder();
             for (Command command : instance.getCommands()) {
                 if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
-                    if (command.getCategory().getName().equalsIgnoreCase(category.getText())) {
+                    if (command.getCategory().getName().equalsIgnoreCase(category)) {
                         builder
                                 .append("`")
                                 .append(instance.getPrefix())

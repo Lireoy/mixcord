@@ -47,8 +47,8 @@ public class StringUtil {
      * @param args the {@link String} to split
      * @return a {@link String} array with two elements in it
      */
-    public static String[] separateArgs(final String args) {
-        return args.trim().split(",", 2);
+    public static String[] separateArgs(final String args, final int numberOfArgs) {
+        return args.trim().split(",", numberOfArgs);
     }
 
     public static String replaceLastComma(final String text) {

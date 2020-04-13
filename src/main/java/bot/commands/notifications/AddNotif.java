@@ -1,10 +1,9 @@
 package bot.commands.notifications;
 
 import bot.constants.BotConstants;
-import bot.constants.HelpConstants;
+import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Server;
-import bot.structures.enums.CommandCategory;
 import bot.utils.HelpUtil;
 import bot.utils.MixerQuery;
 import com.google.gson.Gson;
@@ -28,8 +27,8 @@ public class AddNotif extends Command {
     public AddNotif() {
         this.name = "AddNotif";
         this.aliases = new String[]{"CreateNotif"};
-        this.help = HelpConstants.ADD_NOTIF_HELP;
-        this.category = new Category(CommandCategory.NOTIFICATIONS.toString());
+        this.help = Locale.ADD_NOTIF_COMMAND_HELP;
+        this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -56,19 +55,18 @@ public class AddNotif extends Command {
 
         // Empty args check
         if (query.isEmpty()) {
-            commandEvent.reply("Please provide a streamer name!");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_NO_STREAMER_NAME);
             return;
         }
 
         if (query.length() > 20) {
-            commandEvent.reply("This name is too long! Please provide a shorter one!");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_TOO_LONG_NAME);
             return;
         }
 
         Cursor cursor = DatabaseDriver.getInstance().selectOneServer(serverId);
         if (!cursor.hasNext()) {
-            commandEvent.reply("This server does not exist in the database. " +
-                    "Please contact the developer: **Lireoy#4444**");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_SERVER_DOES_NOT_EXIST);
             return;
         }
 
@@ -78,12 +76,12 @@ public class AddNotif extends Command {
         final ArrayList list = DatabaseDriver.getInstance().selectServerNotifsOrdered(serverId);
         if (server.isWhitelisted()) {
             if (list.size() >= 25) {
-                commandEvent.reply("This server has reached the limit for the number of notifications.");
+                commandEvent.reply(Locale.ADD_NOTIF_COMMAND_FREE_LIMIT_REACHED);
                 return;
             }
         } else {
             if (list.size() >= 10) {
-                commandEvent.reply("This server has reached the limit for the number of notifications.");
+                commandEvent.reply(Locale.ADD_NOTIF_COMMAND_TIER_ONE_LIMIT_REACHED);
                 return;
             }
         }
@@ -94,14 +92,13 @@ public class AddNotif extends Command {
 
         if (channel == null) {
             commandEvent.reactError();
-            commandEvent.reply("Query response JSON was null, when adding a notification, " +
-                    "please contact the developer: **Lireoy#4444**");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_JSON_WAS_NULL);
 
             return;
         }
 
         if (channel.isEmpty()) {
-            commandEvent.reply("There is no such streamer...");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_NO_SUCH_STREAMER);
             return;
         }
 
@@ -109,8 +106,7 @@ public class AddNotif extends Command {
         final String streamerName = channel.getString("token");
 
         if (streamerName.isEmpty() || streamerId.isEmpty()) {
-            commandEvent.reply("Streamer name or ID is empty. " +
-                    "Please contact the developer: **Lireoy#4444**");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_EMPTY_STREAMER);
             log.info("Streamer name or ID was empty.");
             return;
         }
@@ -122,10 +118,13 @@ public class AddNotif extends Command {
         final boolean response = DatabaseDriver.getInstance().addNotif(serverId, channelId, streamerName, streamerId);
 
         if (response) {
-            commandEvent.reply("From now, you will receive notifications for " + streamerName + " in this channel.");
+            commandEvent.reply(
+                    String.format(
+                            Locale.ADD_NOTIF_COMMAND_SUCCESSFUL,
+                            streamerName));
             commandEvent.reactSuccess();
         } else {
-            commandEvent.reply("You have already set up a notification for this streamer.");
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_ALREADY_EXISTS);
         }
     }
 }
