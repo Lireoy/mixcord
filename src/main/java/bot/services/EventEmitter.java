@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.User;
 @Slf4j
 public class EventEmitter {
 
+    // TODO: Impelent canTalk() stuff
+
     public static boolean emitInDm(final User user, final String message) {
         if (user == null) {
             log.info("User was null.");

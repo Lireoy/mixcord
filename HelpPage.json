@@ -1,0 +1,309 @@
+{
+  "commands": {
+    "categories": {
+      "informative": [
+        {
+          "name": "Info",
+          "what_it_does": "Shows information about the bot.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [],
+          "usage_example": [
+            ".Info"
+          ]
+        },
+        {
+          "name": "Invite",
+          "what_it_does": "Provides an invite link so you can add this bot to your server.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [],
+          "usage_example": [
+            ".Invite"
+          ]
+        },
+        {
+          "name": "Ping",
+          "what_it_does": "Shows the current latency of the bot.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [],
+          "usage_example": [
+            ".Ping"
+          ]
+        },
+        {
+          "name": "WhoCanUseMe",
+          "what_it_does": "Displays those roles which can use Mixcord.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [],
+          "usage_example": [
+            ".WhoCanUseMe"
+          ]
+        }
+      ],
+      "mixer": [
+        {
+          "name": "MixerUser",
+          "what_it_does": "Displays a Mixer user's data.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions",
+              "Embed Links"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".MixerUser shroud"
+          ]
+        },
+        {
+          "name": "MixerUserSocials",
+          "what_it_does": "Displays a Mixer user's social profiles.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions",
+              "Embed Links"
+            ],
+            "user_permissions": []
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".MixerUserSocials shroud"
+          ]
+        }
+      ],
+      "notifications": [
+        {
+          "name": "AddNotif",
+          "what_it_does": "Creates a new notification for a Mixer streamer in the channel where the command is used.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions",
+              "Embed Links"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".AddNotif shroud"
+          ]
+        },
+        {
+          "name": "DeleteNotif",
+          "what_it_does": "Deletes a streamer notification in the channel where the command is used.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".DeleteNotif shroud"
+          ]
+        },
+        {
+          "name": "NotifDetails",
+          "what_it_does": "Lists all settings for a notifications.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".NotifDetails shroud"
+          ]
+        },
+        {
+          "name": "MakeDefault",
+          "what_it_does": "Resets a notification's configuration to the defaults.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".MakeDefault shroud"
+          ]
+        },
+        {
+          "name": "ChannelNotifs",
+          "what_it_does": "Lists all available notifications for this channel.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+          ],
+          "usage_example": [
+            ".ChannelNotifs"
+          ]
+        },
+        {
+          "name": "ServerNotifs",
+          "what_it_does": "Lists all available notifications for this server.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+          ],
+          "usage_example": [
+            ".ServerNotifs"
+          ]
+        },
+        {
+          "name": "NotifPreview",
+          "what_it_does": "Sends a preview for a notification.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>"
+          ],
+          "usage_example": [
+            ".NotifPreview shroud"
+          ]
+        },
+        {
+          "name": "NotifMessageEdit",
+          "what_it_does": "Edits the notification's message.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages",
+              "Add Reactions"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>",
+            "<new message>"
+          ],
+          "usage_example": [
+            ".NotifMessageEdit shroud, Hey guys, this is a new notification message! Akira is dope, wink wink"
+          ]
+        },
+        {
+          "name": "NotifColorEdit",
+          "what_it_does": "Edits the notification's embed color.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>",
+            "<new hex color code>"
+          ],
+          "usage_example": [
+            ".NotifColorEdit shroud, #ffd900"
+          ]
+        },
+        {
+          "name": "NotifEmbedConfig",
+          "what_it_does": "Edits the notification format. Set it to true for embed, false for non-embed notification.",
+          "required_permissions:": {
+            "bot_permissions": [
+              "Read Messages",
+              "Send Messages"
+            ],
+            "user_permissions": [
+              "Manage Server"
+            ]
+          },
+          "arguments": [
+            "<streamer name>",
+            "<true | false>"
+          ],
+          "usage_example": [
+            ".NotifEmbedConfig shroud, true"
+          ]
+        }
+      ]
+    }
+  }
+}

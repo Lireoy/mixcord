@@ -30,6 +30,7 @@ public class NotifMessageEdit extends Command {
         this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
+                Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
                 Permission.MESSAGE_ADD_REACTION};
     }
