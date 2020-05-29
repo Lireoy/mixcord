@@ -29,13 +29,11 @@ public class Locale {
     public static final String INFO_COMMAND_LINKS = "· Website: %s\n· Discord: %s";
     public static final String INFO_COMMAND_DEVELOPER_TITLE = "Developer";
     public static final String INFO_COMMAND_DEVELOPER = "Lireoy#4444";
-    public static final String INFO_COMMAND_INFRASTRUCTURE_TITLE = "Infrastructure";
-    public static final String INFO_COMMAND_INFRASTRUCTURE = "Provided by Akira#8185";
 
     // INVITE COMMAND
     public static final String INVITE_COMMAND_HELP = "Provides an invite link so you can add this bot to your server.";
     public static final String INVITE_COMMAND_INVITE_TITLE = "Invite";
-    public static final String INVITE_COMMAND_INVITE_LINK = "[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=%s&permissions=347200&scope=bot)";
+    public static final String INVITE_COMMAND_INVITE_LINK = "[Click Here to Invite Me](https://discordapp.com/oauth2/authorize?client_id=%s&permissions=281664&scope=bot)";
 
     // PING COMMAND
     public static final String PING_COMMAND_HELP = "Shows the current latency of the bot.";

@@ -105,7 +105,7 @@ public class Info extends Command {
         // Links
         final String links = String.format(
                 Locale.INFO_COMMAND_LINKS,
-                BotConstants.MIXCORD_IO,
+                BotConstants.MIXCORD_XYZ,
                 BotConstants.DISCORD
         );
 
@@ -138,10 +138,6 @@ public class Info extends Command {
                 .addField(
                         Locale.INFO_COMMAND_DEVELOPER_TITLE,
                         Locale.INFO_COMMAND_DEVELOPER,
-                        false)
-                .addField(
-                        Locale.INFO_COMMAND_INFRASTRUCTURE_TITLE,
-                        Locale.INFO_COMMAND_INFRASTRUCTURE,
                         false)
                 .build());
     }

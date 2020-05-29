@@ -7,7 +7,7 @@ public class BotConstants {
     public static final String WARNING = "‼";
     public static final String ERROR = "❌";
     public static final String DISCORD = "https://discord.gg/PXU46xR";
-    public static final String MIXCORD_IO = "https://streamcord.io/mixer/";
-    public static final String MIXCORD_IO_EMBED_FOOTER = "streamcord.io/mixer";
+    public static final String MIXCORD_XYZ = "https://mixcord.xyz";
+    public static final String MIXCORD_XYZ_EMBED_FOOTER = "mixcord.xyz";
     public static final String RANDOM_GEN_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 }
