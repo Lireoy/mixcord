@@ -22,7 +22,6 @@ public class ClientService {
                 .setPrefix(BotConstants.PREFIX)
                 .setAlternativePrefix("@mention")
                 .setOwnerId(Credentials.getInstance().getOwnerOne())
-                .setCoOwnerIds(Credentials.getInstance().getOwnerTwo(), Credentials.getInstance().getOwnerThree())
                 .setEmojis(BotConstants.SUCCESS, BotConstants.WARNING, BotConstants.ERROR)
                 .setServerInvite(BotConstants.DISCORD)
                 .addCommands(Commands.getCommands())

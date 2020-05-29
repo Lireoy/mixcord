@@ -21,6 +21,10 @@ public class Commands {
                 new Invite(),
                 new WhoCanUseMe(),
 
+                // Mixer
+                new MixerUser(),
+                new MixerUserSocials(),
+
                 // Notifications
                 new AddNotif(),
                 new DeleteNotif(),
@@ -33,17 +37,12 @@ public class Commands {
                 new NotifColorEdit(),
                 new NotifEmbedConfig(),
 
-                // Mixer
-                new MixerUser(),
-                new MixerUserSocials(),
-
                 // Owner
                 new Debug(),
                 new Whitelist(),
                 new GetServerShard(),
                 new GetDbStats(),
                 new NotifServiceStatus(),
-                new Owners(),
                 new StartNotifService(),
                 new StopNotifService(),
                 new RoleInfo(),

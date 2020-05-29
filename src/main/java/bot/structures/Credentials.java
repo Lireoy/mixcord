@@ -25,8 +25,6 @@ public class Credentials {
     private String databasePassword;
     private int numberOfShards;
     private String ownerOne;
-    private String ownerTwo;
-    private String ownerThree;
     private String metricsGuild;
     private String metricsChannel;
 
@@ -100,14 +98,6 @@ public class Credentials {
 
     public String getOwnerOne() {
         return ownerOne;
-    }
-
-    public String getOwnerTwo() {
-        return ownerTwo;
-    }
-
-    public String getOwnerThree() {
-        return ownerThree;
     }
 
     public String getMetricsGuild() {
