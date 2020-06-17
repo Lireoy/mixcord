@@ -22,14 +22,14 @@ public class MixerEmbedBuilder extends EmbedBuilder {
      * Sets the embed time and footer.
      */
     public MixerEmbedBuilder() {
-        this.setFooter(BotConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(BotConstants.MIXCORD_XYZ_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
     public MixerEmbedBuilder(JSONObject mixerInfo) {
         this.mixerInfo = mixerInfo;
         this.setCustomColor();
-        this.setFooter(BotConstants.MIXCORD_IO_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
+        this.setFooter(BotConstants.MIXCORD_XYZ_EMBED_FOOTER, ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
 
@@ -46,7 +46,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
         this.notif = notif;
         this.setCustomColor();
         this.setImage(MixerConstants.MIXER_BANNER_DEFAULT);
-        this.setFooter(BotConstants.MIXCORD_IO_EMBED_FOOTER,
+        this.setFooter(BotConstants.MIXCORD_XYZ_EMBED_FOOTER,
                 ShardService.getInstance().getShards().get(0).getSelfUser().getAvatarUrl());
         this.setTimestamp(Instant.now());
     }
@@ -124,7 +124,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
 
         String viewersCurrent = "0";
         if (mixerInfo.optInt("viewersCurrent") != 0)
-            viewersCurrent = String.valueOf(mixerInfo.getInt("viewersCurrent"));
+            viewersCurrent = String.format("%,d",mixerInfo.getInt("viewersCurrent"));
 
         String description = "Playing %s for %s viewers.\n[Click Here to Watch](%s)";
         String finalDescription = String.format(description, currentGame, viewersCurrent, getChannelLink());

@@ -115,7 +115,7 @@ public class MixerUser extends Command {
 
         String followers = Locale.MIXER_USER_COMMAND_NO_FOLLOWERS;
         if (channel.optInt("numFollowers") != 0)
-            followers = String.valueOf(channel.optInt("numFollowers"));
+            followers = String.format("%,d", channel.optInt("numFollowers"));
 
         String streamTitle = Locale.MIXER_USER_COMMAND_NO_STREAM_TITLE;
         if (!channel.optString("name").isEmpty())
@@ -135,7 +135,7 @@ public class MixerUser extends Command {
 
         String viewersCurrent = "0";
         if (channel.optInt("viewersCurrent") != 0)
-            viewersCurrent = String.valueOf(channel.getInt("viewersCurrent"));
+            viewersCurrent = String.format("%,d", channel.getInt("viewersCurrent"));
 
         final String channelUrl = MixerConstants.HTTPS_MIXER_COM + username;
         final String liveStreamLink = String.format(
@@ -201,7 +201,7 @@ public class MixerUser extends Command {
                             bio,
                             false)
                     .addField(
-                            Locale.INFO_COMMAND_INFRASTRUCTURE_TITLE,
+                            Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
                             trusted,
                             true)
                     .addField(

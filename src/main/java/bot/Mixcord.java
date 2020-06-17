@@ -22,8 +22,6 @@ public class Mixcord {
         log.info("Bot alternate prefix set to {}", ClientService.getInstance().getAltPrefix());
 
         log.info("Added owner: {}", ClientService.getInstance().getOwnerId());
-        for (String coOwnerId : ClientService.getInstance().getCoOwnerIds())
-            log.info("Added co-owner: {}", coOwnerId);
 
         ShardService.getInstance();
     }
