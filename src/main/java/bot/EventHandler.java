@@ -94,7 +94,7 @@ public class EventHandler extends ListenerAdapter {
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
         log.info("Leaving guild {}", event.getGuild().getId());
-        DatabaseDriver.getInstance().deleteGuild(event.getGuild().getId());
+        DatabaseDriver.getInstance().deleteServer(event.getGuild().getId());
         log.info("Deleting server configuration from database...");
 
         List<String> streamerIds = new ArrayList<>();

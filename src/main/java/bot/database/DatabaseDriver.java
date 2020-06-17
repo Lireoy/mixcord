@@ -24,12 +24,12 @@ public class DatabaseDriver {
     private Connection connection; // connection link
     private Table notifications; // notifications table
     private Table streamers; // streamers table
-    private Table guilds; // servers table
+    private Table servers; // servers table
 
     private DatabaseDriver() {
         this.notifications = rethink.db("Mixcord").table("notifications");
         this.streamers = rethink.db("Mixcord").table("streamers");
-        this.guilds = rethink.db("Mixcord").table("guilds");
+        this.servers = rethink.db("Mixcord").table("guilds");
     }
 
     public static DatabaseDriver getInstance() {
@@ -408,8 +408,8 @@ public class DatabaseDriver {
      * @return true if the insertion is successful
      */
     public boolean addServer(String serverId) {
-        if (getGuildDocId(serverId) == null) {
-            guilds.insert(rethink.hashMap("serverId", serverId)
+        if (getServerDocId(serverId) == null) {
+            servers.insert(rethink.hashMap("serverId", serverId)
                     .with("whitelisted", false)
                     .with("prefix", "."))
                     .run(connection);
@@ -426,7 +426,7 @@ public class DatabaseDriver {
      * @return a {@link Cursor} with a single server if found
      */
     public Cursor selectOneServer(String serverId) {
-        return guilds.filter(rethink
+        return servers.filter(rethink
                 .hashMap("serverId", serverId))
                 .map(ReqlExpr::toJson).run(connection);
     }
@@ -436,12 +436,12 @@ public class DatabaseDriver {
      *
      * @return a {@link Cursor} with all the documents in the guilds table
      */
-    public Cursor selectAllGuilds() {
-        return guilds.map(ReqlExpr::toJson).run(connection);
+    public Cursor selectAllServers() {
+        return servers.map(ReqlExpr::toJson).run(connection);
     }
 
-    public long countAllGuilds() {
-        return guilds.count().run(connection);
+    public long countAllServers() {
+        return servers.count().run(connection);
     }
 
     /**
@@ -452,7 +452,7 @@ public class DatabaseDriver {
      * @param whitelisted set true to be whitelisted, otherwise false
      */
     public void updateWhitelist(String documentId, boolean whitelisted) {
-        guilds.get(documentId).update(rethink.hashMap("whitelisted", whitelisted)).run(connection);
+        servers.get(documentId).update(rethink.hashMap("whitelisted", whitelisted)).run(connection);
     }
 
     /**
@@ -460,8 +460,8 @@ public class DatabaseDriver {
      *
      * @param docId the ID of the document to delete
      */
-    public void deleteGuild(String docId) {
-        guilds.get(docId).delete().run(connection);
+    public void deleteServer(String docId) {
+        servers.get(docId).delete().run(connection);
     }
 
     /**
@@ -470,8 +470,8 @@ public class DatabaseDriver {
      * @param serverId the ID of the server
      * @return the unique ID of the document if found, otherwise null
      */
-    public String getGuildDocId(String serverId) {
-        Cursor cursor = guilds.filter(row -> row.g("serverId").eq(serverId))
+    public String getServerDocId(String serverId) {
+        Cursor cursor = servers.filter(row -> row.g("serverId").eq(serverId))
                 .map(ReqlExpr::toJson).run(connection);
 
         if (cursor.hasNext()) {

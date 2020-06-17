@@ -65,7 +65,7 @@ public class Whitelist extends Command {
                 return;
             }
 
-            final Cursor cursor = DatabaseDriver.getInstance().selectAllGuilds();
+            final Cursor cursor = DatabaseDriver.getInstance().selectAllServers();
             StringBuilder serversDetails = new StringBuilder();
             for (Object o : cursor) {
                 final Server server = new Gson().fromJson(o.toString(), Server.class);
@@ -130,8 +130,8 @@ public class Whitelist extends Command {
             commandEvent.reply(Locale.WHITELIST_COMMAND_NOT_IN_SERVER);
             commandEvent.reactError();
 
-            String docId = DatabaseDriver.getInstance().getGuildDocId(serverId);
-            DatabaseDriver.getInstance().deleteGuild(docId);
+            String docId = DatabaseDriver.getInstance().getServerDocId(serverId);
+            DatabaseDriver.getInstance().deleteServer(docId);
 
             log.info("Guild is not reachable. G:{}. Deleted from database.", serverId);
             commandEvent.reply(

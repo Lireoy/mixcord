@@ -39,7 +39,7 @@ public class GetDbStats extends Command {
 
         String message = String.format(
                 Locale.GET_DB_STATS_COMMAND_STATISTICS,
-                DatabaseDriver.getInstance().countAllGuilds(),
+                DatabaseDriver.getInstance().countAllServers(),
                 DatabaseDriver.getInstance().countAllStreamers(),
                 DatabaseDriver.getInstance().countAllNotifs());
 
