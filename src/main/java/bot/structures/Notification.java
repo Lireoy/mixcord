@@ -10,7 +10,7 @@ public class Notification {
     private boolean embed;
     private String embedColor;
     private String message;
-    private int streamEndAction;
+    private String streamEndAction;
     private String streamEndMessage;
 
     public Notification() {
@@ -80,11 +80,11 @@ public class Notification {
         this.message = message;
     }
 
-    public int getStreamEndAction() {
+    public String getStreamEndAction() {
         return streamEndAction;
     }
 
-    public void setStreamEndAction(int streamEndAction) {
+    public void setStreamEndAction(String streamEndAction) {
         this.streamEndAction = streamEndAction;
     }
 

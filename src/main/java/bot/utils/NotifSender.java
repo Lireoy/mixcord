@@ -5,23 +5,16 @@ import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Notification;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.internal.utils.PermissionUtil;
 import org.json.JSONObject;
 
 @Slf4j
 public class NotifSender {
 
-    //TODO:UPDATE DOCS
-
-    /**
-     * Sends the specified message to the specified address in an embed when a streamer comes online.
-     * If the channel or guild does not exist, the notification is deleted.
-     *
-     * @param notif     {@link Notification} object which contains data for the notification from the database
-     * @param queryJson {@link JSONObject} which contains data for the streamer from Mixer
-     */
     public static void sendEmbed(final Notification notif, final JSONObject queryJson) {
         final String queryChId = String.valueOf(queryJson.getInt("id"));
         final String embLiveThumbnail = MixerConstants.MIXER_THUMB_PRE + queryChId +
@@ -41,12 +34,6 @@ public class NotifSender {
         log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
 
-    /**
-     * Sends the specified message to the specified address as a regular message when a streamer comes online.
-     * If the channel or guild does not exist, the notification is deleted.
-     *
-     * @param notif {@link Notification} object which contains data for the notification from the database
-     */
     public static void sendNonEmbed(final Notification notif) {
         if (!isAvailable(notif)) return;
         TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
@@ -56,19 +43,21 @@ public class NotifSender {
         log.info("Sent notification to G:{} C:{}", notif.getServerId(), notif.getChannelId());
     }
 
-    /**
-     * Sends the specified offline message to the specified address.
-     * If the channel or guild does not exist, the notification is deleted.
-     *
-     * @param notif {@link Notification} object which contains data for the notification from the database
-     */
     public static void sendOfflineMsg(final Notification notif) {
         if (!isAvailable(notif)) return;
         TextChannel textChannel = ShardService.getInstance().getTextChannelById(notif.getChannelId());
 
         assert textChannel != null;
-        textChannel.sendMessage(notif.getStreamEndMessage()).queue();
-        log.info("Sent stream end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
+
+        if (notif.getStreamEndAction().equalsIgnoreCase("0")) {
+            log.info("Do nothing to G:{} C:{}", notif.getServerId(), notif.getChannelId());
+            return;
+        }
+
+        if (notif.getStreamEndAction().equalsIgnoreCase("1")) {
+            textChannel.sendMessage(notif.getStreamEndMessage()).queue();
+            log.info("Sent stream end message to G:{} C:{}", notif.getServerId(), notif.getChannelId());
+        }
     }
 
     private static boolean isAvailable(final Notification notif) {
@@ -86,7 +75,11 @@ public class NotifSender {
             return false;
         }
 
-        if (textChannel.canTalk()) {
+        if (PermissionUtil.checkPermission(textChannel, guild.getSelfMember(),
+                Permission.MESSAGE_READ,
+                Permission.MESSAGE_WRITE,
+                Permission.MESSAGE_EMBED_LINKS)) {
+
             return true;
         } else {
             final Member owner = textChannel.getGuild().getOwner();

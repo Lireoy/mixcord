@@ -157,7 +157,7 @@ public class Locale {
     public static final String NOTIF_PREVIEW_COMMAND_WAS_NOT_FOUND_ON_MIXER = "Streamer was not found on Mixer.";
 
     // NOTIF MESSAGE EDIT COMMAND
-    public static final String NOTIF_MESSAGE_EDIT_COMMAND_HELP = "Edits the notification's message.";
+    public static final String NOTIF_MESSAGE_EDIT_COMMAND_HELP = "Edits the stream start notification's message.";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration. %s";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_NO_STREAMER_NAME = "Please provide a streamer name!";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_TOO_LONG_NAME = "This name is too long! Please provide a shorter one!";
@@ -167,7 +167,7 @@ public class Locale {
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_SAME_MESSAGE = "Your new message is same as the old one!";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_WRONG_LINK = "Your notification message contains a link to a different streamer.";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_NO_LINK = "Your notification message does not contain a link to the streamer.";
-    public static final String NOTIF_MESSAGE_EDIT_COMMAND_SUCCESSFUL = "Notification message was changed for the following notification: `%s`";
+    public static final String NOTIF_MESSAGE_EDIT_COMMAND_SUCCESSFUL = "Stream start notification message was changed for the following notification: `%s`";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_OLD_MESSAGE = "\nOld message:\n```%s```\n\n";
     public static final String NOTIF_MESSAGE_EDIT_COMMAND_NEW_MESSAGE = "New message:\n```%s```";
 
@@ -195,6 +195,37 @@ public class Locale {
     public static final String NOTIF_EMBED_CONFIG_COMMAND_SUCCESSFUL = "Notification format was changed for the following notification: `%s`";
     public static final String NOTIF_EMBED_CONFIG_COMMAND_SEND_AS_EMBED = "\nThis notification will be sent as an embed in the future.";
     public static final String NOTIF_EMBED_CONFIG_COMMAND_SEND_AS_NON_EMBED = "\nThis notification will be sent without an embed in the future.";
+
+    // NOTIF END ACTION CONFIG COMMAND
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_HELP = "Modifies the stream ending action. Set it to `1` to send a notification when the stream ends.\nSet it to `0`, to do nothing.";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration. %s";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_NO_STREAMER_NAME = "Please provide a streamer name!";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_TOO_LONG_NAME = "This name is too long! Please provide a shorter one!";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_INVALID_END_ACTION_VALUE = "Please provide a valid end action value. %s";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_NO_SUCH_NOTIFICATION = "There is no such notification in this channel.";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_ALREADY_SET = "This end action is already set.";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_SUCCESSFUL = "Notification end action was changed for the following notification: `%s`";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_DO_NOTHING = "\nI will do nothing when the streamer finishes streaming.";
+    public static final String NOTIF_END_ACTION_CONFIG_COMMAND_END_NOTIFICATION = "\nI will send a notification when the streamer finishes streaming.";
+
+    // NOTIF END MESSAGE EDIT
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_HELP = "Edits the stream end notification's message.";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration. %s";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NO_STREAMER_NAME = "Please provide a streamer name!";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_TOO_LONG_NAME = "This name is too long! Please provide a shorter one!";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NO_NEW_MESSAGE = "Please provide a new notification message!";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NEW_MESSAGE_TOO_LONG = "Your new notification message is too long! (max 300 chars)";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NO_SUCH_NOTIFICATION = "There is no such notification in this channel.";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_SAME_MESSAGE = "Your new message is same as the old one!";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_WRONG_LINK = "Your notification message contains a link to a different streamer.";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NO_LINK = "Your notification message does not contain a link to the streamer.";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_SUCCESSFUL = "Stream end notification message was changed for the following notification: `%s`";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_OLD_MESSAGE = "\nOld message:\n```%s```\n\n";
+    public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NEW_MESSAGE = "New message:\n```%s```";
+
+
+
+
 
 
     public static final String DEBUG_COMMAND_HELP = "Helps retrieve information about a server which the bot is in.";

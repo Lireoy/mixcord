@@ -36,6 +36,8 @@ public class Commands {
                 new NotifMessageEdit(),
                 new NotifColorEdit(),
                 new NotifEmbedConfig(),
+                new NotifEndMessageEdit(),
+                new NotifEndActionConfig(),
 
                 // Owner
                 new Debug(),
