@@ -54,6 +54,11 @@ public class WhoCanUseMe extends Command {
         commandEvent.replyFormatted(description.toString());
     }
 
+    private boolean checkHelp(CommandEvent commandEvent) {
+        final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
+    }
+
     private void formatRolesWithSimpleUse(List<Role> roleToUse, StringBuilder description) {
         if (roleToUse.size() > 0) {
             description.append(Locale.WHO_CAN_USE_ME_COMMAND_BASIC_COMMANDS);
@@ -91,10 +96,5 @@ public class WhoCanUseMe extends Command {
                 roleToUse.add(role);
             }
         }
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 }

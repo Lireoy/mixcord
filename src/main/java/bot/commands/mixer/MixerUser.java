@@ -12,6 +12,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 /**
@@ -39,36 +40,13 @@ public class MixerUser extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
+        if (checkHelp(commandEvent)) return;
 
-        final boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        final String channelQuery = validateQueryParam(commandEvent);
+        if (channelQuery == null) return;
 
-        final String query = commandEvent.getArgs().trim();
-
-        if (query.isEmpty()) {
-            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_STREAMER_NAME);
-            return;
-        }
-
-        if (query.length() > 20) {
-            commandEvent.reply(Locale.MIXER_USER_COMMAND_TOO_LONG_NAME);
-            return;
-        }
-
-        final JSONObject channel = MixerQuery.queryChannel(query);
-
-        if (channel == null) {
-            commandEvent.reactError();
-            commandEvent.reply(Locale.MIXER_USER_COMMAND_JSON_WAS_NULL);
-            return;
-        }
-
-        if (channel.isEmpty()) {
-            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_SUCH_STREAMER);
-            return;
-        }
+        final JSONObject channel = validateMixerQuery(commandEvent, channelQuery);
+        if (channel == null) return;
 
         final int id = channel.getInt("id");
         final String liveThumbnail = MixerConstants.MIXER_THUMB_PRE + id +
@@ -143,76 +121,124 @@ public class MixerUser extends Command {
                 channelUrl);
 
 
+        respond(commandEvent, channel, liveThumbnail, avatarUrl, bio, streaming, trusted, status, followers, streamTitle, currentGame, language, targetAudience, viewersCurrent, liveStreamLink);
+    }
+
+    @Nullable
+    private String validateQueryParam(CommandEvent commandEvent) {
+        final String query = commandEvent.getArgs().trim();
+        if (query.isEmpty()) {
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_STREAMER_NAME);
+            return null;
+        }
+
+        if (query.length() > 20) {
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_TOO_LONG_NAME);
+            return null;
+        }
+        return query;
+    }
+
+    @Nullable
+    private JSONObject validateMixerQuery(CommandEvent commandEvent, String query) {
+        final JSONObject channel = MixerQuery.queryChannel(query);
+        if (channel == null) {
+            commandEvent.reactError();
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_JSON_WAS_NULL);
+            return null;
+        }
+
+        if (channel.isEmpty()) {
+            commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_SUCH_STREAMER);
+            return null;
+        }
+        return channel;
+    }
+
+    private boolean checkHelp(CommandEvent commandEvent) {
+        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
+        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
+    }
+
+    private void offlineResponse(CommandEvent commandEvent, JSONObject channel, String avatarUrl, String bio, String trusted, String status, String followers) {
+        // Offline
+        commandEvent.reply(new MixerEmbedBuilder(channel)
+                .setCustomAuthor()
+                .setCustomImage()
+                .setThumbnail(avatarUrl)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_BIO_TITLE,
+                        bio,
+                        false)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
+                        trusted,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_STATUS_TITLE,
+                        status,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
+                        followers,
+                        true)
+                .build());
+    }
+
+    private void liveResponse(CommandEvent commandEvent, JSONObject channel, String liveThumbnail, String avatarUrl, String bio, String trusted, String status, String followers, String streamTitle, String currentGame, String language, String targetAudience, String viewersCurrent, String liveStreamLink) {
+        // Live
+        commandEvent.reply(new MixerEmbedBuilder(channel)
+                .setCustomAuthor()
+                .setThumbnail(avatarUrl)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_BIO_TITLE,
+                        bio,
+                        false)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
+                        trusted,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_STATUS_TITLE,
+                        status,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
+                        followers,
+                        false)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_CURRENTLY_LIVE_TITLE,
+                        streamTitle,
+                        false)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_GAME_TITLE,
+                        currentGame,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_VIEWERS_TITLE,
+                        viewersCurrent,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_LANGUAGE_TITLE,
+                        language,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_TARGET_AUDIENCE_TITLE,
+                        targetAudience,
+                        true)
+                .addField(
+                        Locale.MIXER_USER_COMMAND_LINK_TITLE,
+                        liveStreamLink,
+                        false)
+                .setImage(liveThumbnail)
+                .build());
+    }
+
+    private void respond(CommandEvent commandEvent, JSONObject channel, String liveThumbnail, String avatarUrl, String bio, boolean streaming, String trusted, String status, String followers, String streamTitle, String currentGame, String language, String targetAudience, String viewersCurrent, String liveStreamLink) {
         if (streaming) {
-            // Live
-            commandEvent.reply(new MixerEmbedBuilder(channel)
-                    .setCustomAuthor()
-                    .setThumbnail(avatarUrl)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_BIO_TITLE,
-                            bio,
-                            false)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
-                            trusted,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_STATUS_TITLE,
-                            status,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
-                            followers,
-                            false)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_CURRENTLY_LIVE_TITLE,
-                            streamTitle,
-                            false)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_GAME_TITLE,
-                            currentGame,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_VIEWERS_TITLE,
-                            viewersCurrent,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_LANGUAGE_TITLE,
-                            language,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_TARGET_AUDIENCE_TITLE,
-                            targetAudience,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_LINK_TITLE,
-                            liveStreamLink,
-                            false)
-                    .setImage(liveThumbnail)
-                    .build());
+            liveResponse(commandEvent, channel, liveThumbnail, avatarUrl, bio, trusted, status, followers, streamTitle, currentGame, language, targetAudience, viewersCurrent, liveStreamLink);
         } else {
-            // Offline
-            commandEvent.reply(new MixerEmbedBuilder(channel)
-                    .setCustomAuthor()
-                    .setCustomImage()
-                    .setThumbnail(avatarUrl)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_BIO_TITLE,
-                            bio,
-                            false)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_TRUSTED_TITLE,
-                            trusted,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_STATUS_TITLE,
-                            status,
-                            true)
-                    .addField(
-                            Locale.MIXER_USER_COMMAND_FOLLOWERS_TITLE,
-                            followers,
-                            true)
-                    .build());
+            offlineResponse(commandEvent, channel, avatarUrl, bio, trusted, status, followers);
         }
     }
 }
