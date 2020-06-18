@@ -37,24 +37,22 @@ public class Ping extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        if (checkHelp(commandEvent)) return;
+        respond(commandEvent);
+    }
+
+    private boolean checkHelp(CommandEvent commandEvent) {
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
+    }
 
-        boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
-
+    private void respond(CommandEvent commandEvent) {
         commandEvent.reply(Locale.PING_COMMAND_CALCULATING, (m) -> {
-            final long ping =
-                    commandEvent.getMessage()
-                            .getTimeCreated()
-                            .until(m.getTimeCreated(),
-                                    ChronoUnit.MILLIS);
+            final long ping = commandEvent.getMessage().getTimeCreated()
+                    .until(m.getTimeCreated(), ChronoUnit.MILLIS);
             final long gatewayPing = commandEvent.getJDA().getGatewayPing();
 
-            m.editMessage(String.format(
-                    Locale.PING_COMMAND_REPLY,
-                    ping, gatewayPing)
-            ).queue();
+            m.editMessage(String.format(Locale.PING_COMMAND_REPLY, ping, gatewayPing)).queue();
         });
     }
 }
