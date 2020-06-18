@@ -38,36 +38,39 @@ public class Info extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        if (checkHelp(commandEvent)) return;
+
+        final String upTime = calculateUpTime();
+        final String usage = generateUsageSegment(commandEvent);
+        final String version = generateVersioning();
+        final String shards = generateShardInfo(commandEvent);
+        final String systemInfo = generateSystemInfo();
+        final String links = generateLinks();
+
+
+        respond(commandEvent, upTime, usage, version, shards, systemInfo, links);
+    }
+
+    private boolean checkHelp(CommandEvent commandEvent) {
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        final boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
+    }
 
+    private String calculateUpTime() {
         // Calculate uptime
         final long duration = ManagementFactory.getRuntimeMXBean().getUptime();
-
-        //final long years = duration / 31104000000L;
-        //final long months = duration / 2592000000L % 12;
         final long days = duration / 86400000L % 30;
         final long hours = duration / 3600000L % 24;
         final long minutes = duration / 60000L % 60;
         final long seconds = duration / 1000L % 60;
 
-
-        /*String uptime =
-                (years == 0 ? "" : years + " years, ") +
-                        (months == 0 ? "" : months + " months, ") +
-                        (days == 0 ? "" : days + " days, ") +
-                        (hours == 0 ? "" : hours + " hours, ") +
-                        (minutes == 0 ? "" : minutes + " minutes, ") +
-                        (seconds == 0 ? "" : seconds + " seconds, ");
-        uptime = StringUtil.replaceLastComma(uptime);*/
-        String upTime = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_UPTIME,
                 days, hours, minutes, seconds);
+    }
 
-
+    private String generateUsageSegment(CommandEvent commandEvent) {
         // Usage segment
         final int guildCount = commandEvent.getJDA().getGuilds().size();
         int memberCount = 0;
@@ -77,38 +80,48 @@ public class Info extends Command {
             memberCount += commandEvent.getJDA().getGuilds().get(i).getMembers().size();
         }
 
-        String usage = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_USAGE,
                 guildCount, memberCount);
+    }
 
+    private String generateVersioning() {
         // Get Java version
-        String version = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_JAVA_VERSION,
                 System.getProperty("java.version"));
+    }
 
+    private String generateShardInfo(CommandEvent commandEvent) {
         // Shards
         final long ping = commandEvent.getJDA().getGatewayPing();
         final int shardId = commandEvent.getJDA().getShardInfo().getShardId();
         final int totalShards = commandEvent.getJDA().getShardInfo().getShardTotal();
-        String shards = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_SHARDS,
                 shardId, ping, totalShards);
+    }
 
+    private String generateSystemInfo() {
         // System
         Runtime rt = Runtime.getRuntime();
-        final String systemInfo = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_RAM_USAGE,
                 rt.freeMemory() / 1024 / 1024,
                 rt.maxMemory() / 1024 / 1024
         );
+    }
 
+    private String generateLinks() {
         // Links
-        final String links = String.format(
+        return String.format(
                 Locale.INFO_COMMAND_LINKS,
                 BotConstants.MIXCORD_XYZ,
                 BotConstants.DISCORD
         );
+    }
 
+    private void respond(CommandEvent commandEvent, String upTime, String usage, String version, String shards, String systemInfo, String links) {
         commandEvent.reply(new MixerEmbedBuilder()
                 .setTitle(commandEvent.getJDA().getSelfUser().getName())
                 .addField(
