@@ -1,15 +1,51 @@
 package bot.services;
 
+import bot.constants.BotConstants;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
+import java.util.Arrays;
+
 @Slf4j
 public class EventEmitter {
 
+    public static void emitGenericExceptionEvent(final User user, final Exception ex) {
+        String message = "General exception in NotifService.";
+        emitInDm(user, message);
+        emitInDm(user, ex.getMessage());
+        emitInDm(user, Arrays.toString(ex.getCause().getStackTrace()));
+    }
 
-    public static boolean emitInDm(final User user, final String message) {
+    public static void emitGenericExceptionEvent(final TextChannel textChannel, final Exception ex) {
+        String message = "General exception in NotifService.";
+        emitToChannel(textChannel, message);
+        emitToChannel(textChannel, ex.getMessage());
+        emitToChannel(textChannel, Arrays.toString(ex.getCause().getStackTrace()));
+    }
+
+    public static void emitDatabaseExceptionEvent(final User user, final Exception ex) {
+        String message = BotConstants.WARNING + BotConstants.WARNING +
+                "There is a database issue. Stopping the notifier service." +
+                BotConstants.WARNING + BotConstants.WARNING;
+
+        emitInDm(user, message);
+        emitInDm(user, ex.getMessage());
+        emitInDm(user, Arrays.toString(ex.getCause().getStackTrace()));
+    }
+
+    public static void emitDatabaseExceptionEvent(final TextChannel textChannel, final Exception ex) {
+        String message = BotConstants.WARNING + BotConstants.WARNING +
+                "There is a database issue. Stopping the notifier service." +
+                BotConstants.WARNING + BotConstants.WARNING;
+
+        emitToChannel(textChannel, message);
+        emitToChannel(textChannel, ex.getMessage());
+        emitToChannel(textChannel, Arrays.toString(ex.getCause().getStackTrace()));
+    }
+
+    private static boolean emitInDm(final User user, final String message) {
         if (user == null) {
             log.info("User was null.");
             return false;
@@ -27,7 +63,7 @@ public class EventEmitter {
         return true;
     }
 
-    public static boolean emitInDm(final User user, final MessageEmbed embed) {
+    private static boolean emitInDm(final User user, final MessageEmbed embed) {
         if (user == null) {
             log.info("User was null.");
             return false;
@@ -45,7 +81,7 @@ public class EventEmitter {
         return true;
     }
 
-    public static boolean emitToChannel(final TextChannel textChannel, final String message) {
+    private static boolean emitToChannel(final TextChannel textChannel, final String message) {
         if (!textChannel.canTalk()) {
             log.info("No talk power in C:{}.", textChannel.getId());
             return false;
@@ -61,7 +97,7 @@ public class EventEmitter {
         return true;
     }
 
-    public static boolean emitToChannel(final TextChannel textChannel, final MessageEmbed embed) {
+    private static boolean emitToChannel(final TextChannel textChannel, final MessageEmbed embed) {
         if (!textChannel.canTalk()) {
             log.info("No talk power in C:{}.", textChannel.getId());
             return false;
