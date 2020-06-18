@@ -33,15 +33,22 @@ public class Invite extends Command {
         final User commandAuthor = commandEvent.getAuthor();
         log.info("Command ran by {}", commandAuthor);
 
+        if (checkHelp(commandEvent)) return;
+        final String finalDescription = generateDescription(commandEvent);
+        respond(commandEvent, finalDescription);
+    }
+
+    private boolean checkHelp(CommandEvent commandEvent) {
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
+        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
+    }
 
-        boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
-
+    private String generateDescription(CommandEvent commandEvent) {
         final String clientId = commandEvent.getSelfUser().getId();
-        String finalDescription = String.format(Locale.INVITE_COMMAND_INVITE_LINK, clientId);
+        return String.format(Locale.INVITE_COMMAND_INVITE_LINK, clientId);
+    }
 
+    private void respond(CommandEvent commandEvent, String finalDescription) {
         commandEvent.reactSuccess();
         commandEvent.reply(new MixerEmbedBuilder()
                 .setAuthor(Locale.INVITE_COMMAND_INVITE_TITLE)

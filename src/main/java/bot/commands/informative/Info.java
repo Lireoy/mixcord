@@ -52,7 +52,6 @@ public class Info extends Command {
 
     private boolean checkHelp(CommandEvent commandEvent) {
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
-
         return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
