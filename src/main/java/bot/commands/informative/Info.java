@@ -47,7 +47,6 @@ public class Info extends Command {
         final String systemInfo = generateSystemInfo();
         final String links = generateLinks();
 
-
         respond(commandEvent, upTime, usage, version, shards, systemInfo, links);
     }
 
@@ -121,7 +120,8 @@ public class Info extends Command {
         );
     }
 
-    private void respond(CommandEvent commandEvent, String upTime, String usage, String version, String shards, String systemInfo, String links) {
+    private void respond(CommandEvent commandEvent, String upTime, String usage,
+                         String version, String shards, String systemInfo, String links) {
         commandEvent.reply(new MixerEmbedBuilder()
                 .setTitle(commandEvent.getJDA().getSelfUser().getName())
                 .addField(

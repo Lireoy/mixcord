@@ -1,6 +1,7 @@
 package bot.utils;
 
 import bot.services.ShardService;
+import bot.structures.Credentials;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -103,6 +104,10 @@ public class MetricsUtil {
      * @param channelId Discord channel ID
      */
     public void postMetrics(final String channelId) {
+        log.info("Posting metrics to {} - {}",
+                Credentials.getInstance().getMetricsGuild(), Credentials.getInstance().getMetricsChannel());
+        log.info("Checked {} streamers in {}s", getStreamersProcessed(), getSecs());
+
         final TextChannel channel = ShardService.getInstance().getTextChannelById(channelId);
 
         final String line = "· Streamers Processed: %d\n· Notifications Sent: %d\n· Time: %.2f sec";

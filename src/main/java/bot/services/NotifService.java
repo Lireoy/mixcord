@@ -40,23 +40,10 @@ public class NotifService implements Runnable {
         try {
             while (isRunning) {
                 MetricsUtil.getInstance().startTimer();
-                final Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
-
-                for (Object streamerObj : streamers) {
-                    if (!isRunning) break;
-                    Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
-                    final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
-
-                    processStreamer(streamers, streamer, queryJson);
-                }
+                processAllStreamers();
 
                 MetricsUtil.getInstance().stopTimer();
                 MetricsUtil.getInstance().postMetrics(Credentials.getInstance().getMetricsChannel());
-                log.info("Posting metrics to {} - {}",
-                        Credentials.getInstance().getMetricsGuild(), Credentials.getInstance().getMetricsChannel());
-                log.info("Checked {} streamers in {}s",
-                        MetricsUtil.getInstance().getStreamersProcessed(),
-                        MetricsUtil.getInstance().getSecs());
 
                 if (MetricsUtil.getInstance().getSecs() <= 40) {
                     for (int i = 0; i < 9; i++) {
@@ -77,6 +64,31 @@ public class NotifService implements Runnable {
         }
     }
 
+    private void processAllStreamers() {
+        final Cursor streamers = DatabaseDriver.getInstance().selectAllStreamers();
+
+        for (Object streamerObj : streamers) {
+            if (!isRunning) break;
+            final Streamer streamer = new Gson().fromJson(streamerObj.toString(), Streamer.class);
+            final JSONObject queryJson = MixerQuery.queryChannel(streamer.getStreamerName());
+
+            processStreamer(streamers, streamer, queryJson);
+        }
+    }
+
+    private void cleanUpStreamer(Streamer streamer) {
+        // If the JSON is empty then the streamer was deleted on Mixer or changed name
+        // We delete all the correlating data to the streamer
+        Cursor notifications = DatabaseDriver.getInstance().selectStreamerNotifs(streamer.getStreamerId());
+        for (Object notificationObj : notifications) {
+            Notification notif = new Gson().fromJson(
+                    notificationObj.toString(), Notification.class);
+            DatabaseDriver.getInstance().deleteNotif(notif.getId());
+        }
+
+        DatabaseDriver.getInstance().deleteStreamer(streamer.getStreamerId());
+    }
+
     private void processStreamer(Cursor streamers, Streamer streamer, JSONObject queryJson) {
         if (queryJson == null) {
             // Check if it's null or not. Idk what this would do if it's null
@@ -93,20 +105,6 @@ public class NotifService implements Runnable {
             MetricsUtil.getInstance().incrementStreamersProcessed();
             streamers.close();
         }
-    }
-
-
-    private void cleanUpStreamer(Streamer streamer) {
-        // If the JSON is empty then the streamer was deleted on Mixer or changed name
-        // We delete all the correlating data to the streamer
-        Cursor notifications = DatabaseDriver.getInstance().selectStreamerNotifs(streamer.getStreamerId());
-        for (Object notificationObj : notifications) {
-            Notification notif = new Gson().fromJson(
-                    notificationObj.toString(), Notification.class);
-            DatabaseDriver.getInstance().deleteNotif(notif.getId());
-        }
-
-        DatabaseDriver.getInstance().deleteStreamer(streamer.getStreamerId());
     }
 
     private void wasOfflineNowOnline(Streamer streamer, JSONObject queryJson, boolean queryIsOnline) {
