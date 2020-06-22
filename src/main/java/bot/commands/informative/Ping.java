@@ -2,8 +2,8 @@ package bot.commands.informative;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
-import bot.utils.HelpUtil;
-import com.jagrosh.jdautilities.command.Command;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
@@ -19,7 +19,7 @@ import java.time.temporal.ChronoUnit;
  * The true ping is the time difference between message creation and current time.
  */
 @Slf4j
-public class Ping extends Command {
+public class Ping extends MixcordCommand {
 
     public Ping() {
         this.name = "Ping";
@@ -27,6 +27,7 @@ public class Ping extends Command {
         this.help = Locale.PING_COMMAND_HELP;
         this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE};
@@ -34,16 +35,8 @@ public class Ping extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        if (checkHelp(commandEvent)) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
         respond(commandEvent);
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
     private void respond(CommandEvent commandEvent) {

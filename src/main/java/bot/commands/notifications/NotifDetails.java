@@ -4,7 +4,7 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import bot.utils.HexUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
@@ -37,7 +37,7 @@ public class NotifDetails extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

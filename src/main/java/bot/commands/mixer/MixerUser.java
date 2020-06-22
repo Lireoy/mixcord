@@ -3,15 +3,14 @@ package bot.commands.mixer;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.constants.MixerConstants;
-import bot.utils.HelpUtil;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import bot.utils.StringUtil;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
@@ -20,7 +19,7 @@ import org.json.JSONObject;
  * Information varies based on the current state of the channel. (Live or offline)
  */
 @Slf4j
-public class MixerUser extends Command {
+public class MixerUser extends MixcordCommand {
 
     public MixerUser() {
         this.name = "MixerUser";
@@ -28,6 +27,7 @@ public class MixerUser extends Command {
         this.category = new Category(Locale.CATEGORIES.get("MIXER"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " shroud"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -37,10 +37,7 @@ public class MixerUser extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        if (checkHelp(commandEvent)) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
 
         final String channelQuery = validateQueryParam(commandEvent);
         if (channelQuery == null) return;
@@ -153,11 +150,6 @@ public class MixerUser extends Command {
             return null;
         }
         return channel;
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
     private void offlineResponse(CommandEvent commandEvent, JSONObject channel, String avatarUrl, String bio, String trusted, String status, String followers) {

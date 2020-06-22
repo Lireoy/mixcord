@@ -2,7 +2,8 @@ package bot.commands.informative;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
-import bot.utils.HelpUtil;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -14,7 +15,7 @@ import net.dv8tion.jda.api.entities.User;
  * Sends the bot's invite link to the user in a formatted embed.
  */
 @Slf4j
-public class Invite extends Command {
+public class Invite extends MixcordCommand {
 
     public Invite() {
         this.name = "Invite";
@@ -22,6 +23,7 @@ public class Invite extends Command {
         this.help = Locale.INVITE_COMMAND_HELP;
         this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -30,17 +32,9 @@ public class Invite extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        if (checkHelp(commandEvent)) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
         final String finalDescription = generateDescription(commandEvent);
         respond(commandEvent, finalDescription);
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
     private String generateDescription(CommandEvent commandEvent) {

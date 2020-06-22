@@ -3,7 +3,7 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.services.NotifService;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class NotifServiceStatus extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        boolean helpResponse = HelpUtil.getInstance()
+        boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

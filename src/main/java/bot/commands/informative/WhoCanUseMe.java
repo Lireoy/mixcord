@@ -2,25 +2,25 @@ package bot.commands.informative;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
-import bot.utils.HelpUtil;
-import com.jagrosh.jdautilities.command.Command;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class WhoCanUseMe extends Command {
+public class WhoCanUseMe extends MixcordCommand {
 
     public WhoCanUseMe() {
         this.name = "WhoCanUseMe";
         this.help = Locale.WHO_CAN_USE_ME_COMMAND_HELP;
         this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -29,10 +29,7 @@ public class WhoCanUseMe extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        if (checkHelp(commandEvent)) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
 
         List<Role> roleWithManageServer = new ArrayList<>();
         List<Role> roleToUse = new ArrayList<>();
@@ -52,11 +49,6 @@ public class WhoCanUseMe extends Command {
 
         commandEvent.reactSuccess();
         commandEvent.replyFormatted(description.toString());
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
     private void formatRolesWithSimpleUse(List<Role> roleToUse, StringBuilder description) {

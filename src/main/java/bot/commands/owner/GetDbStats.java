@@ -3,7 +3,7 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -33,7 +33,7 @@ public class GetDbStats extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name};
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

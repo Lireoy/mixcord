@@ -4,7 +4,7 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.services.ShardService;
 import bot.structures.enums.ServerFeatures;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.jagrosh.jdautilities.command.Command;
@@ -42,7 +42,7 @@ public class ServerInfo extends Command {
                 BotConstants.PREFIX + this.name,
                 BotConstants.PREFIX + this.name + " 348110542667251712"};
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

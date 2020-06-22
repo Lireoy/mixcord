@@ -2,7 +2,8 @@ package bot.commands.informative;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
-import bot.utils.HelpUtil;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -21,13 +22,14 @@ import java.lang.management.ManagementFactory;
  * Discord user names of developers.
  */
 @Slf4j
-public class Info extends Command {
+public class Info extends MixcordCommand {
 
     public Info() {
         this.name = "Info";
         this.help = Locale.INFO_COMMAND_HELP;
         this.category = new Category(Locale.CATEGORIES.get("INFORMATIVE"));
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE};
@@ -35,10 +37,7 @@ public class Info extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        if (checkHelp(commandEvent)) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
 
         final String upTime = calculateUpTime();
         final String usage = generateUsageSegment(commandEvent);
@@ -48,11 +47,6 @@ public class Info extends Command {
         final String links = generateLinks();
 
         respond(commandEvent, upTime, usage, version, shards, systemInfo, links);
-    }
-
-    private boolean checkHelp(CommandEvent commandEvent) {
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-        return HelpUtil.getInstance().sendCommandHelp(this, commandEvent, commandExamples);
     }
 
     private String calculateUpTime() {

@@ -4,7 +4,7 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -40,7 +40,7 @@ public class DeleteNotif extends Command {
 
         final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

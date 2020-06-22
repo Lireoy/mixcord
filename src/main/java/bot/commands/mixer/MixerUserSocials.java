@@ -2,7 +2,8 @@ package bot.commands.mixer;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
-import bot.utils.HelpUtil;
+import bot.structures.MixcordCommand;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.jagrosh.jdautilities.command.Command;
@@ -19,7 +20,7 @@ import org.json.JSONObject;
  * Only available socials are displayed.
  */
 @Slf4j
-public class MixerUserSocials extends Command {
+public class MixerUserSocials extends MixcordCommand {
 
     public MixerUserSocials() {
         this.name = "MixerUserSocials";
@@ -27,6 +28,7 @@ public class MixerUserSocials extends Command {
         this.category = new Category(Locale.CATEGORIES.get("MIXER"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " shroud"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -36,14 +38,7 @@ public class MixerUserSocials extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
-
-        final boolean helpResponse = HelpUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
 
         final String streamerName = validateQueryParam(commandEvent);
         if (streamerName == null) return;

@@ -7,7 +7,7 @@ import bot.database.DatabaseDriver;
 import bot.services.ShardService;
 import bot.structures.Notification;
 import bot.structures.Streamer;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
@@ -52,7 +52,7 @@ public class Debug extends Command {
                 BotConstants.PREFIX + this.name + " 348110542667251712, 346474378466164736, shroud",
         };
 
-        boolean helpResponse = HelpUtil.getInstance()
+        boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 

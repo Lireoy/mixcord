@@ -5,7 +5,7 @@ import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.structures.Notification;
-import bot.utils.HelpUtil;
+import bot.utils.CommandUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
@@ -43,7 +43,7 @@ public class NotifMessageEdit extends Command {
         final String[] commandExamples = {BotConstants.PREFIX + this.name +
                 " shroud, Hey guys! shroud is streaming, and this is a new notification message!"};
 
-        final boolean helpResponse = HelpUtil.getInstance()
+        final boolean helpResponse = CommandUtil.getInstance()
                 .sendCommandHelp(this, commandEvent, commandExamples);
         if (helpResponse) return;
 
