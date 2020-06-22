@@ -224,10 +224,6 @@ public class Locale {
     public static final String NOTIF_END_MESSAGE_EDIT_COMMAND_NEW_MESSAGE = "New message:\n```%s```";
 
 
-
-
-
-
     public static final String DEBUG_COMMAND_HELP = "Helps retrieve information about a server which the bot is in.";
     public static final String DEBUG_COMMAND_NO_ARGUMENTS = "Please provide some arguments.";
     public static final String DEBUG_COMMAND_NO_SERVER_ID = "Empty serverId argument.";

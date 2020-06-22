@@ -2,22 +2,21 @@ package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
+import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
-public class RoleInfo extends Command {
+public class RoleInfo extends MixcordCommand {
 
     public RoleInfo() {
         this.name = "RoleInfo";
@@ -26,6 +25,7 @@ public class RoleInfo extends Command {
         this.arguments = "<role>";
         this.guildOnly = true;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " testers"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE};
@@ -33,14 +33,7 @@ public class RoleInfo extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " testers"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         if (commandEvent.getArgs().isEmpty()) {
             commandEvent.replyError(Locale.ROLE_INFO_COMMAND_NO_ROLE);

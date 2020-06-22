@@ -2,16 +2,15 @@ package bot.commands.owner;
 
 import bot.constants.BotConstants;
 import bot.constants.Locale;
+import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
 import bot.utils.StringUtil;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class GetServerShard extends Command {
+public class GetServerShard extends MixcordCommand {
 
     public GetServerShard() {
         this.name = "GetServerShard";
@@ -19,6 +18,7 @@ public class GetServerShard extends Command {
         this.arguments = "<server ID>, <total number of shards>";
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " 348110542667251712, 12"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -27,14 +27,7 @@ public class GetServerShard extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " 348110542667251712, 12"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
 

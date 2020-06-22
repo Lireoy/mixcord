@@ -37,7 +37,7 @@ public class MixerUser extends MixcordCommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String channelQuery = validateQueryParam(commandEvent);
         if (channelQuery == null) return;

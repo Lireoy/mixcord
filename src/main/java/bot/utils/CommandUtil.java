@@ -11,20 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 @Slf4j
 public class CommandUtil {
 
-    private static CommandUtil commandUtil;
-
-    private CommandUtil() {
-    }
-
-    public static CommandUtil getInstance() {
-        if (commandUtil == null) {
-            commandUtil = new CommandUtil();
-        }
-
-        return commandUtil;
-    }
-
-    private void logCommand(CommandEvent commandEvent) {
+    private static void logCommand(CommandEvent commandEvent) {
         final String guildId = commandEvent.getGuild().getId();
         final String channelId = commandEvent.getChannel().getId();
         final User commandAuthor = commandEvent.getAuthor();
@@ -32,7 +19,7 @@ public class CommandUtil {
         log.info("G:{} C:{} command ran by {} : {}", guildId, channelId, commandAuthor, message);
     }
 
-    public boolean checkHelp(final MixcordCommand cmd, final CommandEvent commandEvent) {
+    public static boolean checkHelp(final MixcordCommand cmd, final CommandEvent commandEvent) {
         logCommand(commandEvent);
 
         if (commandEvent.getArgs().equals("--help")) {
@@ -96,7 +83,7 @@ public class CommandUtil {
     }
 
     @Deprecated
-    public boolean sendCommandHelp(final Command cmd, final CommandEvent cmdEvent, final String[] cmdExamples) {
+    public static boolean sendCommandHelp(final Command cmd, final CommandEvent cmdEvent, final String[] cmdExamples) {
         if (cmdEvent.getArgs().equals("--help")) {
             EmbedBuilder embedBuilder = new MixerEmbedBuilder()
                     .setTitle(cmd.getName() + " command")

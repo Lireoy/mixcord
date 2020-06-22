@@ -3,23 +3,22 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.services.ShardService;
+import bot.structures.MixcordCommand;
 import bot.structures.enums.ServerFeatures;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
-public class ServerInfo extends Command {
+public class ServerInfo extends MixcordCommand {
 
     public ServerInfo() {
         this.name = "ServerInfo";
@@ -27,6 +26,9 @@ public class ServerInfo extends Command {
         this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = true;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{
+                BotConstants.PREFIX + this.name,
+                BotConstants.PREFIX + this.name + " 348110542667251712"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -35,16 +37,7 @@ public class ServerInfo extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {
-                BotConstants.PREFIX + this.name,
-                BotConstants.PREFIX + this.name + " 348110542667251712"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         Guild guild = commandEvent.getGuild();
         if (!commandEvent.getArgs().trim().isEmpty()) {

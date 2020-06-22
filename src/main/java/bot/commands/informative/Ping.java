@@ -7,7 +7,6 @@ import bot.utils.CommandUtil;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 import java.time.temporal.ChronoUnit;
 
@@ -35,7 +34,7 @@ public class Ping extends MixcordCommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
         respond(commandEvent);
     }
 

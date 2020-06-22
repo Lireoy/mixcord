@@ -3,17 +3,16 @@ package bot.commands.notifications;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
+import bot.structures.MixcordCommand;
 import bot.structures.Notification;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
 import com.google.gson.Gson;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
 /**
@@ -21,7 +20,7 @@ import org.json.JSONObject;
  * in a specific Discord channel with the already specified options.
  */
 @Slf4j
-public class NotifPreview extends Command {
+public class NotifPreview extends MixcordCommand {
 
     public NotifPreview() {
         this.name = "NotifPreview";
@@ -30,6 +29,7 @@ public class NotifPreview extends Command {
         this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>";
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " shroud"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -39,14 +39,7 @@ public class NotifPreview extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();

@@ -5,26 +5,25 @@ import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
 import bot.services.ShardService;
+import bot.structures.MixcordCommand;
 import bot.structures.Notification;
 import bot.structures.Streamer;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 @Slf4j
-public class Debug extends Command {
+public class Debug extends MixcordCommand {
 
     public Debug() {
         this.name = "Debug";
@@ -32,6 +31,14 @@ public class Debug extends Command {
         this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{
+                BotConstants.PREFIX + this.name + " <server ID>",
+                BotConstants.PREFIX + this.name + " 348110542667251712",
+                BotConstants.PREFIX + this.name + " <server ID>, <channel ID>",
+                BotConstants.PREFIX + this.name + " 348110542667251712, 346474378466164736",
+                BotConstants.PREFIX + this.name + " <server ID>, <channel ID>, <streamer name>",
+                BotConstants.PREFIX + this.name + " 348110542667251712, 346474378466164736, shroud",
+        };
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -40,21 +47,7 @@ public class Debug extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {
-                BotConstants.PREFIX + this.name + " <server ID>",
-                BotConstants.PREFIX + this.name + " 348110542667251712",
-                BotConstants.PREFIX + this.name + " <server ID>, <channel ID>",
-                BotConstants.PREFIX + this.name + " 348110542667251712, 346474378466164736",
-                BotConstants.PREFIX + this.name + " <server ID>, <channel ID>, <streamer name>",
-                BotConstants.PREFIX + this.name + " 348110542667251712, 346474378466164736, shroud",
-        };
-
-        boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.DEBUG_COMMAND_NO_ARGUMENTS);

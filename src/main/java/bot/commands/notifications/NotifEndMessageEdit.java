@@ -4,19 +4,18 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
+import bot.structures.MixcordCommand;
 import bot.structures.Notification;
 import bot.utils.CommandUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class NotifEndMessageEdit extends Command {
+public class NotifEndMessageEdit extends MixcordCommand {
 
     public NotifEndMessageEdit() {
         this.name = "NotifEndMessageEdit";
@@ -25,6 +24,8 @@ public class NotifEndMessageEdit extends Command {
         this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>, <new message>";
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name +
+                " shroud, shroud just finished streaming!"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -34,15 +35,7 @@ public class NotifEndMessageEdit extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name +
-                " shroud, shroud just finished streaming!"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();

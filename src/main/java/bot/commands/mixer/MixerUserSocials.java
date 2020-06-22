@@ -6,11 +6,9 @@ import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import bot.utils.MixerQuery;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -38,7 +36,7 @@ public class MixerUserSocials extends MixcordCommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String streamerName = validateQueryParam(commandEvent);
         if (streamerName == null) return;

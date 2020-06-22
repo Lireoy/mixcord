@@ -5,11 +5,9 @@ import bot.constants.Locale;
 import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 /**
  * Sends the bot's invite link to the user in a formatted embed.
@@ -32,7 +30,7 @@ public class Invite extends MixcordCommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
         final String finalDescription = generateDescription(commandEvent);
         respond(commandEvent, finalDescription);
     }

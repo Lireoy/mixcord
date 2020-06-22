@@ -29,7 +29,7 @@ public class WhoCanUseMe extends MixcordCommand {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (CommandUtil.getInstance().checkHelp(this, commandEvent)) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         List<Role> roleWithManageServer = new ArrayList<>();
         List<Role> roleToUse = new ArrayList<>();

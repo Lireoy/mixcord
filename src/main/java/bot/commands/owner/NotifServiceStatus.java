@@ -3,15 +3,14 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.services.NotifService;
+import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class NotifServiceStatus extends Command {
+public class NotifServiceStatus extends MixcordCommand {
 
     public NotifServiceStatus() {
         this.name = "NotifServiceStatus";
@@ -20,6 +19,7 @@ public class NotifServiceStatus extends Command {
         this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " shroud"};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -28,14 +28,7 @@ public class NotifServiceStatus extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud"};
-
-        boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         if (NotifService.getInstance().isRunning()) {
             commandEvent.reply(Locale.NOTIF_SERVICE_STATUS_COMMAND_RUNNING);

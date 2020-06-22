@@ -3,15 +3,14 @@ package bot.commands.owner;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.services.NotifierThread;
+import bot.structures.MixcordCommand;
 import bot.utils.CommandUtil;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class StopNotifService extends Command {
+public class StopNotifService extends MixcordCommand {
 
     public StopNotifService() {
         this.name = "StopNotifService";
@@ -19,6 +18,7 @@ public class StopNotifService extends Command {
         this.category = new Category(Locale.CATEGORIES.get("OWNER"));
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -28,14 +28,7 @@ public class StopNotifService extends Command {
     // This command stops the notifier service manually
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
         NotifierThread.getInstance().stop();
 
         commandEvent.reactSuccess();

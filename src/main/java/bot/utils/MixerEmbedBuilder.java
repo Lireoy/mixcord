@@ -124,7 +124,7 @@ public class MixerEmbedBuilder extends EmbedBuilder {
 
         String viewersCurrent = "0";
         if (mixerInfo.optInt("viewersCurrent") != 0)
-            viewersCurrent = String.format("%,d",mixerInfo.getInt("viewersCurrent"));
+            viewersCurrent = String.format("%,d", mixerInfo.getInt("viewersCurrent"));
 
         String description = "Playing %s for %s viewers.\n[Click Here to Watch](%s)";
         String finalDescription = String.format(description, currentGame, viewersCurrent, getChannelLink());

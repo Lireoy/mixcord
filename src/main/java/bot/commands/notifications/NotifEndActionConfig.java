@@ -3,6 +3,7 @@ package bot.commands.notifications;
 import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
+import bot.structures.MixcordCommand;
 import bot.structures.Notification;
 import bot.utils.CommandUtil;
 import bot.utils.StringUtil;
@@ -12,10 +13,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class NotifEndActionConfig extends Command {
+public class NotifEndActionConfig extends MixcordCommand {
 
     public NotifEndActionConfig() {
         this.name = "NotifEndActionConfig";
@@ -23,6 +23,7 @@ public class NotifEndActionConfig extends Command {
         this.category = new Command.Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.arguments = "<streamer name>, <end action number>";
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name + " shroud, 2"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -31,14 +32,7 @@ public class NotifEndActionConfig extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name + " shroud, 2"};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();

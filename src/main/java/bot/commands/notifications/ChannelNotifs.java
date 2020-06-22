@@ -4,22 +4,21 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.constants.MixerConstants;
 import bot.database.DatabaseDriver;
+import bot.structures.MixcordCommand;
 import bot.structures.Streamer;
 import bot.utils.CommandUtil;
 import bot.utils.MixerEmbedBuilder;
 import com.google.gson.Gson;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.User;
 
 /**
  * Lists all notifications already set up in a specific Discord channel.
  */
 @Slf4j
-public class ChannelNotifs extends Command {
+public class ChannelNotifs extends MixcordCommand {
 
     public ChannelNotifs() {
         this.name = "ChannelNotifs";
@@ -27,6 +26,7 @@ public class ChannelNotifs extends Command {
         this.help = Locale.CHANNEL_NOTIFS_COMMAND_HELP;
         this.category = new Category(Locale.CATEGORIES.get("NOTIFICATIONS"));
         this.guildOnly = true;
+        this.commandExamples = new String[]{BotConstants.PREFIX + this.name};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
@@ -35,14 +35,7 @@ public class ChannelNotifs extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {BotConstants.PREFIX + this.name};
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();

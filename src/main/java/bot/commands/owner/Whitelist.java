@@ -4,20 +4,19 @@ import bot.constants.BotConstants;
 import bot.constants.Locale;
 import bot.database.DatabaseDriver;
 import bot.services.ShardService;
+import bot.structures.MixcordCommand;
 import bot.structures.Server;
 import bot.utils.CommandUtil;
 import bot.utils.StringUtil;
 import com.google.gson.Gson;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 
 @Slf4j
-public class Whitelist extends Command {
+public class Whitelist extends MixcordCommand {
 
     public Whitelist() {
         this.name = "Whitelist";
@@ -26,6 +25,10 @@ public class Whitelist extends Command {
         this.arguments = "<server ID>, <true | false> || 'all'";
         this.guildOnly = false;
         this.ownerCommand = true;
+        this.commandExamples = new String[]{
+                BotConstants.PREFIX + this.name + " 637724317672669184, true",
+                BotConstants.PREFIX + this.name + " --all"
+        };
         this.botPermissions = new Permission[]{
                 Permission.MESSAGE_READ,
                 Permission.MESSAGE_WRITE,
@@ -34,17 +37,7 @@ public class Whitelist extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        final User commandAuthor = commandEvent.getAuthor();
-        log.info("Command ran by {}", commandAuthor);
-
-        final String[] commandExamples = {
-                BotConstants.PREFIX + this.name + " 637724317672669184, true",
-                BotConstants.PREFIX + this.name + " --all"
-        };
-
-        final boolean helpResponse = CommandUtil.getInstance()
-                .sendCommandHelp(this, commandEvent, commandExamples);
-        if (helpResponse) return;
+        if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.WHITELIST_COMMAND_NO_ARGUMENTS);
