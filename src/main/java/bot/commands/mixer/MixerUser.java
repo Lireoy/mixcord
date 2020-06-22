@@ -38,11 +38,9 @@ public class MixerUser extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String channelQuery = validateQueryParam(commandEvent);
-        if (channelQuery == null) return;
-
-        final JSONObject channel = validateMixerQuery(commandEvent, channelQuery);
+        final JSONObject channel = validateMixerQuery(commandEvent, commandEvent.getArgs().trim());
         if (channel == null) return;
 
         final int id = channel.getInt("id");
@@ -121,19 +119,17 @@ public class MixerUser extends MixcordCommand {
         respond(commandEvent, channel, liveThumbnail, avatarUrl, bio, streaming, trusted, status, followers, streamTitle, currentGame, language, targetAudience, viewersCurrent, liveStreamLink);
     }
 
-    @Nullable
-    private String validateQueryParam(CommandEvent commandEvent) {
-        final String query = commandEvent.getArgs().trim();
-        if (query.isEmpty()) {
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.MIXER_USER_COMMAND_NO_STREAMER_NAME);
-            return null;
+            return false;
         }
 
-        if (query.length() > 20) {
+        if (commandEvent.getArgs().trim().length() > 20) {
             commandEvent.reply(Locale.MIXER_USER_COMMAND_TOO_LONG_NAME);
-            return null;
+            return false;
         }
-        return query;
+        return true;
     }
 
     @Nullable

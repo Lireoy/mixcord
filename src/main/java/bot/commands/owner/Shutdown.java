@@ -37,7 +37,7 @@ public class Shutdown extends MixcordCommand {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
 
         User commandAuthor = commandEvent.getAuthor();
-        final String reason = commandEvent.getArgs();
+        final String reason = commandEvent.getArgs().trim();
         if (reason.isEmpty()) {
             log.info("{} attempted to shutdown the bot, but failed because there was no reason provided.", commandAuthor);
             commandEvent.reply(Locale.SHUTDOWN_COMMAND_NO_REASON);

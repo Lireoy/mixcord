@@ -37,9 +37,9 @@ public class ChannelNotifs extends MixcordCommand {
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
 
-        final String serverId = commandEvent.getMessage().getGuild().getId();
-        final String channelId = commandEvent.getMessage().getChannel().getId();
-        final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(serverId, channelId);
+        final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(
+                commandEvent.getMessage().getGuild().getId(),
+                commandEvent.getMessage().getChannel().getId());
 
         if (!cursor.hasNext()) {
             commandEvent.reactError();

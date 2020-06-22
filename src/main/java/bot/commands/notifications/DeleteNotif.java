@@ -37,27 +37,23 @@ public class DeleteNotif extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String query = validateQueryParam(commandEvent);
-        if (query == null) return;
-
-        handleDeletion(commandEvent, query);
+        handleDeletion(commandEvent, commandEvent.getArgs().trim());
         respond(commandEvent);
     }
 
-    @Nullable
-    private String validateQueryParam(CommandEvent commandEvent) {
-        final String query = commandEvent.getArgs().trim();
-        if (query.isEmpty()) {
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_STREAMER_NAME);
-            return null;
+            return false;
         }
 
-        if (query.length() > 20) {
+        if (commandEvent.getArgs().trim().length() > 20) {
             commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_TOO_LONG_NAME);
-            return null;
+            return false;
         }
-        return query;
+        return true;
     }
 
     private void handleDeletion(CommandEvent commandEvent, String query) {

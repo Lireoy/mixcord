@@ -22,7 +22,7 @@ public class CommandUtil {
     public static boolean checkHelp(final MixcordCommand cmd, final CommandEvent commandEvent) {
         logCommand(commandEvent);
 
-        if (commandEvent.getArgs().equals("--help")) {
+        if (commandEvent.getArgs().trim().equals("--help")) {
             EmbedBuilder embedBuilder = new MixerEmbedBuilder()
                     .setTitle(cmd.getName() + " command")
                     .addField("Category", cmd.getCategory().getName(), false)

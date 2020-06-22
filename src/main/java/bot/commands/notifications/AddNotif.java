@@ -42,17 +42,11 @@ public class AddNotif extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String serverId = commandEvent.getMessage().getGuild().getId();
-        final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String query = commandEvent.getArgs().trim();
+        if (checkAvailableNotificationSlots(commandEvent, commandEvent.getMessage().getGuild().getId())) return;
 
-        final String channelQuery = validateQueryParam(commandEvent);
-        if (channelQuery == null) return;
-
-        if (checkAvailableNotificationSlots(commandEvent, serverId)) return;
-
-        final JSONObject channel = validateMixerQuery(commandEvent, query);
+        final JSONObject channel = validateMixerQuery(commandEvent, commandEvent.getArgs().trim());
         if (channel == null) return;
 
         final String streamerId = String.valueOf(channel.getInt("userId"));
@@ -67,25 +61,26 @@ public class AddNotif extends MixcordCommand {
         if (DatabaseDriver.getInstance().addStreamer(streamerName, streamerId)) {
             log.info("New streamer detected, added to database...");
         }
-        final boolean response = DatabaseDriver.getInstance().addNotif(serverId, channelId, streamerName, streamerId);
+        final boolean response = DatabaseDriver.getInstance().addNotif(
+                commandEvent.getMessage().getGuild().getId(),
+                commandEvent.getMessage().getChannel().getId(),
+                streamerName,
+                streamerId);
 
         respond(commandEvent, streamerName, response);
     }
 
-
-    @Nullable
-    private String validateQueryParam(CommandEvent commandEvent) {
-        final String query = commandEvent.getArgs().trim();
-        if (query.isEmpty()) {
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.ADD_NOTIF_COMMAND_NO_STREAMER_NAME);
-            return null;
+            return false;
         }
 
-        if (query.length() > 20) {
+        if (commandEvent.getArgs().trim().length() > 20) {
             commandEvent.reply(Locale.ADD_NOTIF_COMMAND_TOO_LONG_NAME);
-            return null;
+            return false;
         }
-        return query;
+        return true;
     }
 
     @Nullable

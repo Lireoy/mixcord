@@ -37,11 +37,9 @@ public class MixerUserSocials extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String streamerName = validateQueryParam(commandEvent);
-        if (streamerName == null) return;
-
-        final JSONObject channel = validateMixerQuery(commandEvent, streamerName);
+        final JSONObject channel = validateMixerQuery(commandEvent, commandEvent.getArgs().trim());
         if (channel == null) return;
 
         final JSONObject socials = channel.getJSONObject("user").optJSONObject("social");
@@ -50,20 +48,17 @@ public class MixerUserSocials extends MixcordCommand {
         respond(commandEvent, channel, description);
     }
 
-    @Nullable
-    private String validateQueryParam(CommandEvent commandEvent) {
-        final String streamerName = commandEvent.getArgs().trim();
-
-        if (streamerName.isEmpty()) {
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_NO_STREAMER_NAME);
-            return null;
+            return false;
         }
 
-        if (streamerName.length() > 20) {
+        if (commandEvent.getArgs().trim().length() > 20) {
             commandEvent.reply(Locale.MIXER_USER_SOCIALS_COMMAND_TOO_LONG_NAME);
-            return null;
+            return false;
         }
-        return streamerName;
+        return true;
     }
 
     @Nullable

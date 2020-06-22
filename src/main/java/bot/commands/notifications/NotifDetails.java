@@ -36,7 +36,7 @@ public class NotifDetails extends MixcordCommand {
 
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String username = commandEvent.getArgs();
+        final String username = commandEvent.getArgs().trim();
 
         // Empty args check
         if (username.isEmpty()) {

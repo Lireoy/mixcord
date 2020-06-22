@@ -35,12 +35,12 @@ public class RoleInfo extends MixcordCommand {
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
 
-        if (commandEvent.getArgs().isEmpty()) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
             commandEvent.replyError(Locale.ROLE_INFO_COMMAND_NO_ROLE);
             return;
         }
 
-        final List<Role> found = FinderUtil.findRoles(commandEvent.getArgs(), commandEvent.getGuild());
+        final List<Role> found = FinderUtil.findRoles(commandEvent.getArgs().trim(), commandEvent.getGuild());
         if (found.isEmpty()) {
             commandEvent.replyError(Locale.ROLE_INFO_COMMAND_NO_SUCH_ROLE);
             return;
@@ -51,7 +51,7 @@ public class RoleInfo extends MixcordCommand {
             reply.append(
                     String.format(
                             Locale.ROLE_INFO_COMMAND_MULTIPLE_ROLES_FOUND,
-                            commandEvent.getArgs()));
+                            commandEvent.getArgs().trim()));
 
             for (Role item : found) {
                 reply.append(

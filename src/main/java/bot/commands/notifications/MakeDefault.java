@@ -35,22 +35,13 @@ public class MakeDefault extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String serverId = commandEvent.getMessage().getGuild().getId();
-        final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String streamerName = commandEvent.getArgs().trim();
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(
+                commandEvent.getMessage().getGuild().getId(),
+                commandEvent.getMessage().getChannel().getId(),
+                commandEvent.getArgs().trim());
 
-        if (streamerName.isEmpty()) {
-            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_STREAMER_NAME);
-            return;
-        }
-
-        if (streamerName.length() > 20) {
-            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_TOO_LONG_NAME);
-            return;
-        }
-
-        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
         if (!cursor.hasNext()) {
             commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_SUCH_NOTIFICATION);
             return;
@@ -60,10 +51,24 @@ public class MakeDefault extends MixcordCommand {
         DatabaseDriver.getInstance().resetNotification(notif.getId(), notif.getStreamerName());
         cursor.close();
 
-        commandEvent.reply(
-                String.format(
-                        Locale.MAKE_DEFAULT_COMMAND_SUCCESSFUL,
-                        notif.getStreamerName()));
+        repsond(commandEvent, notif.getStreamerName());
+    }
+
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_STREAMER_NAME);
+            return false;
+        }
+
+        if (commandEvent.getArgs().trim().length() > 20) {
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_TOO_LONG_NAME);
+            return false;
+        }
+        return true;
+    }
+
+    private void repsond(CommandEvent commandEvent, String streamerName) {
+        commandEvent.reply(String.format(Locale.MAKE_DEFAULT_COMMAND_SUCCESSFUL, streamerName));
     }
 }
 
