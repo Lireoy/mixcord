@@ -41,14 +41,21 @@ public class ChannelNotifs extends MixcordCommand {
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(serverId, channelId);
 
-        StringBuilder description = new StringBuilder();
-        int notifCount = 0;
-
         if (!cursor.hasNext()) {
             commandEvent.reactError();
             commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_NO_NOTIFICATIONS);
             return;
         }
+
+        StringBuilder description = generateDescription(cursor);
+        cursor.close();
+
+        respond(commandEvent, description);
+    }
+
+    private StringBuilder generateDescription(Cursor cursor) {
+        StringBuilder description = new StringBuilder();
+        int notifCount = 0;
 
         for (Object doc : cursor) {
             Streamer streamer = new Gson().fromJson(doc.toString(), Streamer.class);
@@ -63,25 +70,13 @@ public class ChannelNotifs extends MixcordCommand {
                 description.append("\n");
             }
         }
-        cursor.close();
+        return description;
+    }
 
-        if (notifCount == 1) {
-            commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_ONLY_ONE);
-            commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle(Locale.CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE)
-                    .setDescription(description)
-                    .build());
-        }
-
-        if (notifCount > 1) {
-            commandEvent.reply(
-                    String.format(
-                            Locale.CHANNEL_NOTIFS_COMMAND_N_AMOUNT,
-                            notifCount));
-            commandEvent.reply(new MixerEmbedBuilder()
-                    .setTitle(Locale.CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE)
-                    .setDescription(description)
-                    .build());
-        }
+    private void respond(CommandEvent commandEvent, StringBuilder description) {
+        commandEvent.reply(new MixerEmbedBuilder()
+                .setTitle(Locale.CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE)
+                .setDescription(description)
+                .build());
     }
 }

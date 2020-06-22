@@ -11,6 +11,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.rethinkdb.net.Cursor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Deletes a specific notification entry from the database.
@@ -37,23 +38,34 @@ public class DeleteNotif extends MixcordCommand {
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
 
+        final String query = validateQueryParam(commandEvent);
+        if (query == null) return;
+
+        handleDeletion(commandEvent, query);
+        respond(commandEvent);
+    }
+
+    @Nullable
+    private String validateQueryParam(CommandEvent commandEvent) {
+        final String query = commandEvent.getArgs().trim();
+        if (query.isEmpty()) {
+            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_STREAMER_NAME);
+            return null;
+        }
+
+        if (query.length() > 20) {
+            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_TOO_LONG_NAME);
+            return null;
+        }
+        return query;
+    }
+
+    private void handleDeletion(CommandEvent commandEvent, String query) {
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String username = commandEvent.getArgs().trim();
-
-        // Empty args check
-        if (username.isEmpty()) {
-            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_STREAMER_NAME);
-            return;
-        }
-
-        if (username.length() > 20) {
-            commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_TOO_LONG_NAME);
-            return;
-        }
-
         final Cursor notificationCursor = DatabaseDriver.getInstance()
-                .selectOneNotification(serverId, channelId, username);
+                .selectOneNotification(serverId, channelId, query);
+
         if (!notificationCursor.hasNext()) {
             commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_NO_SUCH_NOTIFICATION);
             return;
@@ -65,8 +77,6 @@ public class DeleteNotif extends MixcordCommand {
         DatabaseDriver.getInstance().deleteNotif(notif.getId());
         log.info("Deleted the notification in G:{} C:{} for {} ({})",
                 notif.getServerId(), notif.getChannelId(), notif.getStreamerName(), notif.getStreamerId());
-        commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_SUCCESSFUL);
-        commandEvent.reactSuccess();
 
         Cursor cursor = DatabaseDriver.getInstance().selectStreamerNotifs(notif.getStreamerId());
         if (!cursor.hasNext()) {
@@ -78,5 +88,10 @@ public class DeleteNotif extends MixcordCommand {
             }
         }
         cursor.close();
+    }
+
+    private void respond(CommandEvent commandEvent) {
+        commandEvent.reply(Locale.DELETE_NOTIF_COMMAND_SUCCESSFUL);
+        commandEvent.reactSuccess();
     }
 }

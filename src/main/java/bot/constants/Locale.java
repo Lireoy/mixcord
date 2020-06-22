@@ -114,8 +114,6 @@ public class Locale {
     public static final String CHANNEL_NOTIFS_COMMAND_HELP = "Lists all available notifications for this channel.";
     public static final String CHANNEL_NOTIFS_COMMAND_NO_NOTIFICATIONS = "There are no notifications in this channel";
     public static final String CHANNEL_NOTIFS_COMMAND_LINE = "· [%s](%s%s)\n";
-    public static final String CHANNEL_NOTIFS_COMMAND_ONLY_ONE = "There's only 1 notification in this channel.";
-    public static final String CHANNEL_NOTIFS_COMMAND_N_AMOUNT = "There's a total of %s notifications in this channel.";
     public static final String CHANNEL_NOTIFS_COMMAND_CHANNEL_NOTIFS_TITLE = "Channel Notifications";
 
     // SERVER NOTIFS
