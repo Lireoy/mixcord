@@ -33,22 +33,17 @@ public class NotifDetails extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
+        if (!isValidQueryParam(commandEvent)) return;
 
-        final String serverId = commandEvent.getMessage().getGuild().getId();
-        final String channelId = commandEvent.getMessage().getChannel().getId();
-        final String username = commandEvent.getArgs().trim();
+        generateNotifDetails(commandEvent);
+    }
 
-        // Empty args check
-        if (username.isEmpty()) {
-            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_NO_STREAMER_NAME);
-        }
+    private void generateNotifDetails(CommandEvent commandEvent) {
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(
+                commandEvent.getGuild().getId(),
+                commandEvent.getChannel().getId(),
+                commandEvent.getArgs().trim());
 
-        if (username.length() > 20) {
-            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_TOO_LONG_NAME);
-            return;
-        }
-
-        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, username);
         if (!cursor.hasNext()) {
             commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_NO_SUCH_NOTIFICATION);
             return;
@@ -56,7 +51,23 @@ public class NotifDetails extends MixcordCommand {
 
         final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
+        respond(commandEvent, notif);
+    }
 
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
+            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_NO_STREAMER_NAME);
+            return false;
+        }
+
+        if (commandEvent.getArgs().trim().length() > 20) {
+            commandEvent.reply(Locale.NOTIF_DETAILS_COMMAND_TOO_LONG_NAME);
+            return false;
+        }
+        return true;
+    }
+
+    private void respond(CommandEvent commandEvent, Notification notif) {
         commandEvent.reply(new MixerEmbedBuilder()
                 .setTitle(Locale.NOTIF_DETAILS_COMMAND_NOTIFICATION_DETAILS_TITLE)
                 .setColor(HexUtil.getInstance().formatForEmbed(notif.getEmbedColor()))

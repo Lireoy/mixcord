@@ -40,7 +40,6 @@ public class DeleteNotif extends MixcordCommand {
         if (!isValidQueryParam(commandEvent)) return;
 
         handleDeletion(commandEvent, commandEvent.getArgs().trim());
-        respond(commandEvent);
     }
 
     private boolean isValidQueryParam(CommandEvent commandEvent) {
@@ -84,6 +83,8 @@ public class DeleteNotif extends MixcordCommand {
             }
         }
         cursor.close();
+
+        respond(commandEvent);
     }
 
     private void respond(CommandEvent commandEvent) {

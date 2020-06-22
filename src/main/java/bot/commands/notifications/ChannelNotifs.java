@@ -36,21 +36,7 @@ public class ChannelNotifs extends MixcordCommand {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
-
-        final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(
-                commandEvent.getMessage().getGuild().getId(),
-                commandEvent.getMessage().getChannel().getId());
-
-        if (!cursor.hasNext()) {
-            commandEvent.reactError();
-            commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_NO_NOTIFICATIONS);
-            return;
-        }
-
-        StringBuilder description = generateDescription(cursor);
-        cursor.close();
-
-        respond(commandEvent, description);
+        handleListingNotifications(commandEvent);
     }
 
     private StringBuilder generateDescription(Cursor cursor) {
@@ -71,6 +57,23 @@ public class ChannelNotifs extends MixcordCommand {
             }
         }
         return description;
+    }
+
+    private void handleListingNotifications(CommandEvent commandEvent) {
+        final Cursor cursor = DatabaseDriver.getInstance().selectChannelNotifs(
+                commandEvent.getMessage().getGuild().getId(),
+                commandEvent.getMessage().getChannel().getId());
+
+        if (!cursor.hasNext()) {
+            commandEvent.reactError();
+            commandEvent.reply(Locale.CHANNEL_NOTIFS_COMMAND_NO_NOTIFICATIONS);
+            return;
+        }
+
+        StringBuilder description = generateDescription(cursor);
+        cursor.close();
+
+        respond(commandEvent, description);
     }
 
     private void respond(CommandEvent commandEvent, StringBuilder description) {

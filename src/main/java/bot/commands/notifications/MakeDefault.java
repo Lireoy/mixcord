@@ -37,6 +37,23 @@ public class MakeDefault extends MixcordCommand {
         if (CommandUtil.checkHelp(this, commandEvent)) return;
         if (!isValidQueryParam(commandEvent)) return;
 
+        handleMakeDefault(commandEvent);
+    }
+
+    private boolean isValidQueryParam(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().trim().isEmpty()) {
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_STREAMER_NAME);
+            return false;
+        }
+
+        if (commandEvent.getArgs().trim().length() > 20) {
+            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_TOO_LONG_NAME);
+            return false;
+        }
+        return true;
+    }
+
+    private void handleMakeDefault(CommandEvent commandEvent) {
         final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(
                 commandEvent.getMessage().getGuild().getId(),
                 commandEvent.getMessage().getChannel().getId(),
@@ -52,19 +69,6 @@ public class MakeDefault extends MixcordCommand {
         cursor.close();
 
         repsond(commandEvent, notif.getStreamerName());
-    }
-
-    private boolean isValidQueryParam(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().trim().isEmpty()) {
-            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_NO_STREAMER_NAME);
-            return false;
-        }
-
-        if (commandEvent.getArgs().trim().length() > 20) {
-            commandEvent.reply(Locale.MAKE_DEFAULT_COMMAND_TOO_LONG_NAME);
-            return false;
-        }
-        return true;
     }
 
     private void repsond(CommandEvent commandEvent, String streamerName) {

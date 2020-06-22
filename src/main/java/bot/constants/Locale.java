@@ -171,7 +171,7 @@ public class Locale {
 
     // NOTIF COLOR EDIT COMMAND
     public static final String NOTIF_COLOR_EDIT_COMMAND_HELP = "Edits the notification's embed color.";
-    public static final String NOTIF_COLOR_EDIT_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration. %s";
+    public static final String NOTIF_COLOR_EDIT_COMMAND_NO_FULL_CONFIG = "Please provide a full configuration.\nExample: `%s`";
     public static final String NOTIF_COLOR_EDIT_COMMAND_NO_STREAMER_NAME = "Please provide a streamer name!";
     public static final String NOTIF_COLOR_EDIT_COMMAND_TOO_LONG_NAME = "This name is too long! Please provide a shorter one!";
     public static final String NOTIF_COLOR_EDIT_COMMAND_INVALID_HEX = "Please provide a valid hex color.";

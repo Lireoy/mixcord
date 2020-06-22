@@ -41,40 +41,55 @@ public class NotifColorEdit extends MixcordCommand {
         final String serverId = commandEvent.getMessage().getGuild().getId();
         final String channelId = commandEvent.getMessage().getChannel().getId();
         final String[] args = StringUtil.separateArgs(commandEvent.getArgs(), 2);
-        final String example = "\nExample: `" + BotConstants.PREFIX + this.name + " shroud, 32a852`";
 
-        if (args.length < 2) {
-            commandEvent.reply(
-                    String.format(
-                            Locale.NOTIF_COLOR_EDIT_COMMAND_NO_FULL_CONFIG,
-                            example));
-            return;
-        }
+        if (!isValidCommand(commandEvent, args)) return;
 
-        String streamerName = args[0].trim();
+        String query = args[0].trim();
         String newColor = args[1].trim();
+        if (!isValidQueryParam(commandEvent, query)) return;
+        if (!isValidColor(commandEvent, newColor)) return;
 
-        if (streamerName.isEmpty()) {
+        handleColorUpdate(commandEvent, args);
+    }
+
+    private boolean isValidCommand(CommandEvent commandEvent, String[] args) {
+        if (args.length != 2) {
+            commandEvent.reply(String.format(Locale.NOTIF_COLOR_EDIT_COMMAND_NO_FULL_CONFIG, commandExamples[0]));
+        }
+        return true;
+    }
+
+    private boolean isValidQueryParam(CommandEvent commandEvent, String query) {
+        if (query.isEmpty()) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_NO_STREAMER_NAME);
-            return;
+            return false;
         }
 
-        if (streamerName.length() > 20) {
+        if (query.length() > 20) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_TOO_LONG_NAME);
-            return;
+            return false;
         }
+        return true;
+    }
 
+    private boolean isValidColor(CommandEvent commandEvent, String newColor) {
         if (newColor.isEmpty()) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_INVALID_HEX);
-            return;
+            return false;
         }
 
         if (!HexUtil.getInstance().validateHex(newColor.trim())) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_INVALID_HEX);
-            return;
+            return false;
         }
+        return true;
+    }
 
-        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(serverId, channelId, streamerName);
+    private void handleColorUpdate(CommandEvent commandEvent, String[] args) {
+        final Cursor cursor = DatabaseDriver.getInstance().selectOneNotification(
+                commandEvent.getGuild().getId(),
+                commandEvent.getChannel().getId(),
+                args[0].trim());
         if (!cursor.hasNext()) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_NO_NOTIFICATIONS);
             return;
@@ -83,7 +98,7 @@ public class NotifColorEdit extends MixcordCommand {
         final Notification notif = new Gson().fromJson(cursor.next().toString(), Notification.class);
         cursor.close();
 
-        newColor = HexUtil.getInstance().formatHex(newColor).trim();
+        String newColor = HexUtil.getInstance().formatHex(args[1].trim()).trim();
         if (notif.getEmbedColor().equals(newColor)) {
             commandEvent.reply(Locale.NOTIF_COLOR_EDIT_COMMAND_SAME_COLOR);
             return;
@@ -91,17 +106,21 @@ public class NotifColorEdit extends MixcordCommand {
 
         DatabaseDriver.getInstance().updateColor(notif.getId(), newColor);
 
-        String response = "";
-        response += String.format(
-                Locale.NOTIF_COLOR_EDIT_COMMAND_SUCCESSFUL,
-                notif.getStreamerName());
-        response += String.format(
-                Locale.NOTIF_COLOR_EDIT_COMMAND_OLD_COLOR,
-                notif.getEmbedColor());
-        response += String.format(
-                Locale.NOTIF_COLOR_EDIT_COMMAND_NEW_COLOR,
-                newColor);
+        respond(commandEvent, newColor, notif);
+    }
 
-        commandEvent.reply(response);
+    private void respond(CommandEvent commandEvent, String newColor, Notification notif) {
+        StringBuilder response = new StringBuilder()
+                .append(String.format(
+                        Locale.NOTIF_COLOR_EDIT_COMMAND_SUCCESSFUL,
+                        notif.getStreamerName()))
+                .append(String.format(
+                        Locale.NOTIF_COLOR_EDIT_COMMAND_OLD_COLOR,
+                        notif.getEmbedColor()))
+                .append(String.format(
+                        Locale.NOTIF_COLOR_EDIT_COMMAND_NEW_COLOR,
+                        newColor));
+
+        commandEvent.reply(response.toString());
     }
 }

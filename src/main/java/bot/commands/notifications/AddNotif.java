@@ -49,25 +49,7 @@ public class AddNotif extends MixcordCommand {
         final JSONObject channel = validateMixerQuery(commandEvent, commandEvent.getArgs().trim());
         if (channel == null) return;
 
-        final String streamerId = String.valueOf(channel.getInt("userId"));
-        final String streamerName = channel.getString("token");
-
-        if (streamerName.isEmpty() || streamerId.isEmpty()) {
-            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_EMPTY_STREAMER);
-            log.info("Streamer name or ID was empty.");
-            return;
-        }
-
-        if (DatabaseDriver.getInstance().addStreamer(streamerName, streamerId)) {
-            log.info("New streamer detected, added to database...");
-        }
-        final boolean response = DatabaseDriver.getInstance().addNotif(
-                commandEvent.getMessage().getGuild().getId(),
-                commandEvent.getMessage().getChannel().getId(),
-                streamerName,
-                streamerId);
-
-        respond(commandEvent, streamerName, response);
+        handleAddition(commandEvent, channel);
     }
 
     private boolean isValidQueryParam(CommandEvent commandEvent) {
@@ -121,6 +103,28 @@ public class AddNotif extends MixcordCommand {
             }
         }
         return false;
+    }
+
+    private void handleAddition(CommandEvent commandEvent, JSONObject channel) {
+        final String streamerId = String.valueOf(channel.getInt("userId"));
+        final String streamerName = channel.getString("token");
+
+        if (streamerName.isEmpty() || streamerId.isEmpty()) {
+            commandEvent.reply(Locale.ADD_NOTIF_COMMAND_EMPTY_STREAMER);
+            log.info("Streamer name or ID was empty.");
+            return;
+        }
+
+        if (DatabaseDriver.getInstance().addStreamer(streamerName, streamerId)) {
+            log.info("New streamer detected, added to database...");
+        }
+        final boolean response = DatabaseDriver.getInstance().addNotif(
+                commandEvent.getMessage().getGuild().getId(),
+                commandEvent.getMessage().getChannel().getId(),
+                streamerName,
+                streamerId);
+
+        respond(commandEvent, streamerName, response);
     }
 
     private void respond(CommandEvent commandEvent, String streamerName, boolean response) {
